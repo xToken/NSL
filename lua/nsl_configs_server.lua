@@ -154,8 +154,7 @@ local Configs = { }
 
 local function OnConfigResponse(response)
 	if response then
-		local responsetable, _, errStr = json.decode(response)
-		Shared.Message(ToString(errStr))
+		local responsetable = json.decode(response)
 		if responsetable == nil or responsetable.Version == nil then
 			// RIP
 			//Retry?

@@ -36,12 +36,12 @@ function GetNSLUserData(ns2id)
 	if NSL_ClientData[ns2id] == nil then
 		//Check manually specified player data table from configs
 		local cPlayerData = GetNSLConfigValue("PLAYERDATA")
-		Shared.Message(ToString(#cPlayerData))
-		for i = 1, #cPlayerData do
-			Shared.Message(ToString(cPlayerData[i]))
-		end
-		if cPlayerData ~= nil and cPlayerData[ns2id] ~= nil then
-			return cPlayerData[ns2id]
+		for id, data in pairs(cPlayerData) do
+			Shared.Message(ToString(data))
+			Shared.Message(ToString(id))
+			if id == ns2id then
+				return data
+			end
 		end
 	else
 		return NSL_ClientData[ns2id]
@@ -178,7 +178,7 @@ local function OnClientConnected(client)
 			if QueryURL then
 				//PlayerDataFormat
 				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
-				//steamId = "0:0:25291317"// Seb
+				steamId = "0:0:25291317"// Seb
 				//steamId = "0:1:144758"// Grissi
 				NSL_NS2IDLookup[steamId] = NS2ID
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then

@@ -41,14 +41,14 @@
 												],
 		"PLAYERDATA":							{
 												"999999999999": { 
-																"NSL_Team": "ThisIsAnExample", 
-																"NICK": "TestUser", 
-																"S_ID": "0:1:12345678910" 
+																"NSL_Team": "ThisIsAnExample",
+																"NICK": "TestUser",
+																"S_ID": "0:1:12345678910"
 																},
 												"5176141": 		{ 
-																"NSL_Team": "ThisIsAnExample", 
-																"NICK": "TestUser", 
-																"S_ID": "0:1:12345678910" 
+																"NSL_Team": "ThisIsAnExample",
+																"NICK": "TestUser",
+																"S_ID": "0:1:5176141" 
 																}
 												}
 		},
@@ -93,7 +93,7 @@
 												"5176141": 		{ 
 																"NSL_Team": "ThisIsAnExample", 
 																"NICK": "TestUser", 
-																"S_ID": "0:1:12345678910" 
+																"S_ID": "0:1:5176141" 
 																}
 												}
 		}
