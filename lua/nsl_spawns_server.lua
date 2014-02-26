@@ -64,7 +64,7 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 		if not kLoadedSpawnFile then
 			LoadCustomTechPointData()
 		end
-		if gCustomTechPoints == nil then
+		if gCustomTechPoints == nil or not GetNSLModEnabled() then
 			techPoint = originalNS2GRGetChooseTechPoint(self, techPoints, teamNumber)
 		else
 			if teamNumber == kTeam1Index then

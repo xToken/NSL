@@ -18,7 +18,7 @@ local function UnstuckCallback(self)
 	local ns2id = client:GetUserId()
 	local origin = Vector(UnstuckOriginTracker[ns2id])
 	if not self:GetIsAlive() or (HasMixin(self, "Stun") and self:GetIsStunned()) or (origin - self:GetOrigin()):GetLength() > 0.1 or self:isa("Embryo") then
-		SendClientMessage(client, GetNSLMessages().UnstuckCancelled)
+		SendClientMessage(client, GetNSLMessage("UnstuckCancelled"))
 		UnstuckRetryTracker[ns2id] = 0
 		return false
 	end
@@ -34,7 +34,7 @@ local function UnstuckCallback(self)
 		LastUnstuckTracker[ns2id] = Shared.GetTime()
 		UnstuckOriginTracker[ns2id] = nil
 		UnstuckRetryTracker[ns2id] = 0
-		SendClientMessage(client, GetNSLMessages().Unstuck)
+		SendClientMessage(client, GetNSLMessage("Unstuck"))
 		return false
 	else
 		if UnstuckRetryTracker[ns2id] < kMaxUnstuckAttemps then
@@ -45,7 +45,7 @@ local function UnstuckCallback(self)
 		else
 			UnstuckOriginTracker[ns2id] = nil
 			LastUnstuckTracker[ns2id] = 0
-			SendClientMessage(client, string.format("Unstuck Failed after %s attempts.", UnstuckRetryTracker[ns2id]))
+			SendClientMessage(client, string.format(GetNSLMessage("UnstuckFailed"), UnstuckRetryTracker[ns2id]))
 			UnstuckRetryTracker[ns2id] = 0
 			return false
 		end
@@ -67,9 +67,9 @@ local function RegisterClientStuck(client)
 			LastUnstuckTracker[ns2id] = Shared.GetTime()
 			UnstuckRetryTracker[ns2id] = 0
 			player:AddTimedCallback(UnstuckIntialCallback, unstucktime)
-			SendClientMessage(client, string.format(GetNSLMessages().UnstuckIn, unstucktime))
+			SendClientMessage(client, string.format(GetNSLMessage("UnstuckIn"), unstucktime))
 		else
-			SendClientMessage(client, string.format(GetNSLMessages().UnstuckRecently, (LastUnstuckTracker[ns2id] + kUnstuckRate) - Shared.GetTime()))
+			SendClientMessage(client, string.format(GetNSLMessage("UnstuckRecently"), (LastUnstuckTracker[ns2id] + kUnstuckRate) - Shared.GetTime()))
 		end
 	end
 end

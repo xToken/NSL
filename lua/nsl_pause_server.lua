@@ -224,13 +224,11 @@ local function ResumeEntStates()
 	//Resume the annoying noise
 	local Obs = Shared.GetEntitiesWithClassname("Observatory")
 	for _, Ob in ientitylist(Obs) do
-		if Ob.distressBeaconTime ~= nil then
-			Ob.distressBeaconSoundMarine:Start()
-			Ob.distressBeaconSoundAlien:Start()
+		if Ob.distressBeaconTime ~= nil and Ob.distressBeaconSound ~= nil then
+			Ob.distressBeaconSound:Start()
 			
 			local origin = Ob:GetDistressOrigin()
-			Ob.distressBeaconSoundMarine:SetOrigin(origin)
-			Ob.distressBeaconSoundAlien:SetOrigin(origin)
+			Ob.distressBeaconSound:SetOrigin(origin)
 		end
 	end
 	
@@ -258,9 +256,8 @@ local function SaveEntStates()
 	//Stop the bacon from spammmming.
 	local Obs = Shared.GetEntitiesWithClassname("Observatory")
 	for _, Ob in ientitylist(Obs) do
-		if Ob.distressBeaconTime ~= nil then
-			Ob.distressBeaconSoundMarine:Stop()
-			Ob.distressBeaconSoundAlien:Stop()
+		if Ob.distressBeaconTime ~= nil and Ob.distressBeaconSound ~= nil then
+			Ob.distressBeaconSound:Stop()
 			//Dont wanna listen to that noise over and over and over and over and over ..
 		end
 	end
@@ -287,7 +284,9 @@ local function SaveEntStates()
 	
 	local Ents = Shared.GetEntitiesWithClassname("Entity")
 	for _, ent in ientitylist(Ents) do
-		ent:SetUpdates(false)
+		if not ent:isa("PlayerInfoEntity") then
+			ent:SetUpdates(false)
+		end
 	end
 end
 
@@ -299,34 +298,35 @@ local function UpdateMoveState(deltatime)
 			//Going to check and reblock player movement every second or so - trying every frame, might as well.
 			gSharedGetTimeAdjustments = gSharedGetTimeAdjustments + deltatime
 			gamestate.gamepausedmessagetime = (gamestate.gamepausedmessagetime + deltatime)
-			if gamestate.gamepausedmessagetime > GetNSLConfig().kPausedReadyNotificationDelay and gamestate.gamepausedcountdown == 0 then
+			if gamestate.gamepausedmessagetime > GetNSLConfigValue("PausedReadyNotificationDelay") and gamestate.gamepausedcountdown == 0 then
 				if gamestate.team2resume and not gamestate.team1resume then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseTeamReadyPeriodicMessage, GetActualTeamName(2), GetActualTeamName(1)))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyPeriodicMessage"), GetActualTeamName(2), GetActualTeamName(1)))
 				elseif gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseTeamReadyPeriodicMessage, GetActualTeamName(1), GetActualTeamName(2)))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyPeriodicMessage"), GetActualTeamName(1), GetActualTeamName(2)))
 				elseif not gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(GetNSLMessages().PauseNoTeamReadyMessage)
+					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
 				end
-				if GetNSLConfig().kPausedMaxDuration ~= 0 then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseResumeWarningMessage, ((GetNSLConfig().kPausedMaxDuration - gamestate.gamepauseddelta))))
+				if GetNSLConfigValue("PausedMaxDuration") ~= 0 then
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeWarningMessage"), ((GetNSLConfigValue("PausedMaxDuration") - gamestate.gamepauseddelta))))
 				end
 				gamestate.gamepausedmessagetime = 0
 			end
 			UpdateEntStates(deltatime)
-			if GetNSLConfig().kPausedMaxDuration ~= 0 and gamestate.gamepauseddelta >= GetNSLConfig().kPausedMaxDuration and gamestate.gamepausedcountdown == 0 then
+			if GetNSLConfigValue("PausedMaxDuration") ~= 0 and gamestate.gamepauseddelta >= GetNSLConfigValue("PausedMaxDuration") and gamestate.gamepausedcountdown == 0 then
 				gamestate.serverdelayedupdateenabled = true
-				gamestate.gamepausedcountdown = GetNSLConfig().kPauseEndDelay
+				gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 			end
-			if gamestate.gamepausedscoreupdate + kScoreboardUpdateInterval < gamestate.gamepauseddelta then
+			//No more scoreboard updates, uses PlayerInfo ent.
+			/*if gamestate.gamepausedscoreupdate + kScoreboardUpdateInterval < gamestate.gamepauseddelta then
 				GetGamerules().timeToSendScores = nil
 				GetGamerules():UpdateScores()
 				gamestate.gamepausedscoreupdate = gamestate.gamepauseddelta
-			end
+			end*/
 		else
 			ResumeEntStates()
 			gamestate.serverupdateenabled = false
 			if gamestate.gamepausingteam ~= 0 then
-				SendAllClientsMessage(string.format(GetNSLMessages().PauseResumeMessage, GetActualTeamName(gamestate.gamepausingteam), (GetNSLConfig().kPauseMaxPauses - (ConditionalValue(gamestate.gamepausingteam == 1, gamestate.team1pauses, gamestate.team2pauses)))))
+				SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeMessage"), GetActualTeamName(gamestate.gamepausingteam), (GetNSLConfigValue("PauseMaxPauses") - (ConditionalValue(gamestate.gamepausingteam == 1, gamestate.team1pauses, gamestate.team2pauses)))))
 			end
 			gamestate.gamepausedtime = 0
 			gamestate.gamepausingteam = 0
@@ -338,17 +338,17 @@ local function UpdateMoveState(deltatime)
 		if gamestate.gamedelaydelta >= 1 then
 			gamestate.gamepausedcountdown = (gamestate.gamepausedcountdown - 1)
 			if gamestate.gamepausedcountdown > 0 then
-				SendAllClientsMessage(string.format(GetNSLMessages().PauseWarningMessage, ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)))
+				SendAllClientsMessage(string.format(GetNSLMessage("PauseWarningMessage"), ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)))
 			else
 				if not GetIsGamePaused() then
 					SaveEntStates()
 					gamestate.serverupdateenabled = true
-					SendAllClientsMessage(GetNSLMessages().PausePausedMessage)
+					SendAllClientsMessage(GetNSLMessage("PausePausedMessage"))
 					gamestate.gamepausedtime = Shared.GetTime()
-					Shared.Message("Game Paused.")
+					//Shared.Message("Game Paused.")
 				else
 					//Since other event already running, just let the final trigger run there (will be next frame).
-					Shared.Message("Game Resumed.")
+					//Shared.Message("Game Resumed.")
 				end
 				gamestate.serverdelayedupdateenabled = false
 				gamestate.gamepaused = not GetIsGamePaused()
@@ -371,12 +371,12 @@ local function OnCommandPause(client)
 			if teamnumber and ValidateTeamNumber(teamnumber) then
 				local validpause = false
 				if teamnumber == 1 then
-					if gamestate.team1pauses < GetNSLConfig().kPauseMaxPauses then
+					if gamestate.team1pauses < GetNSLConfigValue("PauseMaxPauses") then
 						gamestate.team1pauses = gamestate.team1pauses + 1
 						validpause = true
 					end
 				else
-					if gamestate.team2pauses < GetNSLConfig().kPauseMaxPauses then
+					if gamestate.team2pauses < GetNSLConfigValue("PauseMaxPauses") then
 						gamestate.team2pauses = gamestate.team2pauses + 1
 						validpause = true
 					end
@@ -384,12 +384,12 @@ local function OnCommandPause(client)
 				if validpause then
 					gamestate.team1resume = false
 					gamestate.team2resume = false
-					gamestate.gamepausedcountdown = GetNSLConfig().kPauseStartDelay
+					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseStartDelay")
 					gamestate.gamepausingteam = teamnumber
 					gamestate.serverdelayedupdateenabled = true
-					SendAllClientsMessage(string.format(GetNSLMessages().PausePlayerMessage, player:GetName()))
+					SendAllClientsMessage(string.format(GetNSLMessage("PausePlayerMessage"), player:GetName()))
 				else
-					SendClientMessage(client, GetNSLMessages().PauseTooManyPausesMessage)
+					SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
 				end
 			end
 		end
@@ -413,15 +413,15 @@ local function OnCommandUnPause(client)
 					gamestate.team2resume = not gamestate.team2resume
 				end
 				if gamestate.team2resume and not gamestate.team1resume then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseTeamReadyMessage, player:GetName(), GetActualTeamName(2), GetActualTeamName(1)))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyMessage"), player:GetName(), GetActualTeamName(2), GetActualTeamName(1)))
 				elseif gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseTeamReadyMessage, player:GetName(), GetActualTeamName(1), GetActualTeamName(2)))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyMessage"), player:GetName(), GetActualTeamName(1), GetActualTeamName(2)))
 				elseif not gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(GetNSLMessages().PauseNoTeamReadyMessage)
+					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
 				elseif gamestate.gamepausedcountdown == 0 then
-					SendAllClientsMessage(string.format(GetNSLMessages().PauseTeamReadiedMessage, player:GetName(), GetActualTeamName(teamnumber)))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadiedMessage"), player:GetName(), GetActualTeamName(teamnumber)))
 					gamestate.serverdelayedupdateenabled = true
-					gamestate.gamepausedcountdown = GetNSLConfig().kPauseEndDelay
+					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 				end
 			end
 		end
@@ -437,16 +437,16 @@ local function OnCommandAdminPause(client)
 	
 	if client and GetNSLModEnabled() and kPauseEnabled then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			if GetGamerules():GetGameStarted() then
 				if gamestate.gamepausedcountdown == 0 then
 					gamestate.serverdelayedupdateenabled = true
 					gamestate.team1resume = false
 					gamestate.team2resume = false
-					gamestate.gamepausedcountdown = ConditionalValue(GetIsGamePaused(), GetNSLConfig().kPauseEndDelay, GetNSLConfig().kPauseStartDelay)
+					gamestate.gamepausedcountdown = ConditionalValue(GetIsGamePaused(), GetNSLConfigValue("PauseEndDelay"), GetNSLConfigValue("PauseStartDelay"))
 				else
 					gamestate.serverdelayedupdateenabled = false
-					SendAllClientsMessage(GetNSLMessages().PauseCancelledMessage)
+					SendAllClientsMessage(GetNSLMessage("PauseCancelledMessage"))
 					gamestate.gamepausedcountdown = 0
 				end
 			

@@ -1,8 +1,13 @@
 //NSL Configs
+//Example of manual playerdata values for reference
+//[999999999999] = { NSL_Team = "ThisIsAnExample", NICK = "TestUser", S_ID = "0:1:12345678910" }
 
 local configFileName = "NSLConfig.json"
+local configUpdateURL = "https://raw.github.com/xToken/NSL/master/League%20Config.lua"
+local configUpdateRequestSent = false
+local configUpdateRetries = 0
 local NSL_Mode = "PCW"
-local FF_Enabled = true
+local NSL_League = "NSL"
 
 function GetNSLMode()
 	return NSL_Mode
@@ -12,8 +17,22 @@ function GetNSLModEnabled()
 	return NSL_Mode ~= "DISABLED"
 end
 
-function GetFFEnabled()
-	return FF_Enabled
+function GetActiveLeague()
+	return NSL_League
+end
+
+local function LoadConfig()
+	local defaultConfig = { mode = "PCW", league = "NSL" }
+	WriteDefaultConfigFile(configFileName, defaultConfig)
+	local config = LoadConfigFile(configFileName) or defaultConfig
+	NSL_Mode = config.mode or "PCW"
+	NSL_League = config.league or "NSL"
+end
+
+LoadConfig()
+
+local function SavePluginConfig()
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League })
 end
 
 function SetNSLMode(state)
@@ -28,62 +47,182 @@ function SetNSLMode(state)
 	end
 end
 
-function SetFFState(state)
-	if FF_Enabled ~= state then
-		FF_Enabled = state
+function SetActiveLeague(state)
+	if NSL_League ~= state then
+		NSL_League = state
 		SavePluginConfig()
 	end
 end
 
-local function LoadConfig()
-	local defaultConfig = { mode = "PCW", friendlyfire = true }
-	WriteDefaultConfigFile(configFileName, defaultConfig)
-	local config = LoadConfigFile(configFileName) or defaultConfig
-	NSL_Mode = config.mode or "PCW"
-	FF_Enabled = config.friendlyfire or true
-end
-
-LoadConfig()
-
-function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = GetNSLMode(), friendlyfire = GetFFEnabled() })
-end
-
-local PCWConfig = {
-kPauseEndDelay 						= 5,
-kPauseStartDelay 					= 1,
-kPauseMaxPauses 					= 3,
-kPausedReadyNotificationDelay 		= 30,
-kPausedMaxDuration 					= 120,
-kInterp 							= 70,
-kMoveRate 							= 50,
-kClientRate 						= 20,
-kFriendlyFireDamagePercentage 		= 0.33,
-kTournamentModeAlertDelay 			= 30,
-kTournamentModeForfeitClock			= 0,
-kTournamentModeRestartDuration 		= 90,
-kTournamentModeGameStartDelay 		= 15,
-kLimit6PlayerPerTeam 				= false,
-kMercsRequireApproval 				= false,
+local ENSLBaseConfig = {
+LeagueName 							= "NSL",
+PlayerDataURL 						= "http://www.ensl.org/plugin/user/",
+PlayerDataFormat					= "ENSL",
+PlayerRefLevel 						= 10,
+AutomaticMapCycleDelay				= 180 * 60,
+PauseEndDelay 						= 5,
+PauseStartDelay 					= 1,
+PauseMaxPauses 						= 3,
+PausedReadyNotificationDelay 		= 30,
+Interp 								= 70,
+MoveRate 							= 50,
+ClientRate 							= 20,
+FriendlyFireDamagePercentage 		= 0.33,
+FriendlyFireEnabled			 		= true,
+TournamentModeAlertDelay 			= 30,
+TournamentModeGameStartDelay 		= 15,
+PCW 								= {
+										PausedMaxDuration 					= 120,
+										TournamentModeForfeitClock			= 0,
+										TournamentModeRestartDuration 		= 90,
+										Limit6PlayerPerTeam 				= false,
+										MercsRequireApproval 				= false,
+									},
+OFFICIAL							= {
+										PausedMaxDuration 					= 90,
+										TournamentModeForfeitClock			= 1200,
+										TournamentModeRestartDuration 		= 30,
+										Limit6PlayerPerTeam 				= true,
+										MercsRequireApproval 				= true,
+									},
+REFS								= { 37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 870339, 3834993, 220612, 
+										33962486, 26400815, 4048968, 4288812, 44665807, 28798044, 40509515, 39359741, 64272164, 
+										56472390, 42416427, 7862563, 3823437, 1080730, 221386, 42984531, 37996245, 49465,
+										44778147, 10498798, 24256940, 22793, 80887771, 512557, 4288812, 12482757, 54867496, 
+										711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 45160820, 
+										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 5176141,
+									},
+PLAYERDATA							= { },
 }
 
-local OfficalsConfig = {
-kPauseEndDelay 						= 5,
-kPauseStartDelay 					= 1,
-kPauseMaxPauses 					= 3,
-kPausedReadyNotificationDelay 		= 30,
-kPausedMaxDuration 					= 90,
-kInterp 							= 70,
-kMoveRate 							= 50,
-kClientRate 						= 20,
-kFriendlyFireDamagePercentage 		= 0.33,
-kTournamentModeAlertDelay 			= 30,
-kTournamentModeForfeitClock			= 1200,
-kTournamentModeRestartDuration 		= 30,
-kTournamentModeGameStartDelay 		= 15,
-kLimit6PlayerPerTeam 				= true,
-kMercsRequireApproval 				= true,
+local AUSNS2BaseConfig = {
+LeagueName 							= "AusNS2",
+PlayerDataURL 						= "http://ausns2.org/league-api.php?lookup=player&steamid=",
+PlayerDataFormat					= "AUSNS",
+PlayerRefLevel 						= 1,
+AutomaticMapCycleDelay				= 180 * 60,
+PauseEndDelay 						= 5,
+PauseStartDelay 					= 1,
+PauseMaxPauses 						= 3,
+PausedReadyNotificationDelay 		= 30,
+Interp 								= 70,
+MoveRate 							= 50,
+ClientRate 							= 20,
+FriendlyFireDamagePercentage 		= 0.33,
+FriendlyFireEnabled			 		= false,
+TournamentModeAlertDelay 			= 30,
+TournamentModeGameStartDelay 		= 15,
+PCW 								= {
+										PausedMaxDuration 					= 120,
+										TournamentModeForfeitClock			= 0,
+										TournamentModeRestartDuration 		= 90,
+										Limit6PlayerPerTeam 				= false,
+										MercsRequireApproval 				= false,
+									},
+OFFICIAL							= {
+										PausedMaxDuration 					= 90,
+										TournamentModeForfeitClock			= 1200,
+										TournamentModeRestartDuration 		= 30,
+										Limit6PlayerPerTeam 				= true,
+										MercsRequireApproval 				= true,
+									},
+REFS								= { },
+PLAYERDATA							= { },
 }
+
+local DefaultConfig = {
+AutomaticMapCycleDelay				= 180 * 60,
+PauseEndDelay 						= 5,
+PauseStartDelay 					= 1,
+PauseMaxPauses 						= 3,
+PausedReadyNotificationDelay 		= 30,
+Interp 								= 100,
+MoveRate 							= 30,
+ClientRate 							= 20,
+FriendlyFireDamagePercentage 		= 0.33,
+FriendlyFireEnabled			 		= false,
+TournamentModeAlertDelay 			= 30,
+TournamentModeGameStartDelay 		= 15,
+PausedMaxDuration 					= 120,
+TournamentModeForfeitClock			= 0,
+TournamentModeRestartDuration 		= 90,
+Limit6PlayerPerTeam 				= false,
+MercsRequireApproval 				= false,
+}
+
+local Configs = { }
+
+local function OnConfigResponse(response)
+	if response then
+		local responsetable = json.decode(response)
+		if responsetable == nil or responsetable.Version == nil then
+			// RIP
+			//Retry?
+			if configUpdateRetries < 3 then
+				configUpdateRequestSent = false
+				configUpdateRetries = configUpdateRetries + 1
+			else
+				Shared.Message("Failed getting latest config from GitHub.")
+				Configs = { NSL = ENSLBaseConfig, AUSNS2 = AUSNS2BaseConfig }
+			end
+		else
+			if responsetable.Version and responsetable.EndOfTable then
+				for i, config in ipairs(responsetable.Configs) do
+					if config.LeagueName ~= nil then
+						//assume valid, update Configs table, always uppercase
+						Configs[string.upper(config.LeagueName)] = config
+					end
+				end
+			end
+		end
+	end
+end
+
+local function OnServerUpdated()
+	if GetNSLModEnabled() and not configUpdateRequestSent then
+		Shared.SendHTTPRequest(configUpdateURL, "GET", OnConfigResponse)
+		configUpdateRequestSent = true
+	end
+end
+
+Event.Hook("UpdateServer", OnServerUpdated)
+
+function GetNSLConfigValue(value)
+	//Check base config
+	if Configs[NSL_League] ~= nil and Configs[NSL_League][value] ~= nil then
+		return Configs[NSL_League][value]
+	end
+	//Check Mode Specific config
+	if Configs[NSL_League] ~= nil and Configs[NSL_League][NSL_Mode] ~= nil and Configs[NSL_League][NSL_Mode][value] ~= nil then
+		return Configs[NSL_League][NSL_Mode][value]
+	end
+	if DefaultConfig[value] ~= nil then
+		return DefaultConfig[value]
+	end
+	return nil
+end
+
+function GetNSLLeagueValid(league)
+	if Configs[league] ~= nil and Configs[league].LeagueName ~= nil then
+		return true
+	end
+	return false
+end
+
+function GetIsNSLRef(ns2id)
+	local ref = false
+	if ns2id ~= nil then
+		local cRefs = GetNSLConfigValue("REFS")
+		if cRefs ~= nil then
+			ref = table.contains(cRefs, ns2id)
+		end
+		local pData = GetNSLUserData(ns2id)
+		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
+			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
+		end
+	end
+	return ref
+end
 
 local Messages = {
 PauseResumeMessage 					= "Game Resumed.  %s have %s pauses remaining",
@@ -110,30 +249,12 @@ UnstuckCancelled					= "You moved or were unable to be unstuck currently.",
 Unstuck								= "Unstuck!",
 UnstuckIn							= "You will be unstuck in %s seconds.",
 UnstuckRecently						= "You have unstucked too recently, please wait %d seconds.",
+UnstuckFailed						= "Unstuck Failed after %s attempts.",
 MercApprovalNeeded					= "The opposite team will need to approve you as a merc.",
 MercApproved 						= "%s has been approved as a merc for %s.",
 MercsReset 							= "Merc approvals have been reset."
 }
 
-local ApprovedRefs = { 	37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 870339, 3834993, 220612, 
-						33962486, 26400815, 4048968, 4288812, 44665807, 28798044, 40509515, 39359741, 64272164, 
-						56472390, 42416427, 7862563, 3823437, 1080730, 221386, 42984531, 37996245, 49465,
-						44778147, 10498798, 24256940, 22793, 80887771, 512557, 4288812, 12482757, 54867496, 
-						711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 45160820, 
-						15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 5176141 }
-
-function GetNSLConfig()
-	if GetNSLMode() == "OFFICIAL" then
-		return OfficalsConfig
-	else
-		return PCWConfig
-	end
-end
-
-function GetNSLMessages()
-	return Messages
-end
-
-function GetNSLRefs()
-	return ApprovedRefs
+function GetNSLMessage(message)
+	return Messages[message] or ""
 end

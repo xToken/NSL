@@ -1,7 +1,5 @@
 //NSL Main Plugin
-//This will hopefully (once more is available from ENSL site and also in NS2's engine) function somewhat like the old ensl plugin for ns1.
-//Short term - this just checks the ensl database on user connect to get more information about clients.  Also enables friendly fire and sets some slightly better networking values.
-//Long term - this will force clients to be on their team ingame, and also automatically allow for approval/rejection of mercs.
+//Reworked to function more as a 'league' plugin, not just a ENSL plugin.
 
 //Functions for chat commands
 gChatCommands = { }
@@ -11,7 +9,6 @@ gArgumentedChatCommands = { }
 gConnectFunctions = { }
 //Team Allowance Checks
 gCanJoinTeamFunctions = { }
-local kReserveSlotEnabled = false
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
@@ -20,14 +17,14 @@ Script.Load("lua/nsl_teammanager_server.lua")
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
-		if GetNSLConfig().kInterp ~= 100 then
-			Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfig().kInterp/1000)))
+		if GetNSLConfigValue("Interp") ~= 100 then
+			Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
 		end
-		if GetNSLConfig().kClientRate ~= 20 then
-			//Shared.ConsoleCommand(string.format("cr %f", GetNSLConfig().kClientRate))
+		if GetNSLConfigValue("ClientRate") ~= 20 then
+			//Shared.ConsoleCommand(string.format("cr %f", GetNSLConfigValue("ClientRate")))
 		end
-		if GetNSLConfig().kMoveRate ~= 30 then
-			Shared.ConsoleCommand(string.format("mr %f", GetNSLConfig().kMoveRate))
+		if GetNSLConfigValue("MoveRate") ~= 30 then
+			Shared.ConsoleCommand(string.format("mr %f", GetNSLConfigValue("MoveRate")))
 		end
 		for i = 1, #gConnectFunctions do
 			gConnectFunctions[i](client)
@@ -51,45 +48,49 @@ originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "
 	end
 )
 
-function ValidateNSLUsersAccessLevel(ns2id)
-	if ns2id then
-		return table.contains(GetNSLRefs(), ns2id)
-	end
-	return false
-end
-
 local originalNS2GRGetFriendlyFire
 //Override friendly fire function checks
 originalNS2GRGetFriendlyFire = Class_ReplaceMethod("NS2Gamerules", "GetFriendlyFire", 
 	function(self)
-		return GetFFEnabled() and GetNSLModEnabled()
+		return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 	end
 )
 
 //Override friendly fire function checks
 function GetFriendlyFire()
-	return GetFFEnabled() and GetNSLModEnabled()
+	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
-//Block MapCycle
-function MapCycle_CycleMap()
+local function NewServerAgeCheck(self)
+	if GetNSLModEnabled() then
+		if self.gameState ~= kGameState.Started and Shared.GetTime() > GetNSLConfigValue("AutomaticMapCycleDelay") and Server.GetNumPlayers() == 0 then
+			MapCycle_CycleMap()
+		end
+	else
+		if self.gameState ~= kGameState.Started and Shared.GetTime() > 360000 and Server.GetNumPlayers() == 0 then
+			MapCycle_CycleMap()
+		end
+	end
 end
+
+//Setup Periodic MapCycle to prevent some animation craziness.
+ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 
 //Set friendly fire percentage
-kFriendlyFireScalar = GetNSLConfig().kFriendlyFireDamagePercentage
+kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
 //Simple functions to make sending messages easier.
 function SendAllClientsMessage(message)
-	Server.SendNetworkMessage("Chat", BuildChatMessage(false, "NSL", -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	Server.SendNetworkMessage("Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
 end
 
 function SendClientMessage(client, message)
-	Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, "NSL", -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
 end
 
 function SendTeamMessage(teamnum, message)
 
-	local chatmessage = BuildChatMessage(false, "NSL", -1, kTeamReadyRoom, kNeutralTeamType, message)
+	local chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
 	if tonumber(teamnum) ~= nil then
 		local playerRecords = GetEntitiesForTeam("Player", teamnum)
 		for _, player in ipairs(playerRecords) do
@@ -121,85 +122,105 @@ function ProcessSayCommand(player, command)
 
 end
 
-local function OnClientCommandENSLHelp(client)
+local function OnClientCommandNSLHelp(client)
 	if client then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
-			ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the ENSL site.")
+		if GetIsNSLRef(NS2ID) then
 			ServerAdminPrint(client, "sv_nslsay" .. ": " .. "<message> - Will send a message to all connected players that displays in yellow.")
 			ServerAdminPrint(client, "sv_nsltsay" .. ": " .. "<team, message> - Will send a message to all players on the team provided that displays in yellow.")
 			ServerAdminPrint(client, "sv_nslpsay" .. ": " .. "<player, message> - Will send a message to the provided player that displays in yellow.")
 			ServerAdminPrint(client, "sv_nslcfg" .. ": " .. "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
-			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, optional player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
+			ServerAdminPrint(client, "sv_nslconfig" .. ": " .. "<league> - Changes the league settings used by the NSL plugin.")
+			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
 			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
 			ServerAdminPrint(client, "sv_nslpause" .. ": " .. "Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.")
 			ServerAdminPrint(client, "sv_nslforcestart" .. ": " .. "Will force the countdown to start regardless of teams ready status, still requires commanders.")
 			ServerAdminPrint(client, "sv_nslcancelstart" .. ": " .. "Will cancel a game start countdown currently in progress.")
 			ServerAdminPrint(client, "sv_nslsetteamnames" .. ": " .. "<team1name, team2name> Will set the team names manually, will prevent automatic team name updates.")
 			ServerAdminPrint(client, "sv_nslswitchteams" .. ": " .. "Will switch team names (best used if setting team names manually).")
-			ServerAdminPrint(client, "sv_nslsetteamscores" .. ": " .. "<t1score, t2score> Will set the team scores manually, set team names first.")
+			ServerAdminPrint(client, "sv_nslsetteamscores" .. ": " .. "<t1score, t2score> Will set the team scores manually.")
 		end
+		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
+		ServerAdminPrint(client, "sv_nslmerchelp" .. ": " .. "Displays specific help information pertaining to approving and clearing mercs.")
 	end
 end
 
-Event.Hook("Console_sv_nslhelp",               OnClientCommandENSLHelp)
+Event.Hook("Console_sv_nslhelp",               OnClientCommandNSLHelp)
 
-local function OnCommandEnableFF(client)
-	SetFFState(not GetFFEnabled())
-	ServerAdminPrint(client, "Friendly Fire " .. ConditionalValue(GetFFEnabled(), "enabled.", "disabled."))
+local function UpdateNSLMode(client, mode)
+	if string.lower(mode) == "pcw" then
+		SetNSLMode("PCW")
+	elseif string.lower(mode) == "official" then
+		SetNSLMode("OFFICIAL")
+	elseif string.lower(mode) == "disabled" then
+		SetNSLMode("DISABLED")
+	end
+	ServerAdminPrint(client, string.format("NSL Plugin now running in %s config.", GetNSLMode()))
 end
 
-CreateServerAdminCommand("Console_sv_nslfriendlyfire", OnCommandEnableFF, "Toggles friendly fire on or off.")
-
-local function SetupRefReserveSlot()
-	local setting = Server.GetConfigSetting("reserved_slots")
-	local refs = GetNSLRefs()
-	local validids = { }
-	
-    if not setting then
-        Server.SetConfigSetting("reserved_slots", { amount = 0, ids = { } })
-        setting = Server.GetConfigSetting("reserved_slots")
-    end
-	
-	for i = 1, #refs do
-		local valid
-		for name, ns2id in pairs(setting.ids) do
-			if refs[i] == ns2id then
-				validids[ns2id] = true
-				valid = true
-				break
-			end
-		end
-		if not valid then
-			validids[refs[i]] = true
-			setting.ids["NSLRef"] = refs[i]
-		end
+local function OnClientSVCommandSetMode(client, mode)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
 	end
-	
-	for name, ns2id in pairs(setting.ids) do
-		if (not kReserveSlotEnabled or not validids[ns2id]) and name == "NSLRef" then
-			setting.ids[name] = nil
-		end
+	if not isRef and mode ~= nil then
+		UpdateNSLMode(client, mode)
 	end
-	
-	setting.amount = ConditionalValue(kReserveSlotEnabled, 1, 0)
-	
-	local tags = { }
-	Server.GetTags(tags)
-	for t = 1, #tags do
-	
-		if string.find(tags[t], "R_S") then
-			Server.RemoveTag(tags[t])
-		end
-		
-	end
-	
-	if kReserveSlotEnabled then
-		Server.AddTag("R_S" .. setting.amount)
-		Server.SaveConfigSettings()
-	end
-	
 end
+
+local function OnClientCommandSetMode(client, mode)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
+	end
+	if isRef and mode ~= nil then
+		UpdateNSLMode(client, mode)
+	else
+		ServerAdminPrint(client, string.format("NSL Plugin currently running in %s config.", GetNSLMode()))
+	end
+end
+
+Event.Hook("Console_sv_nslcfg",               OnClientCommandSetMode)
+CreateServerAdminCommand("Console_sv_nslcfg", OnClientSVCommandSetMode, "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
+
+local function UpdateNSLLeague(client, league)
+	league = string.upper(league)
+	if GetNSLLeagueValid(league) then
+		SetActiveLeague(league)
+		ServerAdminPrint(client, string.format("NSL Plugin now using %s league config.", GetActiveLeague()))
+	else
+		ServerAdminPrint(client, string.format("NSL Plugin currently using %s league config.", GetActiveLeague()))
+	end
+end
+
+local function OnClientSVCommandSetLeague(client, league)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
+	end
+	if not isRef and league ~= nil then
+		UpdateNSLLeague(client, league)
+	end
+end
+
+local function OnClientCommandSetLeague(client, league)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
+	end
+	if isRef and league ~= nil then
+		UpdateNSLLeague(client, league)
+	else
+		ServerAdminPrint(client, string.format("NSL Plugin currently using %s league config.", GetActiveLeague()))
+	end
+end
+
+Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
+CreateServerAdminCommand("Console_sv_nslconfig", OnClientSVCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
 
 if GetNSLModEnabled() then
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
@@ -212,9 +233,9 @@ if GetNSLModEnabled() then
 	Server.SetConfigSetting("auto_kick_afk_time", nil)
 	Server.SetConfigSetting("auto_kick_afk_capacity", nil)
 	Server.SetConfigSetting("end_round_on_team_unbalance", nil)
-	SetupRefReserveSlot()
 end
 
+//First Person Spectator Block
 local kDeltatimeBetweenAction = 0.3
 	
 local function IsTeamSpectator(self)
@@ -298,7 +319,7 @@ end
 local function OnClientCommandNSLFPS(client)
 	if client then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			local player = client:GetControllingPlayer()
 			if player ~= nil and player:isa("Spectator") and player:GetTeamNumber() == kSpectatorIndex then
 				player:SetSpectatorMode(kSpectatorMode.FirstPerson)

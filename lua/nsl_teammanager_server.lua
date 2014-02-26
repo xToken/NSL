@@ -73,11 +73,11 @@ local function CheckMercTeamJoin(player, teamNumber)
 				if tqueue[teamNumber] == nil then
 					tqueue[teamNumber] = { }
 					tqueue[teamNumber][ns2id] = false //This is set to true when mercs approved.
-					SendClientMessage(client, GetNSLMessages().MercApprovalNeeded)
+					SendClientMessage(client, GetNSLMessage("MercApprovalNeeded"))
 					return false
 				elseif tqueue[teamNumber][ns2id] ~= true then
 					tqueue[teamNumber][ns2id] = false
-					SendClientMessage(client, GetNSLMessages().MercApprovalNeeded)
+					SendClientMessage(client, GetNSLMessage("MercApprovalNeeded"))
 					return false
 				end
 			end
@@ -90,7 +90,7 @@ end
 local originalNS2GRJoinTeam
 originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam", 
 	function(self, player, newTeamNumber, force)
-		if GetNSLModEnabled() and GetNSLConfig().kMercsRequireApproval and not CheckMercTeamJoin(player, newTeamNumber) then
+		if GetNSLModEnabled() and GetNSLConfigValue("MercsRequireApproval") and not CheckMercTeamJoin(player, newTeamNumber) then
 			return false, player
 		end
 		local success, player = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
@@ -137,7 +137,7 @@ originalNS2GREndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame",
 local function OnCommandOverrideTeamnames(client, team1name, team2name)
 	if client and team1name and team2name then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			overridenames = true
 			t1name = team1name
 			t2name = team2name
@@ -151,7 +151,7 @@ Event.Hook("Console_sv_nslsetteamnames",               OnCommandOverrideTeamname
 local function OnCommandSwitchTeamNames(client)
 	if client then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			overridenames = true
 			local team1name = t1name
 			t1name = t2name
@@ -168,7 +168,7 @@ local function OnCommandSetTeamScores(client, team1score, team2score)
 	team2score = tonumber(team2score)
 	if client then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			if team1score then
 				tscores[t1name] = team1score
 			end
@@ -193,7 +193,7 @@ local function ApproveMercs(teamnum, playerid)
 				tqueue[enemyteam][id] = true
 				local nsldata = GetNSLUserData(id)
 				if nsldata then
-					SendAllClientsMessage(string.format(GetNSLMessages().MercApproved, nsldata.NICK, GetActualTeamName(enemyteam)))
+					SendAllClientsMessage(string.format(GetNSLMessage("MercApproved"), nsldata.NICK, GetActualTeamName(enemyteam)))
 				end
 			end
 		end
@@ -235,7 +235,7 @@ local function OnClientCommandApproveMercs(client, team, target)
 				tns2id = pclient:GetUserId()
 			end
 		end
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			ApproveMercs(team, tns2id)
 		end
 	end
@@ -250,7 +250,7 @@ local function ClearMercs(teamnum)
 	end
 	if tqueue[enemyteam] ~= nil then
 		tqueue[enemyteam] = { }
-		SendTeamMessage(teamnum, GetNSLMessages().MercsReset)
+		SendTeamMessage(teamnum, GetNSLMessage("MercsReset"))
 	end
 end
 
@@ -271,10 +271,31 @@ local function OnClientCommandClearMercs(client, team)
 	team = tonumber(team)
 	if client and team and (team == 1 or team == 2) then
 		local NS2ID = client:GetUserId()
-		if ValidateNSLUsersAccessLevel(NS2ID) then
+		if GetIsNSLRef(NS2ID) then
 			ClearMercs(team)
 		end
 	end
 end
 
 Event.Hook("Console_sv_nslclearmercs",               OnClientCommandClearMercs)
+
+local function OnClientCommandMercHelp(client)
+	if client then
+		local NS2ID = client:GetUserId()
+		if GetIsNSLRef(NS2ID) then
+			//Print Ref only merc commands
+			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
+			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
+		end
+		ServerAdminPrint(client, "rejectmercs" .. ": " .. "Chat command, will clear any merc approvals for your team.")
+		ServerAdminPrint(client, "clearmercs" .. ": " .. "Chat or console command, will also clear any merc approvals for your team.")
+		ServerAdminPrint(client, "/mercsok" .. ": " .. "Chat command, will approve opposing teams merc(s).")
+		ServerAdminPrint(client, "mercsok" .. ": " .. "Chat or console command, will approve opposing teams merc(s).")
+		ServerAdminPrint(client, "approvemercs" .. ": " .. "Chat command, will approve opposing teams merc(s).")
+		ServerAdminPrint(client, "NOTE!" .. ": " .. "Approving a merc optionally requires details to identify the target player.")
+		ServerAdminPrint(client, "NOTE!" .. ": " .. "Mercs can be approved based on name, ns2id or game ID, all of which are listed in sv_nslinfo.")
+		ServerAdminPrint(client, "NOTE!" .. ": " .. "/mercsok Dragon as an example.")
+	end
+end
+
+Event.Hook("Console_sv_nslmerchelp",               OnClientCommandMercHelp)

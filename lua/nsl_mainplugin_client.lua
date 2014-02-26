@@ -46,3 +46,5 @@ local function AdminMessageRecieved(message)
 end
 
 Client.HookNetworkMessage("AdminMessage", AdminMessageRecieved)
+
+AddClientUIScriptForClass("Spectator", "GUINSLFollowingSpectatorHUD")
