@@ -1,0 +1,9 @@
+[{
+    "name":"Reception",
+    "team":"marines",
+    "enemyspawns":    ["Atmosphere Exchange"]
+},
+{
+    "name":"Atmosphere Exchange",
+    "team":"aliens"
+}]

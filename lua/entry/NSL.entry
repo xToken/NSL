@@ -1,0 +1,7 @@
+modEntry = [[
+	Client: lua/nsl_client.lua,
+	Predict: lua/nsl_predict.lua,
+	Server: lua/nsl_server.lua,
+	Shared: lua/nsl_shared.lua,
+	Priority: 5
+]]

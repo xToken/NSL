@@ -1,0 +1,20 @@
+[{
+    "name":"Drone Bay",
+    "team":"both",
+    "enemyspawns": ["Fabrication"]
+},
+{
+    "name":"Fabrication",
+    "team":"both",
+    "enemyspawns": ["Drone Bay"]
+},
+{
+    "name":"Launch Control",
+    "team":"both",
+    "enemyspawns": ["Monorail"]
+},
+{
+    "name":"Monorail",
+    "team":"both",
+    "enemyspawns": ["Launch Control"]
+}]

@@ -1,0 +1,40 @@
+E_URL "http://www.ensl.org/plugin/user/"
+g_userSteamID = steamid
+Challenge code of 10 characters, hex g_userWebHex
+
+
+new pid = args[0], url[W_LEN_URL + 1]
+
+	// Set URL and webhex
+	func_get_randhex(W_LEN_CH, g_userWebHex[pid])
+	formatex(url, W_LEN_URL, "%s%s?ch=%s", E_URL, g_userSteamID[pid], g_userWebHex[pid])
+	// log_message("[DEBUG] url: %s", url)
+
+
+http://www.ensl.org/plugin/user/0:1:1497954?ch=1A2D3E4C5F
+
+contain(g_userWebData[pid][0] - check for banned status
+
+copy(g_userEnslNick[pid], E_LEN_NICK, g_userWebData[pid][2])
+copy(g_userEnslIP[pid], E_LEN_IP, g_userWebData[pid][3])
+copy(g_userEnslTeam[pid], E_LEN_TEAM, g_userWebData[pid][4])
+g_userEnslId[pid] = str_to_num(g_userWebData[pid][5])
+g_userEnslTid[pid] = str_to_num(g_userWebData[pid][6])
+copy(g_userEnslLevel[pid], E_LEN_LEVEL, g_userWebData[pid][7])
+copy(g_userEnslRank[pid], E_LEN_RANK, g_userWebData[pid][8])
+g_userIconFlags[g_userIdIndex[pid]] = str_to_num(g_userWebData[pid][9])
+g_userEnslGather[g_userIdIndex[pid]] = str_to_num(g_userWebData[pid][10])
+
+
+0 = "#USER#",
+1 = "EBB3BBBBBB",
+2 = "0:1:2588070",
+3 = "NotDragon",
+4 = "76.6.42.63",
+5 = "No Team",
+6 = "2697",
+7 = "",
+8 = "User",
+9 = "",
+10 = "0",
+11 = "1A2D3E4C5F"}

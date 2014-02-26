@@ -1,0 +1,20 @@
+[{
+    "name":"Sub Access",
+    "team":"both",
+    "enemyspawns":    ["Atrium"]
+},
+{
+    "name":"Data Core",
+    "team":"both",
+    "enemyspawns":    ["Flight Control"]
+},
+{
+    "name":"Flight Control",
+    "team":"both",
+    "enemyspawns":    ["Data Core"]
+},
+{
+    "name":"Atrium",
+    "team":"both",
+    "enemyspawns":    ["Sub Access"]
+}]
