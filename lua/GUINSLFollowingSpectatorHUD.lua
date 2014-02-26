@@ -7,7 +7,7 @@ class 'GUINSLFollowingSpectatorHUD' (GUIScript)
 local kFontScale = GUIScale(Vector(1, 1, 0))
 local kTextFontName = "fonts/AgencyFB_large.fnt"
 local kFontColor = Color(1, 1, 1, 1)
-local kPlayerNameOffset = GUIScale(Vector(0, -35, 0))
+local kPlayerNameOffset = GUIScale(Vector(0, -85, 0))
 
 local function GetNameofPlayerBeingFollowed()
 	local player = Client.GetLocalPlayer()
@@ -48,7 +48,7 @@ function GUINSLFollowingSpectatorHUD:Update(deltaTime)
 	local pName = GetNameofPlayerBeingFollowed()
     self.nameText:SetIsVisible(pName ~= nil)
 
-    if self.lastname ~= pName then
+    if self.lastname ~= pName and pName ~= nil then
 		local followText = StringReformat(Locale.ResolveString("FOLLOWING_NAME"), { name = pName })
         self.nameText:SetText(followText)
         self.lastname = pName
