@@ -36,10 +36,9 @@ function GetNSLUserData(ns2id)
 	if NSL_ClientData[ns2id] == nil then
 		//Check manually specified player data table from configs
 		local cPlayerData = GetNSLConfigValue("PLAYERDATA")
+		local sns2id = tostring(ns2id)
 		for id, data in pairs(cPlayerData) do
-			Shared.Message(ToString(data))
-			Shared.Message(ToString(id))
-			if id == ns2id then
+			if id == sns2id then
 				return data
 			end
 		end
@@ -115,7 +114,7 @@ local function OnClientConnectENSLResponse(response)
 			if ns2id ~= nil then
 				//GRISSI why...
 				if responsetable[6] == "Goar" then
-					responsetable[6] = "Goðar"
+					responsetable[6] = "Godar"
 				end
 				local player = GetPlayerMatchingNS2Id(ns2id)
 				NSL_ClientData[ns2id] = {
@@ -178,8 +177,6 @@ local function OnClientConnected(client)
 			if QueryURL then
 				//PlayerDataFormat
 				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
-				steamId = "0:0:25291317"// Seb
-				//steamId = "0:1:144758"// Grissi
 				NSL_NS2IDLookup[steamId] = NS2ID
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then
 					Shared.SendHTTPRequest(string.format("%s%s?ch=%s", QueryURL, steamId, C_CODE), "GET", OnClientConnectENSLResponse)
@@ -217,12 +214,13 @@ local function GetPlayerString(player)
 	local playerClient = Server.GetOwner(player)
 	if playerClient then
 		local pNS2ID = playerClient:GetUserId()
+		local NSLData = GetNSLUserData(pNS2ID)
 		local gID = GetGameIDMatchingNS2ID(pNS2ID)
-		if NSL_ClientData[pNS2ID] == nil then
+		if NSLData == nil then
 			local sID = "0:" .. (pNS2ID % 2) .. ":" .. math.floor(pNS2ID / 2)
 			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID)
 		else
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, LNick : %s, LTeam : %s, LID : %s", player:GetName(), NSL_ClientData[pNS2ID].S_ID, pNS2ID, gID, NSL_ClientData[pNS2ID].NICK, NSL_ClientData[pNS2ID].NSL_Team, NSL_ClientData[pNS2ID].NSL_ID or 0)
+			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, LNick : %s, LTeam : %s, LID : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, NSLData.NICK, NSLData.NSL_Team, NSLData.NSL_ID or 0)
 		end				
 	end
 	return ""

@@ -1,6 +1,4 @@
 //NSL Configs
-//Example of manual playerdata values for reference
-//[999999999999] = { NSL_Team = "ThisIsAnExample", NICK = "TestUser", S_ID = "0:1:12345678910" }
 
 local configFileName = "NSLConfig.json"
 local configUpdateURL = "https://raw.github.com/xToken/NSL/master/League%20Config.lua"
@@ -90,7 +88,7 @@ REFS								= { 37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 8
 										56472390, 42416427, 7862563, 3823437, 1080730, 221386, 42984531, 37996245, 49465,
 										44778147, 10498798, 24256940, 22793, 80887771, 512557, 4288812, 12482757, 54867496, 
 										711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 45160820, 
-										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 5176141,
+										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442
 									},
 PLAYERDATA							= { },
 }
@@ -156,7 +154,7 @@ local function OnConfigResponse(response)
 	if response then
 		local responsetable = json.decode(response)
 		if responsetable == nil or responsetable.Version == nil then
-			// RIP
+			//RIP
 			//Retry?
 			if configUpdateRetries < 3 then
 				configUpdateRequestSent = false
@@ -170,8 +168,7 @@ local function OnConfigResponse(response)
 				for i, config in ipairs(responsetable.Configs) do
 					if config.LeagueName ~= nil then
 						//assume valid, update Configs table, always uppercase
-						Shared.Message("Loading config " .. config.LeagueName .. " from GitHub.")
-						//Shared.Message(ToString(config))
+						//Shared.Message("Loading config " .. config.LeagueName .. " from GitHub.")
 						Configs[string.upper(config.LeagueName)] = config
 					end
 				end
