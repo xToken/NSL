@@ -40,8 +40,16 @@
 													15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 5176141
 												],
 		"PLAYERDATA":							{
-												"999999999999": { "NSL_Team": "ThisIsAnExample", "NICK": "TestUser", "S_ID": "0:1:12345678910" }
-												"5176141": { "NSL_Team": "ThisIsAnExample", "NICK": "TestUser", "S_ID": "0:1:12345678910" }
+												"999999999999": { 
+																"NSL_Team": "ThisIsAnExample", 
+																"NICK": "TestUser", 
+																"S_ID": "0:1:12345678910" 
+																},
+												"5176141": 		{ 
+																"NSL_Team": "ThisIsAnExample", 
+																"NICK": "TestUser", 
+																"S_ID": "0:1:12345678910" 
+																}
 												}
 		},
 		{
@@ -75,10 +83,18 @@
 													"Limit6PlayerPerTeam": 					true,
 													"MercsRequireApproval": 				true
 												},
-		"REFS":									[ 0 ],
+		"REFS":									[ ],
 		"PLAYERDATA":							{
-												"999999999999": { "NSL_Team": "ThisIsAnExample", "NICK": "TestUser", "S_ID": "0:1:12345678910" }
-												"5176141": { "NSL_Team": "ThisIsAnExample", "NICK": "TestUser", "S_ID": "0:1:12345678910" }
+												"999999999999": { 
+																"NSL_Team": "ThisIsAnExample", 
+																"NICK": "TestUser", 
+																"S_ID": "0:1:12345678910" 
+																},
+												"5176141": 		{ 
+																"NSL_Team": "ThisIsAnExample", 
+																"NICK": "TestUser", 
+																"S_ID": "0:1:12345678910" 
+																}
 												}
 		}
 	],

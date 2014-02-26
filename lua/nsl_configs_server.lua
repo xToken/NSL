@@ -154,7 +154,8 @@ local Configs = { }
 
 local function OnConfigResponse(response)
 	if response then
-		local responsetable = json.decode(response)
+		local responsetable, _, errStr = json.decode(response)
+		Shared.Message(ToString(errStr))
 		if responsetable == nil or responsetable.Version == nil then
 			// RIP
 			//Retry?
@@ -170,6 +171,8 @@ local function OnConfigResponse(response)
 				for i, config in ipairs(responsetable.Configs) do
 					if config.LeagueName ~= nil then
 						//assume valid, update Configs table, always uppercase
+						Shared.Message("Loading config " .. config.LeagueName .. " from GitHub.")
+						//Shared.Message(ToString(config))
 						Configs[string.upper(config.LeagueName)] = config
 					end
 				end
