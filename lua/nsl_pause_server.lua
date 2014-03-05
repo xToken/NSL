@@ -2,8 +2,6 @@
 
 Script.Load("lua/nsl_class.lua")
 
-local kPauseEnabled = false
-
 local gamestate = {
 serverupdateenabled = false,
 serverdelayedupdateenabled = false,
@@ -317,11 +315,6 @@ local function UpdateMoveState(deltatime)
 				gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 			end
 			//No more scoreboard updates, uses PlayerInfo ent.
-			/*if gamestate.gamepausedscoreupdate + kScoreboardUpdateInterval < gamestate.gamepauseddelta then
-				GetGamerules().timeToSendScores = nil
-				GetGamerules():UpdateScores()
-				gamestate.gamepausedscoreupdate = gamestate.gamepauseddelta
-			end*/
 		else
 			ResumeEntStates()
 			gamestate.serverupdateenabled = false
@@ -364,7 +357,7 @@ Event.Hook("UpdateServer", UpdateMoveState)
 
 local function OnCommandPause(client)
 	
-	if client ~= nil and GetGamerules():GetGameStarted() and GetNSLModEnabled() and kPauseEnabled then
+	if client ~= nil and GetGamerules():GetGameStarted() and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then
 		local player = client:GetControllingPlayer()
 		if player ~= nil and not GetIsGamePaused() and gamestate.gamepausedcountdown == 0 then
 			local teamnumber = player:GetTeamNumber()
@@ -402,7 +395,7 @@ gChatCommands["pause"] = OnCommandPause
 
 local function OnCommandUnPause(client)
 	
-	if client ~= nil and GetNSLModEnabled() and kPauseEnabled then
+	if client ~= nil and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then
 		local player = client:GetControllingPlayer()
 		if player ~= nil  and GetIsGamePaused() then
 			local teamnumber = player:GetTeamNumber()
@@ -435,7 +428,7 @@ gChatCommands["resume"] = OnCommandUnPause
 
 local function OnCommandAdminPause(client)
 	
-	if client and GetNSLModEnabled() and kPauseEnabled then
+	if client and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then
 		local NS2ID = client:GetUserId()
 		if GetIsNSLRef(NS2ID) then
 			if GetGamerules():GetGameStarted() then
@@ -458,10 +451,3 @@ local function OnCommandAdminPause(client)
 end
 
 Event.Hook("Console_sv_nslpause",               OnCommandAdminPause)
-
-local function OnCommandEnablePause(client)
-	kPauseEnabled = not kPauseEnabled
-	ServerAdminPrint(client, "Pause " .. ConditionalValue(kPauseEnabled, "enabled.", "disabled."))
-end
-
-CreateServerAdminCommand("Console_sv_nslenablepause", OnCommandEnablePause, "Toggles the ability to pause the game on or off.")

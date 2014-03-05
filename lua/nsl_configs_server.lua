@@ -6,6 +6,9 @@ local configUpdateRequestSent = false
 local configUpdateRetries = 0
 local NSL_Mode = "PCW"
 local NSL_League = "NSL"
+local NSL_CachedScores = { }
+local NSL_Scores = { }
+local CachedScoresValidFor = 10 * 60
 
 function GetNSLMode()
 	return NSL_Mode
@@ -19,18 +22,29 @@ function GetActiveLeague()
 	return NSL_League
 end
 
+function GetRecentScores()
+	return NSL_CachedScores
+end
+
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "NSL" }
+	local defaultConfig = { mode = "PCW", league = "NSL", recentgames = { } }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = config.mode or "PCW"
 	NSL_League = config.league or "NSL"
+	local loadedScores = config.recentgames or { }
+	local updated = false
+	for t, s in pairs(loadedScores) do
+		if type(s) == "table" and (Shared.GetSystemTime() - (s.scoretime or 0) < CachedScoresValidFor) and (s.score or 0) > 0 then
+			NSL_CachedScores[t] = s.score or 0
+		end
+	end
 end
 
 LoadConfig()
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, recentgames = NSL_Scores })
 end
 
 function SetNSLMode(state)
@@ -52,6 +66,12 @@ function SetActiveLeague(state)
 	end
 end
 
+function UpdateNSLScores(team1name, team1score, team2name, team2score)
+	NSL_Scores[team1name] = { score = team1score, scoretime = Shared.GetSystemTime() }
+	NSL_Scores[team2name] = { score = team2score, scoretime = Shared.GetSystemTime() }
+	SavePluginConfig()
+end
+
 local ENSLBaseConfig = {
 LeagueName 							= "NSL",
 PlayerDataURL 						= "http://www.ensl.org/plugin/user/",
@@ -62,6 +82,7 @@ PauseEndDelay 						= 5,
 PauseStartDelay 					= 1,
 PauseMaxPauses 						= 3,
 PausedReadyNotificationDelay 		= 30,
+PauseEnabled 						= true,
 Interp 								= 70,
 MoveRate 							= 50,
 ClientRate 							= 20,
@@ -88,7 +109,9 @@ REFS								= { 37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 8
 										56472390, 42416427, 7862563, 3823437, 1080730, 221386, 42984531, 37996245, 49465,
 										44778147, 10498798, 24256940, 22793, 80887771, 512557, 4288812, 12482757, 54867496, 
 										711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 45160820, 
-										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442
+										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 3023411, 81519, 
+										3814554, 70496041, 12034125, 41851898, 35329790, 1207116, 69364649, 3490104, 115723837, 
+										15097215, 100657023, 95816540, 599694
 									},
 PLAYERDATA							= { },
 }
@@ -103,6 +126,7 @@ PauseEndDelay 						= 5,
 PauseStartDelay 					= 1,
 PauseMaxPauses 						= 3,
 PausedReadyNotificationDelay 		= 30,
+PauseEnabled 						= true,
 Interp 								= 70,
 MoveRate 							= 50,
 ClientRate 							= 20,
@@ -134,6 +158,7 @@ PauseEndDelay 						= 5,
 PauseStartDelay 					= 1,
 PauseMaxPauses 						= 3,
 PausedReadyNotificationDelay 		= 30,
+PauseEnabled 						= true,
 Interp 								= 100,
 MoveRate 							= 30,
 ClientRate 							= 20,

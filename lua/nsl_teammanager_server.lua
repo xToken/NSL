@@ -6,6 +6,14 @@ local overridenames = false
 
 Script.Load("lua/nsl_class.lua")
 
+local function UpdateCachedTeamScores()
+	for t, s in pairs(GetRecentScores()) do
+		tscores[t] = s
+	end
+end
+
+UpdateCachedTeamScores()
+
 local function SyncTeamInfotoClients(client)
 	if client then
 		Server.SendNetworkMessage(client, "TeamNames", {team1name = t1name, team2name = t2name, team1score = tscores[t1name] or 0, team2score = tscores[t2name] or 0 }, true)
@@ -129,6 +137,7 @@ originalNS2GREndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame",
 			end
 			//Clear merc queue
 			tqueue = { }
+			UpdateNSLScores(t1name, tscores[t1name] or 0, t2name, tscores[t2name] or 0)
 			SyncTeamInfotoClients()
 		end
 	end
