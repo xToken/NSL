@@ -61,14 +61,19 @@ function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
+local oldMapCycle_CycleMap = MapCycle_CycleMap
+function MapCycle_CycleMap()
+	//Override to prevent automatic mapcycle from lazy server admins
+end
+
 local function NewServerAgeCheck(self)
 	if GetNSLModEnabled() then
 		if self.gameState ~= kGameState.Started and Shared.GetTime() > GetNSLConfigValue("AutomaticMapCycleDelay") and Server.GetNumPlayers() == 0 then
-			MapCycle_CycleMap()
+			oldMapCycle_CycleMap()
 		end
 	else
 		if self.gameState ~= kGameState.Started and Shared.GetTime() > 360000 and Server.GetNumPlayers() == 0 then
-			MapCycle_CycleMap()
+			oldMapCycle_CycleMap()
 		end
 	end
 end
@@ -134,6 +139,7 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
 			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
 			ServerAdminPrint(client, "sv_nslpause" .. ": " .. "Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.")
+			ServerAdminPrint(client, "sv_nslsetpauses" .. ": " .. "<team, pauses> - Sets the number of pauses remaining for a team.")
 			ServerAdminPrint(client, "sv_nslforcestart" .. ": " .. "Will force the countdown to start regardless of teams ready status, still requires commanders.")
 			ServerAdminPrint(client, "sv_nslcancelstart" .. ": " .. "Will cancel a game start countdown currently in progress.")
 			ServerAdminPrint(client, "sv_nslsetteamnames" .. ": " .. "<team1name, team2name> Will set the team names manually, will prevent automatic team name updates.")
@@ -164,7 +170,7 @@ local function OnClientSVCommandSetMode(client, mode)
 		local NS2ID = client:GetUserId()
 		isRef = GetIsNSLRef(NS2ID)
 	end
-	if not isRef and mode ~= nil then
+	if (not isRef or not GetNSLModEnabled()) and mode ~= nil then
 		UpdateNSLMode(client, mode)
 	end
 end

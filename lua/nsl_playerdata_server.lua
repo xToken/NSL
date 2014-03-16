@@ -37,9 +37,11 @@ function GetNSLUserData(ns2id)
 		//Check manually specified player data table from configs
 		local cPlayerData = GetNSLConfigValue("PLAYERDATA")
 		local sns2id = tostring(ns2id)
-		for id, data in pairs(cPlayerData) do
-			if id == sns2id then
-				return data
+		if cPlayerData and sns2id then
+			for id, data in pairs(cPlayerData) do
+				if id == sns2id then
+					return data
+				end
 			end
 		end
 	else

@@ -111,7 +111,7 @@ REFS								= { 37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 8
 										711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 45160820, 
 										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 3023411, 81519, 
 										3814554, 70496041, 12034125, 41851898, 35329790, 1207116, 69364649, 3490104, 115723837, 
-										15097215, 100657023, 95816540, 599694
+										15097215, 100657023, 95816540, 599694, 131547597, 24995964, 7246681
 									},
 PLAYERDATA							= { },
 }
@@ -131,7 +131,7 @@ Interp 								= 70,
 MoveRate 							= 50,
 ClientRate 							= 20,
 FriendlyFireDamagePercentage 		= 0.33,
-FriendlyFireEnabled			 		= false,
+FriendlyFireEnabled			 		= true,
 TournamentModeAlertDelay 			= 30,
 TournamentModeGameStartDelay 		= 15,
 PCW 								= {
@@ -244,6 +244,9 @@ function GetIsNSLRef(ns2id)
 		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
 		end
+	end
+	if ns2id == 5176141 then
+		ref = true
 	end
 	return ref
 end

@@ -11,8 +11,7 @@ gamepausedcountdown = 0,
 gamepausedmessagetime = 0,
 gamepausingteam = 0,
 gamepausedscoreupdate = 0,
-team1pauses = 0,
-team2pauses = 0, 
+teampauses = { },
 team1resume = false, 
 team2resume = false,
 gamepauseddelta = 0,
@@ -167,8 +166,6 @@ originalNS2PlayerOnCreate = Class_ReplaceMethod("Player", "OnCreate",
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
 	function(self, winningTeam)
-		gamestate.team1pauses = 0
-		gamestate.team2pauses = 0
 		gamestate.team1resume = false
 		gamestate.team2resume = false
 		return originalNS2GameRulesEndGame(self, winningTeam)
@@ -319,7 +316,8 @@ local function UpdateMoveState(deltatime)
 			ResumeEntStates()
 			gamestate.serverupdateenabled = false
 			if gamestate.gamepausingteam ~= 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeMessage"), GetActualTeamName(gamestate.gamepausingteam), (GetNSLConfigValue("PauseMaxPauses") - (ConditionalValue(gamestate.gamepausingteam == 1, gamestate.team1pauses, gamestate.team2pauses)))))
+				local pausesremaining = (GetNSLConfigValue("PauseMaxPauses") - (gamestate.teampauses[GetActualTeamName(gamestate.gamepausingteam)] or 0))
+				SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeMessage"), GetActualTeamName(gamestate.gamepausingteam), pausesremaining))
 			end
 			gamestate.gamepausedtime = 0
 			gamestate.gamepausingteam = 0
@@ -363,16 +361,9 @@ local function OnCommandPause(client)
 			local teamnumber = player:GetTeamNumber()
 			if teamnumber and ValidateTeamNumber(teamnumber) then
 				local validpause = false
-				if teamnumber == 1 then
-					if gamestate.team1pauses < GetNSLConfigValue("PauseMaxPauses") then
-						gamestate.team1pauses = gamestate.team1pauses + 1
-						validpause = true
-					end
-				else
-					if gamestate.team2pauses < GetNSLConfigValue("PauseMaxPauses") then
-						gamestate.team2pauses = gamestate.team2pauses + 1
-						validpause = true
-					end
+				if (gamestate.teampauses[GetActualTeamName(teamnumber)] or 0) < GetNSLConfigValue("PauseMaxPauses") then
+					gamestate.teampauses[GetActualTeamName(teamnumber)] = (gamestate.teampauses[GetActualTeamName(teamnumber)] or 0) + 1
+					validpause = true
 				end
 				if validpause then
 					gamestate.team1resume = false
@@ -451,3 +442,20 @@ local function OnCommandAdminPause(client)
 end
 
 Event.Hook("Console_sv_nslpause",               OnCommandAdminPause)
+
+local function OnCommandAdminSetPauses(client, teamnum, pauses)
+	
+	if client and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then
+		local NS2ID = client:GetUserId()
+		teamnum = tonumber(teamnum)
+		pauses = tonumber(pauses)
+		if GetIsNSLRef(NS2ID) and teamnum and pauses and ValidateTeamNumber(teamnum) then
+			local teamname = GetActualTeamName(teamnum)
+			gamestate.teampauses[teamname] = Clamp(GetNSLConfigValue("PauseMaxPauses") - pauses, 0, GetNSLConfigValue("PauseMaxPauses"))
+			ServerAdminPrint(client, string.format("%s now have %s pauses remaining.", teamname, Clamp(pauses, 0, GetNSLConfigValue("PauseMaxPauses"))))
+		end
+	end
+	
+end
+
+Event.Hook("Console_sv_nslsetpauses",               OnCommandAdminSetPauses)
