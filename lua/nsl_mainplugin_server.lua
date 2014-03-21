@@ -90,7 +90,9 @@ function SendAllClientsMessage(message)
 end
 
 function SendClientMessage(client, message)
-	Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	if client ~= nil then
+		Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	end
 end
 
 function SendTeamMessage(teamnum, message)

@@ -150,8 +150,8 @@ originalNS2AiAttacksMixinOnTag = Class_ReplaceMethod("AiAttacksMixin", "OnTag",
 local originalNS2PlayerCopyPlayerDataFrom
 originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 
 	function(self, player)
-		originalNS2PlayerCopyPlayerDataFrom(self, player)
 		self.timeadjustment = player.timeadjustment
+		originalNS2PlayerCopyPlayerDataFrom(self, player)
 	end
 )
 

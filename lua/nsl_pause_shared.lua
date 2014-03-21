@@ -88,10 +88,10 @@ originalNS2SharedGetTime = Class_ReplaceMethod("Shared", "GetTime",
 		local localPlayer
 		if Server then
 			timeadjustment = gSharedGetTimeAdjustments
-		elseif Predict then
-			localPlayer = Predict.GetLocalPlayer()
 		elseif Client then
 			localPlayer = Client.GetLocalPlayer()
+		elseif Predict then
+			localPlayer = Predict.GetLocalPlayer()
 		end
 		if localPlayer ~= nil then
 			timeadjustment = localPlayer.timeadjustment

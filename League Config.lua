@@ -20,14 +20,14 @@
 		"TournamentModeAlertDelay": 			30,
 		"TournamentModeGameStartDelay": 		15,
 		"PCW": 									{
-													"PausedMaxDuration": 					120,
+													"PausedMaxDuration": 					300,
 													"TournamentModeForfeitClock":			0,
 													"TournamentModeRestartDuration": 		90,
 													"Limit6PlayerPerTeam": 					false,
 													"MercsRequireApproval": 				false
 												},
 		"OFFICIAL":								{
-													"PausedMaxDuration": 					90,
+													"PausedMaxDuration": 					300,
 													"TournamentModeForfeitClock":			1200,
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
