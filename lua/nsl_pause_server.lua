@@ -18,11 +18,11 @@ gamepauseddelta = 0,
 gamedelaydelta = 0
 }
 
-gSharedGetTimeAdjustments = 0
-
 local function GetDamageOverTimeIsEnabled(self)
     return self.damageOverTime ~= nil and self.damageOverTime > 0
 end
+
+gSharedGetTimeAdjustments = 0
 
 local UpdatingClasses = {	
 "ScriptActor",
@@ -147,11 +147,20 @@ originalNS2AiAttacksMixinOnTag = Class_ReplaceMethod("AiAttacksMixin", "OnTag",
 	end
 )
 
+local originalNS2GameRulesEndGame
+originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
+	function(self, winningTeam)
+		gamestate.team1resume = false
+		gamestate.team2resume = false
+		return originalNS2GameRulesEndGame(self, winningTeam)
+	end
+)
+
 local originalNS2PlayerCopyPlayerDataFrom
 originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 
 	function(self, player)
-		self.timeadjustment = player.timeadjustment
 		originalNS2PlayerCopyPlayerDataFrom(self, player)
+		self.timeadjustment = gSharedGetTimeAdjustments
 	end
 )
 
@@ -160,15 +169,6 @@ originalNS2PlayerOnCreate = Class_ReplaceMethod("Player", "OnCreate",
 	function(self)
 		originalNS2PlayerOnCreate(self)
 		self.timeadjustment = gSharedGetTimeAdjustments
-	end
-)
-
-local originalNS2GameRulesEndGame
-originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
-	function(self, winningTeam)
-		gamestate.team1resume = false
-		gamestate.team2resume = false
-		return originalNS2GameRulesEndGame(self, winningTeam)
 	end
 )
 
@@ -198,22 +198,23 @@ local function UpdateEntStates(deltatime)
 			if ValidateTeamNumber(player:GetTeamNumber()) and not player.gamepaused then
 				player.followMoveEnabled = false
 			end
-			player.timeadjustment = gSharedGetTimeAdjustments
 			player.gamepaused = gamestate.gamepaused
+			player.timeadjustment = gSharedGetTimeAdjustments
 		end
 	end
 end
 
 //This runs when game resumes, should restore any ents whos states were saved initially.
 local function ResumeEntStates()
+	
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	for _, player in ientitylist(playerRecords) do
 		if player ~= nil then
 			if ValidateTeamNumber(player:GetTeamNumber()) then
 				player.followMoveEnabled = true
 			end
-			player.timeadjustment = gSharedGetTimeAdjustments
 			player.gamepaused = gamestate.gamepaused
+			player.timeadjustment = gSharedGetTimeAdjustments
 		end
 	end
 	//Resume the annoying noise
@@ -272,7 +273,6 @@ local function SaveEntStates()
 					player:SecondaryAttackEnd()
 				end
 			end
-			player.timeadjustment = gSharedGetTimeAdjustments
 			player.gamepaused = true
 		end
 	end

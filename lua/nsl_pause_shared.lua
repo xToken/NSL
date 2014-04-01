@@ -81,6 +81,11 @@ elseif Client then
 	end
 end
 
+//This seems wierd, but want to ensure smoothest experience possible, and ready room players that trigger a crouch will cause havok for themselves.
+function Player:GetCrouchCameraAnimationAllowed(result)
+    result.allowed = result.allowed and not self.gamepaused
+end
+
 local originalNS2SharedGetTime
 originalNS2SharedGetTime = Class_ReplaceMethod("Shared", "GetTime", 
 	function()
@@ -99,10 +104,5 @@ originalNS2SharedGetTime = Class_ReplaceMethod("Shared", "GetTime",
 		return (originalNS2SharedGetTime() - (timeadjustment or 0))	
 	end
 )
-
-//This seems wierd, but want to ensure smoothest experience possible, and ready room players that trigger a crouch will cause havok for themselves.
-function Player:GetCrouchCameraAnimationAllowed(result)
-    result.allowed = result.allowed and not self.gamepaused
-end
 
 Class_Reload( "Player", {timeadjustment = "time", gamepaused = "compensated boolean"} )

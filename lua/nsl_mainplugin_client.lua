@@ -48,3 +48,25 @@ end
 Client.HookNetworkMessage("AdminMessage", AdminMessageRecieved)
 
 AddClientUIScriptForClass("Spectator", "GUINSLFollowingSpectatorHUD")
+
+//Materials that reference time dont call back into lua, which causes issues.
+//This sucks, but should hopefully fix those issues.
+//This might be the most epic hack in all of ns2 :<
+
+local TimeBypassFunctions = { }
+table.insert(TimeBypassFunctions, {name = "Alien", func = "UpdateClientEffects", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "BiteLeap", func = "CreateBloodEffect", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "LerkBite", func = "CreateBloodEffect", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "SpitSpray", func = "OnTag", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "LiveMixin", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "DetectableMixin", func = "OnUpdateRender", oldFunc = nil })
+
+for i, classarray in pairs(TimeBypassFunctions) do
+	classarray.oldFunc = Class_ReplaceMethod(classarray.name, classarray.func, 
+		function(...)
+			timeBypass = true
+			classarray.oldFunc(...)
+			timeBypass = false
+		end
+	)
+end

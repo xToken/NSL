@@ -245,9 +245,6 @@ function GetIsNSLRef(ns2id)
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
 		end
 	end
-	if ns2id == 5176141 then
-		ref = true
-	end
 	return ref
 end
 
