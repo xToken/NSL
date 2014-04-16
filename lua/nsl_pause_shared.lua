@@ -3,7 +3,7 @@ Script.Load("lua/nsl_class.lua")
 gTimeBypass = false
 
 local function ValidateTeamNumber(teamnum)
-	return teamnum == 1 or teamnum == 2
+	return teamnum ~= 3
 end
 
 //Blocks input.
@@ -26,13 +26,7 @@ originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove",
 	function(self, input)
 
 		if self.gamepaused then
-			if ValidateTeamNumber(self:GetTeamNumber()) then
-				return
-			else
-				gTimeBypass = true
-				originalNS2PlayerOnProcessMove(self, input)
-				gTimeBypass = false
-			end
+			return
 		else
 			originalNS2PlayerOnProcessMove(self, input)
 		end

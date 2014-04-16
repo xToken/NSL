@@ -57,9 +57,8 @@ local TimeBypassFunctions = { }
 table.insert(TimeBypassFunctions, {name = "Alien", func = "UpdateClientEffects", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "BiteLeap", func = "CreateBloodEffect", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "LerkBite", func = "CreateBloodEffect", oldFunc = nil })
-table.insert(TimeBypassFunctions, {name = "SpitSpray", func = "OnTag", oldFunc = nil })
-table.insert(TimeBypassFunctions, {name = "LiveMixin", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "DetectableMixin", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "ClientWeaponEffectsMixin", func = "UpdateAttackEffects", oldFunc = nil })
 
 for i, classarray in pairs(TimeBypassFunctions) do
 	classarray.oldFunc = Class_ReplaceMethod(classarray.name, classarray.func, 
@@ -69,4 +68,16 @@ for i, classarray in pairs(TimeBypassFunctions) do
 			gTimeBypass = false
 		end
 	)
+end
+
+//WOWOWOWOWOWOW
+local oldChatUI_EnterChatMessage = ChatUI_EnterChatMessage
+function ChatUI_EnterChatMessage(teamOnly)
+	oldChatUI_EnterChatMessage(teamOnly)
+	if Client then
+		local localPlayer = Client.GetLocalPlayer()
+		if localPlayer and localPlayer.gamepaused then
+			ReplaceLocals(oldChatUI_EnterChatMessage, { startedChatTime = (Shared.GetTime() - 0.01) })
+		end
+	end
 end
