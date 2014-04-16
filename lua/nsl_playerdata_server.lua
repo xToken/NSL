@@ -132,6 +132,13 @@ local function OnClientConnectENSLResponse(response)
 				if player then
 					ServerAdminPrint(Server.GetOwner(player), string.format("NSL Username verified as %s", NSL_ClientData[ns2id].NICK))
 				end
+				if responsetable[10]~= nil then
+					if string.find(responsetable[10], "Admin") then
+						NSL_ClientData[ns2id].NSL_Level = 2
+					elseif string.find(responsetable[10], "Referee") then
+						NSL_ClientData[ns2id].NSL_Level = 1
+					end
+				end
 				UpdateClientBadge(ns2id, NSL_ClientData[ns2id].NSL_Team)
 			end
 		end
@@ -195,6 +202,20 @@ local function OnClientConnected(client)
 end
 
 table.insert(gConnectFunctions, OnClientConnected)
+
+local function UpdatePlayerDataOnActivation(newState)
+	if newState == "PCW" or newState == "OFFICIAL" then
+		local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
+		for p = 1, #playerList do
+			local playerClient = Server.GetOwner(playerList[p])
+			if playerClient then
+				OnClientConnected(playerClient)
+			end
+		end
+	end
+end
+
+table.insert(gPluginStateChange, UpdatePlayerDataOnActivation)
 
 local function GetPlayerList(query)
 	if query == nil then

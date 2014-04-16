@@ -5,7 +5,7 @@
 		"LeagueName": 							"NSL",
 		"PlayerDataURL": 						"http://www.ensl.org/plugin/user/",
 		"PlayerDataFormat":						"ENSL",
-		"PlayerRefLevel": 						10,
+		"PlayerRefLevel": 						1,
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
 		"PauseStartDelay": 						1,

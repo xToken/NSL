@@ -160,7 +160,14 @@ local originalNS2PlayerCopyPlayerDataFrom
 originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 
 	function(self, player)
 		originalNS2PlayerCopyPlayerDataFrom(self, player)
-		self.timeadjustment = gSharedGetTimeAdjustments
+		self.gamepaused = GetIsGamePaused()
+		if self.gamepaused then
+			self.timepaused = GetIsGamePausedTime()
+			self.timeadjustment = Shared.GetTime(true) - GetIsGamePausedTime()
+		else
+			self.timepaused = GetIsGamePausedTime()
+			self.timeadjustment = gSharedGetTimeAdjustments
+		end
 	end
 )
 
@@ -168,17 +175,16 @@ local originalNS2PlayerOnCreate
 originalNS2PlayerOnCreate = Class_ReplaceMethod("Player", "OnCreate", 
 	function(self)
 		originalNS2PlayerOnCreate(self)
-		self.timeadjustment = gSharedGetTimeAdjustments
+		self.gamepaused = GetIsGamePaused()
+		if self.gamepaused then
+			self.timepaused = GetIsGamePausedTime()
+			self.timeadjustment = Shared.GetTime(true) - GetIsGamePausedTime()
+		else
+			self.timepaused = GetIsGamePausedTime()
+			self.timeadjustment = gSharedGetTimeAdjustments
+		end
 	end
 )
-
-local function PauseBlockTeamJoins(self, teamNumber)
-	if GetIsGamePaused() and (teamNumber ~= 1 and teamNumber ~= 2) then
-		// send message telling people that they cant do that.
-		return false
-	end
-	return true
-end
 
 table.insert(gCanJoinTeamFunctions, PauseBlockTeamJoins)
 
@@ -190,17 +196,36 @@ function GetIsGamePaused()
 	return gamestate.gamepaused
 end
 
+function GetIsGamePausedTime()
+	return gamestate.gamepausedtime
+end
+
+local lastTimeAdjustmentUpdate = 0
+local kTimeAdjustmentUpdateRate = 1
+
 //This runs every tick to procedurally update any timerelevant fields of any relevant ents to insure they remain in the appropriate state.
 local function UpdateEntStates(deltatime)
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	for _, player in ientitylist(playerRecords) do
 		if player ~= nil then
-			if ValidateTeamNumber(player:GetTeamNumber()) and not player.gamepaused then
-				player.followMoveEnabled = false
+			lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate + deltatime
+			if lastTimeAdjustmentUpdate > (1 / kTimeAdjustmentUpdateRate) then
+				lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate - (1 / kTimeAdjustmentUpdateRate)
+				player.timeadjustment = gSharedGetTimeAdjustments
 			end
 			player.gamepaused = gamestate.gamepaused
-			player.timeadjustment = gSharedGetTimeAdjustments
+			player.timepaused = gamestate.gamepausedtime
 		end
+	end
+	local gamerules = GetGamerules()
+	if gamerules then
+		gamerules.timeToSendAllPings = gamerules.timeToSendAllPings - deltatime
+		gamerules.timeToSendIndividualPings = gamerules.timeToSendIndividualPings - deltatime
+		gamerules.timeToSendHealth = gamerules.timeToSendHealth - deltatime
+		gamerules.timeToSendTechPoints = gamerules.timeToSendTechPoints - deltatime
+		gamerules:UpdatePings()
+		gamerules:UpdateHealth()
+		gamerules:UpdateTechPoints()
 	end
 end
 
@@ -210,11 +235,9 @@ local function ResumeEntStates()
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	for _, player in ientitylist(playerRecords) do
 		if player ~= nil then
-			if ValidateTeamNumber(player:GetTeamNumber()) then
-				player.followMoveEnabled = true
-			end
 			player.gamepaused = gamestate.gamepaused
 			player.timeadjustment = gSharedGetTimeAdjustments
+			player.timepaused = gamestate.gamepausedtime
 		end
 	end
 	//Resume the annoying noise
@@ -222,7 +245,6 @@ local function ResumeEntStates()
 	for _, Ob in ientitylist(Obs) do
 		if Ob.distressBeaconTime ~= nil and Ob.distressBeaconSound ~= nil then
 			Ob.distressBeaconSound:Start()
-			
 			local origin = Ob:GetDistressOrigin()
 			Ob.distressBeaconSound:SetOrigin(origin)
 		end
@@ -267,13 +289,13 @@ local function SaveEntStates()
 				if weapon ~= nil then
 					weapon.reloading = false
 				end
-				player.followMoveEnabled = false
 				player:SetCameraShake(0)
 				if(player.secondaryAttackLastFrame ~= nil and player.secondaryAttackLastFrame) then
 					player:SecondaryAttackEnd()
 				end
 			end
 			player.gamepaused = true
+			player.timepaused = Shared.GetTime()
 		end
 	end
 	

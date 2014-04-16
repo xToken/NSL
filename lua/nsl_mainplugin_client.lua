@@ -64,9 +64,9 @@ table.insert(TimeBypassFunctions, {name = "DetectableMixin", func = "OnUpdateRen
 for i, classarray in pairs(TimeBypassFunctions) do
 	classarray.oldFunc = Class_ReplaceMethod(classarray.name, classarray.func, 
 		function(...)
-			timeBypass = true
+			gTimeBypass = true
 			classarray.oldFunc(...)
-			timeBypass = false
+			gTimeBypass = false
 		end
 	)
 end

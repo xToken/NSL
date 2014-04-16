@@ -9,6 +9,8 @@ gArgumentedChatCommands = { }
 gConnectFunctions = { }
 //Team Allowance Checks
 gCanJoinTeamFunctions = { }
+//Plugin Activation Functions
+gPluginStateChange = { }
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
@@ -312,17 +314,44 @@ local function UpdateSpectatorMode(self, input)
 	
 end
 
-ReplaceLocals(Spectator.OnProcessMove, {UpdateSpectatorMode = UpdateSpectatorMode})
+ReplaceLocals(GetOriginalSpecOnProcessMove(), {UpdateSpectatorMode = UpdateSpectatorMode})
 
-local oldNS2SpectatorOnInitialized = Spectator.OnInitialized
-function Spectator:OnInitialized()
-	oldNS2SpectatorOnInitialized(self)
-	self:SetSpectatorMode(kSpectatorMode.Following)
+function FollowingSpectatorMode:FindTarget(spectator)
+    if spectator.selectedId ~= Entity.invalidId then
+        spectator.followedTargetId = spectator.selectedId    
+    end
 end
 
-function TeamSpectator:OnInitialized()
-	Spectator.OnInitialized(self)
-end
+local oldNS2SpectatorOnInitialized
+oldNS2SpectatorOnInitialized = Class_ReplaceMethod("Spectator", "OnInitialized", 
+	function(self)
+		Player.OnInitialized(self)
+    
+		self.selectedId = Entity.invalidId
+		
+		if Server then
+		
+			self.timeFromLastAction = 0
+			self:SetIsVisible(false)
+			self:SetIsAlive(false)
+			// Start us off by looking for a target to follow.
+			self:SetSpectatorMode(kSpectatorMode.Following)
+			
+		elseif Client then
+		
+			if self:GetIsLocalPlayer() and self:GetTeamNumber() == kSpectatorIndex then
+				self:ShowMap(true, false, true)
+			end
+			
+		end
+		
+		// Remove physics
+		self:DestroyController()
+		
+		// Other players never see a spectator.
+		self:SetPropagate(Entity.Propagate_Never)
+	end
+)
 
 local function OnClientCommandNSLFPS(client)
 	if client then
