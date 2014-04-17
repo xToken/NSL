@@ -8,7 +8,7 @@
 		"PlayerRefLevel": 						1,
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
-		"PauseStartDelay": 						1,
+		"PauseStartDelay": 						5,
 		"PauseMaxPauses": 						3,
 		"PausedReadyNotificationDelay": 		30,
 		"PauseEnabled": 						true,

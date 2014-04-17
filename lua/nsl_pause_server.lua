@@ -3,8 +3,8 @@
 Script.Load("lua/nsl_class.lua")
 
 local gamestate = {
-serverupdateenabled = false,
-serverdelayedupdateenabled = false,
+serverpauseloopenabled = false,
+serverprepauseloopenabled = false,
 gamepaused = false,
 gamepausedtime = 0,
 gamepausedcountdown = 0,
@@ -15,7 +15,7 @@ teampauses = { },
 team1resume = false, 
 team2resume = false,
 gamepauseddelta = 0,
-gamedelaydelta = 0
+gameprepausedelta = 0
 }
 
 local function GetDamageOverTimeIsEnabled(self)
@@ -309,7 +309,7 @@ end
 
 local function UpdateMoveState(deltatime)
 
-	if gamestate.serverupdateenabled then
+	if gamestate.serverpauseloopenabled then
 		gamestate.gamepauseddelta = gamestate.gamepauseddelta + deltatime
 		if GetIsGamePaused() then
 			//Going to check and reblock player movement every second or so - trying every frame, might as well.
@@ -330,13 +330,13 @@ local function UpdateMoveState(deltatime)
 			end
 			UpdateEntStates(deltatime)
 			if GetNSLConfigValue("PausedMaxDuration") ~= 0 and gamestate.gamepauseddelta >= GetNSLConfigValue("PausedMaxDuration") and gamestate.gamepausedcountdown == 0 then
-				gamestate.serverdelayedupdateenabled = true
+				gamestate.serverprepauseloopenabled = true
 				gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 			end
 			//No more scoreboard updates, uses PlayerInfo ent.
 		else
 			ResumeEntStates()
-			gamestate.serverupdateenabled = false
+			gamestate.serverpauseloopenabled = false
 			if gamestate.gamepausingteam ~= 0 then
 				local pausesremaining = (GetNSLConfigValue("PauseMaxPauses") - (gamestate.teampauses[GetActualTeamName(gamestate.gamepausingteam)] or 0))
 				SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeMessage"), GetActualTeamName(gamestate.gamepausingteam), pausesremaining))
@@ -346,16 +346,16 @@ local function UpdateMoveState(deltatime)
 			gamestate.gamepauseddelta = 0
 		end
 	end
-	if gamestate.serverdelayedupdateenabled then
-		gamestate.gamedelaydelta = gamestate.gamedelaydelta + deltatime
-		if gamestate.gamedelaydelta >= 1 then
+	if gamestate.serverprepauseloopenabled then
+		gamestate.gameprepausedelta = gamestate.gameprepausedelta + deltatime
+		if gamestate.gameprepausedelta >= 1 then
 			gamestate.gamepausedcountdown = (gamestate.gamepausedcountdown - 1)
 			if gamestate.gamepausedcountdown > 0 then
 				SendAllClientsMessage(string.format(GetNSLMessage("PauseWarningMessage"), ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)))
 			else
 				if not GetIsGamePaused() then
 					SaveEntStates()
-					gamestate.serverupdateenabled = true
+					gamestate.serverpauseloopenabled = true
 					SendAllClientsMessage(GetNSLMessage("PausePausedMessage"))
 					gamestate.gamepausedtime = Shared.GetTime()
 					//Shared.Message("Game Paused.")
@@ -363,11 +363,11 @@ local function UpdateMoveState(deltatime)
 					//Since other event already running, just let the final trigger run there (will be next frame).
 					//Shared.Message("Game Resumed.")
 				end
-				gamestate.serverdelayedupdateenabled = false
+				gamestate.serverprepauseloopenabled = false
 				gamestate.gamepaused = not GetIsGamePaused()
 				gamestate.gamepausedcountdown = 0
 			end
-			gamestate.gamedelaydelta = gamestate.gamedelaydelta - 1
+			gamestate.gameprepausedelta = gamestate.gameprepausedelta - 1
 		end
 	end
 
@@ -392,7 +392,7 @@ local function OnCommandPause(client)
 					gamestate.team2resume = false
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseStartDelay")
 					gamestate.gamepausingteam = teamnumber
-					gamestate.serverdelayedupdateenabled = true
+					gamestate.serverprepauseloopenabled = true
 					SendAllClientsMessage(string.format(GetNSLMessage("PausePlayerMessage"), player:GetName()))
 				else
 					SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
@@ -426,7 +426,7 @@ local function OnCommandUnPause(client)
 					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
 				elseif gamestate.gamepausedcountdown == 0 then
 					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadiedMessage"), player:GetName(), GetActualTeamName(teamnumber)))
-					gamestate.serverdelayedupdateenabled = true
+					gamestate.serverprepauseloopenabled = true
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 				end
 			end
@@ -446,12 +446,12 @@ local function OnCommandAdminPause(client)
 		if GetIsNSLRef(NS2ID) then
 			if GetGamerules():GetGameStarted() then
 				if gamestate.gamepausedcountdown == 0 then
-					gamestate.serverdelayedupdateenabled = true
+					gamestate.serverprepauseloopenabled = true
 					gamestate.team1resume = false
 					gamestate.team2resume = false
 					gamestate.gamepausedcountdown = ConditionalValue(GetIsGamePaused(), GetNSLConfigValue("PauseEndDelay"), GetNSLConfigValue("PauseStartDelay"))
 				else
-					gamestate.serverdelayedupdateenabled = false
+					gamestate.serverprepauseloopenabled = false
 					SendAllClientsMessage(GetNSLMessage("PauseCancelledMessage"))
 					gamestate.gamepausedcountdown = 0
 				end

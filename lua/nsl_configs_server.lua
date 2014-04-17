@@ -82,7 +82,7 @@ PlayerDataFormat					= "ENSL",
 PlayerRefLevel 						= 1,
 AutomaticMapCycleDelay				= 180 * 60,
 PauseEndDelay 						= 5,
-PauseStartDelay 					= 1,
+PauseStartDelay 					= 5,
 PauseMaxPauses 						= 3,
 PausedReadyNotificationDelay 		= 30,
 PauseEnabled 						= true,
@@ -246,9 +246,6 @@ function GetIsNSLRef(ns2id)
 		local pData = GetNSLUserData(ns2id)
 		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
-		end
-		if ns2id == 5176141 then
-			ref = true
 		end
 	end
 	return ref
