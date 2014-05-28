@@ -81,3 +81,28 @@ function ChatUI_EnterChatMessage(teamOnly)
 		end
 	end
 end
+
+local RefBadges = { }
+
+local function RefBadgeRecieved(msg)
+	Print("received RefBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
+	RefBadges[ msg.clientId ] = msg
+end
+
+Client.HookNetworkMessage("RefBadges", RefBadgeRecieved)
+
+local oldBadges_GetBadgeTextures = Badges_GetBadgeTextures
+function Badges_GetBadgeTextures( clientId, usecase )
+	local textures = { }
+	local badges = RefBadges[ clientId ]
+	textures = oldBadges_GetBadgeTextures(clientId, usecase)
+    if badges then
+		local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
+		for _,info in ipairs(gRefBadges) do
+			if badges[ "has_" .. info.name .. "_badge" ] == true then
+				table.insert( textures, info[textureKey] )
+			end
+		end
+	end
+	return textures
+end

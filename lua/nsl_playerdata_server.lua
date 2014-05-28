@@ -2,6 +2,7 @@ local C_CODE = "1A2D3E4C5F"
 local NSL_ClientData = { }
 local NSL_NS2IDLookup = { }
 local G_IDTable = { }
+local RefBadges = { }
 
 //These are the only mandatory fields
 //S_ID 		- Steam ID
@@ -92,9 +93,44 @@ end
 
 local function UpdateClientBadge(ns2id, team)
 	if GiveBadge then
+		//Yay for badges+ mod.
+		//Give badge if ref, and ref badge configured.
+		local succes, row
+		row = 1
+		if GetNSLConfigValue("RefereeBadge") ~= "" and GetIsNSLRef(ns2id) then
+			success = GiveBadge(ns2id, GetNSLConfigValue("RefereeBadge"), row)
+			row = row + 1
+		end
 		for badge, names in pairs(TeamnameToBadgeNames) do
 			if table.contains(names, team) then
-				return GiveBadge(ns2id, badge)
+				success = success and GiveBadge(ns2id, badge, row)
+				return success
+			end
+		end
+	else
+		//Assume legacy badge process :S
+		local player = GetPlayerMatchingNS2Id(ns2id)
+		if player and GetNSLConfigValue("RefereeBadge") ~= "" and GetIsNSLRef(ns2id) then
+			local client = Server.GetOwner(player)
+			if client then
+				local newmsg = { clientId = client:GetId() }
+				
+				//Set all badges to false first.
+				for _, badge in ipairs(gRefBadges) do
+					newmsg[ "has_" .. badge.name .. "_badge" ] = false
+				end
+				//Set current NSL badge to true.
+				newmsg["has_" .. GetNSLConfigValue("RefereeBadge") .. "_badge"] = true
+				
+				Server.SendNetworkMessage("RefBadges", newmsg, true)
+				
+				// Send this client info for all existing clients.
+				for clientId, msg in pairs(RefBadges) do
+					Server.SendNetworkMessage( client, "RefBadges", msg, true )
+				end
+				
+				// Store it ourselves as well for future clients
+				RefBadges[ newmsg.clientId ] = newmsg
 			end
 		end
 	end

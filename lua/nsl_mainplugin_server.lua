@@ -50,6 +50,31 @@ originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "
 	end
 )
 
+function Player:OnJoinTeam()
+	//This is new, to prevent players joining midgame and getting pRes.
+	local gamerules = GetGamerules()
+	if gamerules and gamerules:GetGameStarted() then
+		//Set pres to 0.
+		local team = self:GetTeam()
+		local startingpres = kPlayerInitialIndivRes
+		if kAlienInitialIndivRes and kMarineInitialIndivRes and team then
+			startingpres = ConditionalValue(team.GetIsAlienTeam and team:GetIsAlienTeam(), kAlienInitialIndivRes, kMarineInitialIndivRes)
+		end
+		if self:GetResources() == startingpres then
+			self:SetResources(0)
+		end
+	end
+end
+
+local originalAlienOnJoinTeam
+//Maintain original AlienOnJoinTeam
+originalAlienOnJoinTeam = Class_ReplaceMethod("Alien", "OnJoinTeam", 
+	function(self)
+		originalAlienOnJoinTeam(self)
+		Player.OnJoinTeam(self)
+	end
+)
+
 local originalNS2GRGetFriendlyFire
 //Override friendly fire function checks
 originalNS2GRGetFriendlyFire = Class_ReplaceMethod("NS2Gamerules", "GetFriendlyFire", 

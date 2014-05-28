@@ -21,6 +21,26 @@ local kAdminChatMessage =
 
 Shared.RegisterNetworkMessage("AdminMessage", kAdminChatMessage)
 
+gRefBadges = 
+{
+	{
+		name = "ensl_staff",
+		unitStatusTexture = "ui/badges/ensl_staff.dds",
+        scoreboardTexture = "ui/badges/ensl_staff.dds"
+	}
+}
+
+local kRefBadgesMessage = 
+{
+    clientId = "integer",
+}
+
+for _, badge in ipairs(gRefBadges) do
+    kRefBadgesMessage[ "has_" .. badge.name .. "_badge" ] = "boolean"
+end
+
+Shared.RegisterNetworkMessage("RefBadges", kRefBadgesMessage)
+
 function PlayerRanking:GetTrackServer()
     return not GetServerContainsBots()
 end

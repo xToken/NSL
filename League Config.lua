@@ -19,6 +19,7 @@
 		"FriendlyFireEnabled":			 		true,
 		"TournamentModeAlertDelay": 			30,
 		"TournamentModeGameStartDelay": 		15,
+		"RefereeBadge":				 			"ensl_staff",
 		"PCW": 									{
 													"PausedMaxDuration": 					300,
 													"TournamentModeForfeitClock":			0,
@@ -28,7 +29,7 @@
 												},
 		"OFFICIAL":								{
 													"PausedMaxDuration": 					300,
-													"TournamentModeForfeitClock":			1200,
+													"TournamentModeForfeitClock":			900,
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
 													"MercsRequireApproval": 				true
