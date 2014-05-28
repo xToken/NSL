@@ -85,7 +85,7 @@ end
 local RefBadges = { }
 
 local function RefBadgeRecieved(msg)
-	Print("received RefBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
+	//Print("received RefBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
 	RefBadges[ msg.clientId ] = msg
 end
 

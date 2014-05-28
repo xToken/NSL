@@ -249,9 +249,6 @@ function GetIsNSLRef(ns2id)
 		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
 		end
-		if ns2id == 5176141 then
-			ref = true
-		end
 	end
 	return ref
 end
