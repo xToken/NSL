@@ -27,6 +27,11 @@ gRefBadges =
 		name = "ensl_staff",
 		unitStatusTexture = "ui/badges/ensl_staff.dds",
         scoreboardTexture = "ui/badges/ensl_staff.dds"
+	},
+	{
+		name = "ensl_admin",
+		unitStatusTexture = "ui/badges/ensl_admin.dds",
+        scoreboardTexture = "ui/badges/ensl_admin.dds"
 	}
 }
 
