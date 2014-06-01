@@ -19,17 +19,17 @@ local RefBadges = { }
 //Would like to USE these icons :S
 
 local TeamnameToBadgeNames = { }
-TeamnameToBadgeNames["clan_all-in"] = { "All-In" }
-TeamnameToBadgeNames["clan_calamity_gaming"] = { "Calamity Gaming" }
-TeamnameToBadgeNames["clan_dark_legion"] = { "Dark Legion" }
-TeamnameToBadgeNames["clan_godar"] = { "Goðar" }
-TeamnameToBadgeNames["clan_legendary_snails"] = { "Legendary Snails" }
-TeamnameToBadgeNames["clan_lucky_fkers"] = { "Lucky Fkers" }
-TeamnameToBadgeNames["clan_mimic"] = { "Mimic" }
-TeamnameToBadgeNames["clan_saunamen"] = { "Saunamen" }
-TeamnameToBadgeNames["clan_scurvy"] = { "Scurvy" }
-TeamnameToBadgeNames["clan_singularity"] = { "Singularity" }
-TeamnameToBadgeNames["clan_titus"] = { "Titus Gaming" }
+TeamnameToBadgeNames["all-in"] = { "all-in" }
+TeamnameToBadgeNames["calamity_gaming"] = { "calamitygaming" }
+TeamnameToBadgeNames["dark_legion"] = { "darklegion" }
+TeamnameToBadgeNames["godar"] = { "godar" }
+TeamnameToBadgeNames["legendary_snails"] = { "legendarysnails" }
+TeamnameToBadgeNames["lucky_fkers"] = { "luckyfkers" }
+TeamnameToBadgeNames["mimic"] = { "mimic" }
+TeamnameToBadgeNames["saunamen"] = { "saunamen" }
+TeamnameToBadgeNames["scurvy"] = { "scurvy" }
+TeamnameToBadgeNames["singularity"] = { "singularity" }
+TeamnameToBadgeNames["titus"] = { "titusgaming" }
 
 Script.Load("lua/nsl_class.lua")
 
@@ -91,26 +91,55 @@ function GetPlayerMatching(id)
     return GetPlayerMatchingGameID(gID) or GetPlayerMatchingNS2Id(id) or GetPlayerMatchingName(id)
 end
 
-local function UpdateClientBadge(ns2id, team)
+local function GetRefBadgeforID(ns2id)
+	if GetIsNSLRef(ns2id) then
+		local NSLBadges = GetNSLConfigValue("RefereeBadge")
+		if NSLBadges and type(NSLBadges) == "table" then
+			local level = 1
+			local pData = GetNSLUserData(ns2id)
+			if pData and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and tonumber(pData.NSL_Level) > level then
+				level = tonumber(pData.NSL_Level)
+			end
+			for badge, bl in pairs(NSLBadges) do
+				if bl == level then
+					return badge
+				end
+			end
+		end
+	end
+end
+
+local function GetTeamBadgeForTeamName(teamName)
+	if teamName and teamName ~= "" then
+		teamName = string.lower(teamName)
+		for badge, names in pairs(TeamnameToBadgeNames) do
+			if table.contains(names, teamName) then
+				return badge
+			end
+		end
+	end
+end
+
+local function UpdateClientBadge(ns2id)
+	local refBadge = GetRefBadgeforID(ns2id)
+	local teamBadge = GetTeamBadgeForTeamName(NSL_ClientData[ns2id].NSL_Team)
 	if GiveBadge then
 		//Yay for badges+ mod.
 		//Give badge if ref, and ref badge configured.
 		local succes, row
 		row = 1
-		if GetNSLConfigValue("RefereeBadge") ~= "" and GetIsNSLRef(ns2id) then
-			success = GiveBadge(ns2id, GetNSLConfigValue("RefereeBadge"), row)
+		if refBadge then
+			success = GiveBadge(ns2id, refBadge, row)
 			row = row + 1
 		end
-		for badge, names in pairs(TeamnameToBadgeNames) do
-			if table.contains(names, team) then
-				success = success and GiveBadge(ns2id, badge, row)
-				return success
-			end
+		if teamBadge then
+			Shared.Message(ToString(kBadges))
+			success = success and GiveBadge(ns2id, teamBadge, row)
 		end
 	else
 		//Assume legacy badge process :S
 		local player = GetPlayerMatchingNS2Id(ns2id)
-		if player and GetNSLConfigValue("RefereeBadge") ~= "" and GetIsNSLRef(ns2id) then
+		if player and refBadge then
 			local client = Server.GetOwner(player)
 			if client then
 				local newmsg = { clientId = client:GetId() }
@@ -120,7 +149,7 @@ local function UpdateClientBadge(ns2id, team)
 					newmsg[ "has_" .. badge.name .. "_badge" ] = false
 				end
 				//Set current NSL badge to true.
-				newmsg["has_" .. GetNSLConfigValue("RefereeBadge") .. "_badge"] = true
+				newmsg["has_" .. refBadge .. "_badge"] = true
 				
 				Server.SendNetworkMessage("RefBadges", newmsg, true)
 				
@@ -162,20 +191,25 @@ local function OnClientConnectENSLResponse(response)
 				NSL_Team = responsetable[6] or "No Team",
 				NSL_ID = responsetable[7] or "",
 				NSL_TID = responsetable[8] or "",
-				NSL_Level = responsetable[9] or "0",
-				NSL_Rank = responsetable[10] or nil,
-				NSL_Icon = responsetable[11] or ""}
+				NSL_Level = "0",
+				NSL_Rank = responsetable[9] or responsetable[10] or nil,
+				NSL_Icon = nil}
 				if player then
 					ServerAdminPrint(Server.GetOwner(player), string.format("NSL Username verified as %s", NSL_ClientData[ns2id].NICK))
 				end
-				if responsetable[10]~= nil then
-					if string.find(responsetable[10], "Admin") then
+				local Groups = { }
+				table.insert(Groups, responsetable[9])
+				table.insert(Groups, responsetable[10])
+				for i, group in pairs(Groups) do
+					if string.find(group, "Admin") then
 						NSL_ClientData[ns2id].NSL_Level = 2
-					elseif string.find(responsetable[10], "Referee") then
+						break
+					elseif string.find(group, "Referee") then
 						NSL_ClientData[ns2id].NSL_Level = 1
+						break
 					end
 				end
-				UpdateClientBadge(ns2id, NSL_ClientData[ns2id].NSL_Team)
+				UpdateClientBadge(ns2id)
 			end
 		end
 	end
@@ -206,7 +240,7 @@ local function OnClientConnectAUSNS2Response(response)
 					if player then
 						ServerAdminPrint(Server.GetOwner(player), string.format("AusNS2 Username verified as %s", NSL_ClientData[ns2id].NICK))
 					end
-					UpdateClientBadge(ns2id, NSL_ClientData[ns2id].NSL_Team)
+					UpdateClientBadge(ns2id)
 				end				
 			end
 		end
