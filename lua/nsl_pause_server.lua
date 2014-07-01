@@ -147,11 +147,41 @@ originalNS2AiAttacksMixinOnTag = Class_ReplaceMethod("AiAttacksMixin", "OnTag",
 	end
 )
 
+local originalNS2CommandStructureOnUse
+originalNS2CommandStructureOnUse = Class_ReplaceMethod("CommandStructure", "OnUse", 
+	function(self, player, elapsedTime, useSuccessTable)
+		
+		if GetIsGamePaused() or GetIsGamePausing() then
+			useSuccessTable.useSuccess = useSuccessTable.useSuccess and false
+		else
+			originalNS2CommandStructureOnUse(self, player, elapsedTime, useSuccessTable)
+		end	
+
+	end
+)
+
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
 	function(self, winningTeam)
 		gamestate.team1resume = false
 		gamestate.team2resume = false
+		//Check pause and copy?
+		local alienpauses = 0
+		local marinepauses = 0
+		if gamestate.teampauses["Aliens"] and gamestate.teampauses["Aliens"] > 0 then
+			alienpauses = gamestate.teampauses["Aliens"]
+		end
+		if gamestate.teampauses["Marines"] and gamestate.teampauses["Marines"] > 0 then
+			marinepauses = gamestate.teampauses["Marines"]
+		end
+		gamestate.teampauses["Marines"] = 0
+		gamestate.teampauses["Aliens"] = 0
+		if alienpauses > 0 then
+			gamestate.teampauses["Marines"] = alienpauses
+		end
+		if marinepauses > 0 then
+			gamestate.teampauses["Aliens"] = marinepauses
+		end
 		return originalNS2GameRulesEndGame(self, winningTeam)
 	end
 )
@@ -194,6 +224,10 @@ end
 
 function GetIsGamePaused()
 	return gamestate.gamepaused
+end
+
+function GetIsGamePausing()
+	return gamestate.gamepausedcountdown ~= 0
 end
 
 function GetIsGamePausedTime()

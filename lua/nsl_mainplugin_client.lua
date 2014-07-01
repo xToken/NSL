@@ -71,14 +71,13 @@ for i, classarray in pairs(TimeBypassFunctions) do
 end
 
 //WOWOWOWOWOWOW
-local oldChatUI_EnterChatMessage = ChatUI_EnterChatMessage
-function ChatUI_EnterChatMessage(teamOnly)
-	oldChatUI_EnterChatMessage(teamOnly)
-	if Client then
-		local localPlayer = Client.GetLocalPlayer()
-		if localPlayer and localPlayer.gamepaused then
-			ReplaceLocals(oldChatUI_EnterChatMessage, { startedChatTime = (Shared.GetTime() - 0.01) })
-		end
+local oldGUIManagerSendCharacterEvent = GUIManager.SendCharacterEvent
+function GUIManager:SendCharacterEvent(character)
+	//Separate callback :/
+	oldGUIManagerSendCharacterEvent(self, character)
+	local localPlayer = Client.GetLocalPlayer()
+	if localPlayer and localPlayer.gamepaused and ChatUI_EnteringChatMessage() then
+		ReplaceLocals(ChatUI_EnterChatMessage, { startedChatTime = (Shared.GetTime() - 0.01) })
 	end
 end
 
