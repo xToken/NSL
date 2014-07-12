@@ -3,6 +3,7 @@
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
 
+local kChatMinWindow = 0.005
 local kTeam1NameLocal
 local kTeam2NameLocal
 
@@ -70,16 +71,45 @@ for i, classarray in pairs(TimeBypassFunctions) do
 	)
 end
 
-//WOWOWOWOWOWOW
-local oldGUIManagerSendCharacterEvent = GUIManager.SendCharacterEvent
-function GUIManager:SendCharacterEvent(character)
-	//Separate callback :/
-	oldGUIManagerSendCharacterEvent(self, character)
-	local localPlayer = Client.GetLocalPlayer()
-	if localPlayer and localPlayer.gamepaused and ChatUI_EnteringChatMessage() then
-		ReplaceLocals(ChatUI_EnterChatMessage, { startedChatTime = (Shared.GetTime() - 0.01) })
+//FFFFFFFFFFFFFFFF
+local startedChatTime = 0
+
+function ChatUI_GetStartedChatTime()
+    return startedChatTime
+end
+
+local oldChatUI_EnterChatMessage = ChatUI_EnterChatMessage
+function ChatUI_EnterChatMessage(teamOnly)
+	local wasEnteringChat = ChatUI_EnteringChatMessage()
+	oldChatUI_EnterChatMessage(teamOnly)
+	if not wasEnteringChat and ChatUI_EnteringChatMessage() then
+		startedChatTime = Client.GetTime()
 	end
 end
+
+local function ChatUICreation(scriptName, script)
+
+	function GUIChat:SendCharacterEvent(character)
+		local enteringChatMessage = ChatUI_EnteringChatMessage()
+		
+		if (Client.GetTime() - ChatUI_GetStartedChatTime()) > kChatMinWindow and enteringChatMessage then
+		
+			local currentText = self.inputItem:GetWideText()
+			if currentText:length() < kMaxChatLength then
+			
+				self.inputItem:SetWideText(currentText .. character)
+				return true
+				
+			end
+			
+		end
+		
+		return false
+	end
+	
+end
+
+ClientUI.AddScriptCreationEventListener(ChatUICreation)
 
 local RefBadges = { }
 
