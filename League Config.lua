@@ -1,5 +1,5 @@
 {
-	"Version": 1.0,
+	"Version": 1.1,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -15,6 +15,8 @@
 		"Interp": 								70,
 		"MoveRate": 							50,
 		"ClientRate": 							20,
+		"TickRate":								30,
+		"MaxDataRate": 							25600,
 		"FriendlyFireDamagePercentage": 		0.33,
 		"FriendlyFireEnabled":			 		true,
 		"TournamentModeAlertDelay": 			30,
@@ -68,6 +70,8 @@
 		"Interp": 								70,
 		"MoveRate": 							50,
 		"ClientRate": 							20,
+		"TickRate":								30,
+		"MaxDataRate": 							25600,
 		"FriendlyFireDamagePercentage": 		0.33,
 		"FriendlyFireEnabled":			 		true,
 		"TournamentModeAlertDelay": 			30,

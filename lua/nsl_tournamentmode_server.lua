@@ -171,6 +171,7 @@ local function CheckGameCountdownStart()
 end
 
 local function OnCommandForceStartRound(client)
+	if not client then return end
 	local NS2ID = client:GetUserId()
 	if GetIsNSLRef(NS2ID) then
 		ClearTournamentModeState()
@@ -184,6 +185,7 @@ end
 Event.Hook("Console_sv_nslforcestart",               OnCommandForceStartRound)
 
 local function OnCommandCancelRoundStart(client)
+	if not client then return end
 	local NS2ID = client:GetUserId()
 	if GetIsNSLRef(NS2ID) then
 		CheckCancelGameStart()

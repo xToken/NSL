@@ -1,54 +1,31 @@
 //NSL Main Plugin
 //Reworked to function more as a 'league' plugin, not just a ENSL plugin.
 
-//Functions for chat commands
-gChatCommands = { }
-//Chat functions which could use additional arguments
-gArgumentedChatCommands = { }
-//Functions on connect
-gConnectFunctions = { }
-//Team Allowance Checks
-gCanJoinTeamFunctions = { }
-//Plugin Activation Functions
-gPluginStateChange = { }
-
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
+Script.Load("lua/nsl_eventhooks_server.lua")
 Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
 
-local function OnClientConnected(client)
-	if GetNSLModEnabled() then
-		if GetNSLConfigValue("Interp") ~= 100 then
-			Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
-		end
-		if GetNSLConfigValue("ClientRate") ~= 20 then
-			//Shared.ConsoleCommand(string.format("cr %f", GetNSLConfigValue("ClientRate")))
-		end
-		if GetNSLConfigValue("MoveRate") ~= 30 then
-			Shared.ConsoleCommand(string.format("mr %f", GetNSLConfigValue("MoveRate")))
-		end
-		for i = 1, #gConnectFunctions do
-			gConnectFunctions[i](client)
-		end
+local function SetupRates()
+	if GetNSLConfigValue("Interp") ~= 100 then
+		Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
+	end
+	if GetNSLConfigValue("ClientRate") ~= 20 then
+		//Shared.ConsoleCommand(string.format("cr %f", GetNSLConfigValue("ClientRate")))
+	end
+	if GetNSLConfigValue("MoveRate") ~= 30 then
+		Shared.ConsoleCommand(string.format("mr %f", GetNSLConfigValue("MoveRate")))
+	end
+	if GetNSLConfigValue("TickRate") ~= 30 then
+		Shared.ConsoleCommand(string.format("tr %f", GetNSLConfigValue("TickRate")))
+	end
+	if GetNSLConfigValue("MaxDataRate") ~= 25600 then
+		Shared.ConsoleCommand(string.format("dr %f", GetNSLConfigValue("MaxDataRate")))
 	end
 end
 
-Event.Hook("ClientConnect", OnClientConnected)
-
-local originalNS2GameRulesGetCanJoinTeamNumber
-originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
-	function(self, teamNumber)
-		if GetNSLModEnabled() then
-			for i = 1, #gCanJoinTeamFunctions do
-				if not gCanJoinTeamFunctions[i](self, teamNumber) then
-					return false
-				end
-			end
-		end
-		return originalNS2GameRulesGetCanJoinTeamNumber(self, teamNumber)
-	end
-)
+table.insert(gConfigLoadedFunctions, SetupRates)
 
 function Player:OnJoinTeam()
 	//This is new, to prevent players joining midgame and getting pRes.
@@ -123,7 +100,6 @@ function SendClientMessage(client, message)
 end
 
 function SendTeamMessage(teamnum, message)
-
 	local chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
 	if tonumber(teamnum) ~= nil then
 		local playerRecords = GetEntitiesForTeam("Player", teamnum)
@@ -136,24 +112,6 @@ function SendTeamMessage(teamnum, message)
 		
 		end
 	end
-end
-
-function ProcessSayCommand(player, command)
-
-	if GetNSLModEnabled() then
-		local client = Server.GetOwner(player)
-		for validCommand, func in pairs(gChatCommands) do
-			if string.lower(validCommand) == string.lower(command) then
-				func(client)
-			end
-		end
-		for validCommand, func in pairs(gArgumentedChatCommands) do
-			if string.lower(string.sub(command, 1, string.len(validCommand))) == string.lower(validCommand) then
-				func(client, string.sub(command, string.len(validCommand) + 2))
-			end
-		end
-	end
-
 end
 
 local function OnClientCommandNSLHelp(client)
@@ -257,7 +215,7 @@ end
 Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
 CreateServerAdminCommand("Console_sv_nslconfig", OnClientSVCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
 
-if GetNSLModEnabled() then
+local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
 	Server.SetConfigSetting("rookie_friendly", false)
 	Server.SetConfigSetting("force_even_teams_on_join", false)
@@ -270,124 +228,4 @@ if GetNSLModEnabled() then
 	Server.SetConfigSetting("end_round_on_team_unbalance", nil)
 end
 
-//First Person Spectator Block
-local kDeltatimeBetweenAction = 0.3
-	
-local function IsTeamSpectator(self)
-	return self:isa("TeamSpectator") or self:isa("AlienSpectator") or self:isa("MarineSpectator")
-end
-
-local function NextSpectatorMode(self, mode)
-
-	if mode == nil then
-		mode = self.specMode
-	end
-	
-	local numModes = 0
-	for name, _ in pairs(kSpectatorMode) do
-	
-		if type(name) ~= "number" then
-			numModes = numModes + 1
-		end
-		
-	end
-
-	local nextMode = (mode % numModes) + 1
-	// FirstPerson is only used directly through SetSpectatorMode(), never in this function.
-	if nextMode == kSpectatorMode.FirstPerson then
-		if IsTeamSpectator(self) then
-			return kSpectatorMode.Following
-		else
-			return kSpectatorMode.FreeLook
-		end
-    else
-		return nextMode
-	end
-	
-end
-
-local function UpdateSpectatorMode(self, input)
-
-	assert(Server)
-	
-	self.timeFromLastAction = self.timeFromLastAction + input.time
-	if self.timeFromLastAction > kDeltatimeBetweenAction then
-	
-		if bit.band(input.commands, Move.Jump) ~= 0 then
-		
-			self:SetSpectatorMode(NextSpectatorMode(self))
-			self.timeFromLastAction = 0
-			
-		elseif bit.band(input.commands, Move.Weapon1) ~= 0 then
-		
-			self:SetSpectatorMode(kSpectatorMode.FreeLook)
-			self.timeFromLastAction = 0
-			
-		elseif bit.band(input.commands, Move.Weapon2) ~= 0 then
-		
-			self:SetSpectatorMode(kSpectatorMode.Overhead)
-			self.timeFromLastAction = 0
-			
-		elseif bit.band(input.commands, Move.Weapon3) ~= 0 then
-		
-			self:SetSpectatorMode(kSpectatorMode.Following)
-			self.timeFromLastAction = 0
-			
-		end
-		
-	end
-	
-end
-
-ReplaceLocals(GetOriginalSpecOnProcessMove(), {UpdateSpectatorMode = UpdateSpectatorMode})
-
-function FollowingSpectatorMode:FindTarget(spectator)
-    if spectator.selectedId ~= Entity.invalidId then
-        spectator.followedTargetId = spectator.selectedId    
-    end
-end
-
-local oldNS2SpectatorOnInitialized
-oldNS2SpectatorOnInitialized = Class_ReplaceMethod("Spectator", "OnInitialized", 
-	function(self)
-		Player.OnInitialized(self)
-    
-		self.selectedId = Entity.invalidId
-		
-		if Server then
-		
-			self.timeFromLastAction = 0
-			self:SetIsVisible(false)
-			self:SetIsAlive(false)
-			// Start us off by looking for a target to follow.
-			self:SetSpectatorMode(kSpectatorMode.Following)
-			
-		elseif Client then
-		
-			if self:GetIsLocalPlayer() and self:GetTeamNumber() == kSpectatorIndex then
-				self:ShowMap(true, false, true)
-			end
-			
-		end
-		
-		// Remove physics
-		self:DestroyController()
-		
-		// Other players never see a spectator.
-		self:SetPropagate(Entity.Propagate_Never)
-	end
-)
-
-local function OnClientCommandNSLFPS(client)
-	if client then
-		local NS2ID = client:GetUserId()
-		if GetIsNSLRef(NS2ID) then
-			local player = client:GetControllingPlayer()
-			if player ~= nil and player:isa("Spectator") and player:GetTeamNumber() == kSpectatorIndex then
-				player:SetSpectatorMode(kSpectatorMode.FirstPerson)
-			end
-		end
-	end
-end
-
-Event.Hook("Console_sv_nslfirstpersonspectate",               OnClientCommandNSLFPS)
+table.insert(gConfigLoadedFunctions, SetupServerConfig)

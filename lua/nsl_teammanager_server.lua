@@ -117,11 +117,9 @@ originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam",
 	end
 )
 
-local originalNS2GREndGame
-originalNS2GREndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
-	function(self, winningteam)
-		originalNS2GREndGame(self, winningteam)
-		if GetNSLModEnabled() then
+local function UpdateTeamDataOnGameEnd(self, winningteam)
+	if GetNSLModEnabled() then
+		if winningteam then
 			local winningteamname
 			if winningteam:GetTeamType() == kAlienTeamType then
 				winningteamname = t2name
@@ -135,13 +133,15 @@ originalNS2GREndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame",
 					tscores[winningteamname] = tscores[winningteamname] + 1
 				end
 			end
-			//Clear merc queue
-			tqueue = { }
-			UpdateNSLScores(t1name, tscores[t1name] or 0, t2name, tscores[t2name] or 0)
-			SyncTeamInfotoClients()
 		end
+		//Clear merc queue
+		tqueue = { }
+		UpdateNSLScores(t1name, tscores[t1name] or 0, t2name, tscores[t2name] or 0)
+		SyncTeamInfotoClients()
 	end
-)
+end
+
+table.insert(gGameEndFunctions, UpdateTeamDataOnGameEnd)
 
 local function OnCommandOverrideTeamnames(client, team1name, team2name)
 	if client and team1name and team2name then
@@ -210,6 +210,7 @@ local function ApproveMercs(teamnum, playerid)
 end
 
 local function OnCommandApproveMercs(client, target)
+	if not client then return end
 	local ns2id = client:GetUserId()
 	local player = client:GetControllingPlayer()
 	local tplayer = GetPlayerMatching(target)
@@ -264,6 +265,7 @@ local function ClearMercs(teamnum)
 end
 
 local function OnCommandClearMercs(client)
+	if not client then return end
 	local ns2id = client:GetUserId()
 	local player = client:GetControllingPlayer()
 	if player ~= nil then
