@@ -11,17 +11,17 @@ local function SetupRates()
 	if GetNSLConfigValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
 	end
-	if GetNSLConfigValue("ClientRate") ~= 20 then
-		//Shared.ConsoleCommand(string.format("cr %f", GetNSLConfigValue("ClientRate")))
-	end
 	if GetNSLConfigValue("MoveRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLConfigValue("MoveRate")))
 	end
 	if GetNSLConfigValue("TickRate") ~= 30 then
-		Shared.ConsoleCommand(string.format("tr %f", GetNSLConfigValue("TickRate")))
+		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLConfigValue("TickRate")))
+	end
+	if GetNSLConfigValue("ClientRate") ~= 20 then
+		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLConfigValue("ClientRate")))
 	end
 	if GetNSLConfigValue("MaxDataRate") ~= 25600 then
-		Shared.ConsoleCommand(string.format("dr %f", GetNSLConfigValue("MaxDataRate")))
+		Shared.ConsoleCommand(string.format("bwlimit %f", GetNSLConfigValue("MaxDataRate")))
 	end
 end
 
