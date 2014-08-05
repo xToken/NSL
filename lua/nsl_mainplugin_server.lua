@@ -7,6 +7,7 @@ Script.Load("lua/nsl_eventhooks_server.lua")
 Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
 
+//Supposedly this still not syncronized.
 local function SetupRates()
 	if GetNSLConfigValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
@@ -25,7 +26,7 @@ local function SetupRates()
 	end
 end
 
-table.insert(gConfigLoadedFunctions, SetupRates)
+table.insert(gConnectFunctions, SetupRates)
 
 function Player:OnJoinTeam()
 	//This is new, to prevent players joining midgame and getting pRes.
