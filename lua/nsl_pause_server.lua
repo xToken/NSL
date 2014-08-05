@@ -160,9 +160,8 @@ originalNS2CommandStructureOnUse = Class_ReplaceMethod("CommandStructure", "OnUs
 	end
 )
 
-local originalNS2GameRulesEndGame
-originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
-	function(self, winningTeam)
+local function UpdatePausesOnGameEnd(self, winningteam)
+	if GetNSLModEnabled() then
 		gamestate.team1resume = false
 		gamestate.team2resume = false
 		//Check pause and copy?
@@ -182,9 +181,10 @@ originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame",
 		if marinepauses > 0 then
 			gamestate.teampauses["Aliens"] = marinepauses
 		end
-		return originalNS2GameRulesEndGame(self, winningTeam)
 	end
-)
+end
+
+table.insert(gGameEndFunctions, UpdatePausesOnGameEnd)
 
 local originalNS2PlayerCopyPlayerDataFrom
 originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 

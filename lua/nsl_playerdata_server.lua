@@ -353,6 +353,7 @@ local function OnCommandChat(client, target, message)
 end
 
 local function OnClientCommandChat(client, ...)
+	if not client then return end
 	local NS2ID = client:GetUserId()
 	if GetIsNSLRef(NS2ID) then
 		local ns2data = GetNSLUserData(NS2ID)
@@ -367,6 +368,7 @@ end
 Event.Hook("Console_sv_nslsay",               OnClientCommandChat)
 
 local function OnClientCommandTeamChat(client, team, ...)
+	if not client then return end
 	local NS2ID = client:GetUserId()
 	team = tonumber(team)
 	if GetIsNSLRef(NS2ID) and team then
@@ -382,6 +384,7 @@ end
 Event.Hook("Console_sv_nsltsay",               OnClientCommandTeamChat)
 
 local function OnClientCommandPlayerChat(client, target, ...)
+	if not client then return end
 	local NS2ID = client:GetUserId()
 	local player = GetPlayerMatching(target)
 	if GetIsNSLRef(NS2ID) and player then

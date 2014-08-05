@@ -120,18 +120,29 @@ end
 
 Client.HookNetworkMessage("RefBadges", RefBadgeRecieved)
 
+local CTextureCache = { }
+local CNameCache = { }
+
 local oldBadges_GetBadgeTextures = Badges_GetBadgeTextures
 function Badges_GetBadgeTextures( clientId, usecase )
-	local textures = { }
+	local textures, badgeNames
 	local badges = RefBadges[ clientId ]
-	textures = oldBadges_GetBadgeTextures(clientId, usecase)
+	textures, badgeNames = oldBadges_GetBadgeTextures(clientId, usecase)
     if badges then
-		local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
-		for _,info in ipairs(gRefBadges) do
-			if badges[ "has_" .. info.name .. "_badge" ] == true then
-				table.insert( textures, info[textureKey] )
+		if not CTextureCache[clientId] then
+			//These seem to get cached somewhere now, so once we have reported back on teh badges once, dont add them anymore...
+			local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
+			for _, info in ipairs(gRefBadges) do
+				if badges[ "has_" .. info.name .. "_badge" ] == true then
+					table.insert( textures, info[textureKey] )
+					table.insert( badgeNames, info.name )
+					CTextureCache[clientId] = info[textureKey]
+					CNameCache[clientId] = info.name
+					break
+					//Can only have 1 nsl badge, sorry dudes
+				end
 			end
 		end
 	end
-	return textures
+	return textures, badgeNames
 end
