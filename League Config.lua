@@ -91,9 +91,9 @@
 															"ui/exosuit_HUD4.dds", 
 															"ui/marine_minimap_blip.dds", 
 															"ui/minimap_blip.dds",
-															"hitsounds_client.fev",
-															"hitsounds_client.fsb",
-															"hitsounds_client.soundinfo"
+															"sound/hitsounds_client.fev",
+															"sound/hitsounds_client.fsb",
+															"sound/hitsounds_client.soundinfo"
 															]
 												}
 		},
@@ -175,9 +175,9 @@
 															"ui/exosuit_HUD4.dds", 
 															"ui/marine_minimap_blip.dds", 
 															"ui/minimap_blip.dds",
-															"hitsounds_client.fev",
-															"hitsounds_client.fsb",
-															"hitsounds_client.soundinfo"
+															"sound/hitsounds_client.fev",
+															"sound/hitsounds_client.fsb",
+															"sound/hitsounds_client.soundinfo"
 															]
 												}
 		}
