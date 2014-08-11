@@ -214,7 +214,10 @@ ConsistencyConfig 					= {	restrict = { "lua/entry/*.entry" },
 													"ui/exosuit_HUD1.dds", 
 													"ui/exosuit_HUD4.dds", 
 													"ui/marine_minimap_blip.dds", 
-													"ui/minimap_blip.dds" },
+													"ui/minimap_blip.dds",
+													"hitsounds_client.fev",
+													"hitsounds_client.fsb",
+													"hitsounds_client.soundinfo",},
 									   },
 }
 

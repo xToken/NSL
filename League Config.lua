@@ -54,6 +54,47 @@
 																"NICK": "TestUser",
 																"S_ID": "0:1:12345678910"
 																}
+												},
+		"ConsistencyConfig":					{
+												"restrict": [ 
+															"lua/entry/*.entry"
+															],
+												"check": 	[ 	
+															"game_setup.xml", 
+															"*.lua", 
+															"*.hlsl", 
+															"*.shader", 
+															"*.screenfx", 
+															"*.surface_shader", 
+															"*.fxh",
+															"*.fx", 
+															"*.render_setup", 
+															"*.shader_template", 
+															"*.level", 
+															"*.dds", 
+															"*.jpg", 
+															"*.png", 
+															"*.cinematic", 
+															"*.material", 
+															"*.model", 
+															"*.animation_graph", 
+															"*.polygons", 
+															"*.fev", 
+															"*.fsb", 
+															"*.entry"
+															],
+												"ignore": 	[ 	
+															"ui/crosshairs.dds", 
+															"ui/crosshairs-hit.dds", 
+															"ui/exo_crosshair.dds", 
+															"ui/exosuit_HUD1.dds", 
+															"ui/exosuit_HUD4.dds", 
+															"ui/marine_minimap_blip.dds", 
+															"ui/minimap_blip.dds",
+															"hitsounds_client.fev",
+															"hitsounds_client.fsb",
+															"hitsounds_client.soundinfo"
+															]
 												}
 		},
 		{
@@ -97,6 +138,47 @@
 																"NICK": "TestUser", 
 																"S_ID": "0:1:12345678910" 
 																}
+												},
+		"ConsistencyConfig":					{
+												"restrict": [ 
+															"lua/entry/*.entry"
+															],
+												"check": 	[ 	
+															"game_setup.xml", 
+															"*.lua", 
+															"*.hlsl", 
+															"*.shader", 
+															"*.screenfx", 
+															"*.surface_shader", 
+															"*.fxh",
+															"*.fx", 
+															"*.render_setup", 
+															"*.shader_template", 
+															"*.level", 
+															"*.dds", 
+															"*.jpg", 
+															"*.png", 
+															"*.cinematic", 
+															"*.material", 
+															"*.model", 
+															"*.animation_graph", 
+															"*.polygons", 
+															"*.fev", 
+															"*.fsb", 
+															"*.entry"
+															],
+												"ignore": 	[ 	
+															"ui/crosshairs.dds", 
+															"ui/crosshairs-hit.dds", 
+															"ui/exo_crosshair.dds", 
+															"ui/exosuit_HUD1.dds", 
+															"ui/exosuit_HUD4.dds", 
+															"ui/marine_minimap_blip.dds", 
+															"ui/minimap_blip.dds",
+															"hitsounds_client.fev",
+															"hitsounds_client.fsb",
+															"hitsounds_client.soundinfo"
+															]
 												}
 		}
 	],
