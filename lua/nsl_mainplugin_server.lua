@@ -9,47 +9,44 @@ Script.Load("lua/nsl_teammanager_server.lua")
 
 //Supposedly this still not syncronized.
 local function SetupRates()
-	if GetNSLConfigValue("Interp") ~= 100 then
-		Shared.ConsoleCommand(string.format("interp %f", (GetNSLConfigValue("Interp")/1000)))
+	if GetNSLPerfValue("Interp") ~= 100 then
+		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
 	end
-	if GetNSLConfigValue("MoveRate") ~= 30 then
-		Shared.ConsoleCommand(string.format("mr %f", GetNSLConfigValue("MoveRate")))
+	if GetNSLPerfValue("MoveRate") ~= 30 then
+		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 	end
-	if GetNSLConfigValue("TickRate") ~= 30 then
-		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLConfigValue("TickRate")))
+	if GetNSLPerfValue("TickRate") ~= 30 then
+		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
 	end
-	if GetNSLConfigValue("ClientRate") ~= 20 then
-		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLConfigValue("ClientRate")))
+	if GetNSLPerfValue("ClientRate") ~= 20 then
+		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
 	end
-	if GetNSLConfigValue("MaxDataRate") ~= 25600 then
-		Shared.ConsoleCommand(string.format("bwlimit %f", GetNSLConfigValue("MaxDataRate")))
+	if GetNSLPerfValue("MaxDataRate") ~= 25 then
+		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
 	end
 end
 
 table.insert(gConnectFunctions, SetupRates)
+table.insert(gConfigLoadedFunctions, SetupRates)
 
-function Player:OnJoinTeam()
-	//This is new, to prevent players joining midgame and getting pRes.
-	local gamerules = GetGamerules()
-	if gamerules and gamerules:GetGameStarted() then
-		//Set pres to 0.
-		local team = self:GetTeam()
-		local startingpres = kPlayerInitialIndivRes
-		if kAlienInitialIndivRes and kMarineInitialIndivRes and team then
-			startingpres = ConditionalValue(team.GetIsAlienTeam and team:GetIsAlienTeam(), kAlienInitialIndivRes, kMarineInitialIndivRes)
-		end
-		if self:GetResources() == startingpres then
-			self:SetResources(0)
-		end
-	end
-end
-
-local originalAlienOnJoinTeam
-//Maintain original AlienOnJoinTeam
-originalAlienOnJoinTeam = Class_ReplaceMethod("Alien", "OnJoinTeam", 
+local originalPlayerOnJoinTeam
+//Maintain original PlayerOnJoinTeam
+originalPlayerOnJoinTeam = Class_ReplaceMethod("Player", "OnJoinTeam", 
 	function(self)
-		originalAlienOnJoinTeam(self)
-		Player.OnJoinTeam(self)
+		originalPlayerOnJoinTeam(self)
+		//This is new, to prevent players joining midgame and getting pRes.
+		local gamerules = GetGamerules()
+		if gamerules and gamerules:GetGameStarted() then
+			//Set pres to 0.
+			local team = self:GetTeam()
+			local startingpres = kPlayerInitialIndivRes
+			if kAlienInitialIndivRes and kMarineInitialIndivRes and team then
+				startingpres = ConditionalValue(team.GetIsAlienTeam and team:GetIsAlienTeam(), kAlienInitialIndivRes, kMarineInitialIndivRes)
+			end
+			if self:GetResources() == startingpres then
+				self:SetResources(0)
+			end
+		end
 	end
 )
 
@@ -124,6 +121,7 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslpsay" .. ": " .. "<player, message> - Will send a message to the provided player that displays in yellow.")
 			ServerAdminPrint(client, "sv_nslcfg" .. ": " .. "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
 			ServerAdminPrint(client, "sv_nslconfig" .. ": " .. "<league> - Changes the league settings used by the NSL plugin.")
+			ServerAdminPrint(client, "sv_nslperfconfig" .. ": " .. "<config> - Changes the performance config used by the NSL plugin.")
 			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
 			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
 			ServerAdminPrint(client, "sv_nslpause" .. ": " .. "Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.")
@@ -158,7 +156,7 @@ local function OnClientSVCommandSetMode(client, mode)
 		local NS2ID = client:GetUserId()
 		isRef = GetIsNSLRef(NS2ID)
 	end
-	if (not isRef or not GetNSLModEnabled()) and mode ~= nil then
+	if (not isRef or not GetNSLModEnabled()) and mode then
 		UpdateNSLMode(client, mode)
 	end
 end
@@ -171,7 +169,7 @@ local function OnClientCommandSetMode(client, mode)
 	end
 	if isRef and mode ~= nil then
 		UpdateNSLMode(client, mode)
-	else
+	elseif isRef then
 		ServerAdminPrint(client, string.format("NSL Plugin currently running in %s config.", GetNSLMode()))
 	end
 end
@@ -195,7 +193,7 @@ local function OnClientSVCommandSetLeague(client, league)
 		local NS2ID = client:GetUserId()
 		isRef = GetIsNSLRef(NS2ID)
 	end
-	if not isRef and league ~= nil then
+	if not isRef and league then
 		UpdateNSLLeague(client, league)
 	end
 end
@@ -206,15 +204,52 @@ local function OnClientCommandSetLeague(client, league)
 		local NS2ID = client:GetUserId()
 		isRef = GetIsNSLRef(NS2ID)
 	end
-	if isRef and league ~= nil then
+	if isRef and league then
 		UpdateNSLLeague(client, league)
-	else
+	elseif isRef then
 		ServerAdminPrint(client, string.format("NSL Plugin currently using %s league config.", GetActiveLeague()))
 	end
 end
 
 Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
 CreateServerAdminCommand("Console_sv_nslconfig", OnClientSVCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
+
+local function UpdateNSLPerfConfig(client, perfcfg)
+	perfcfg = string.upper(perfcfg)
+	if GetPerfLevelValid(perfcfg) then
+		SetPerfLevel(perfcfg)
+		ServerAdminPrint(client, string.format("NSL Plugin now using %s performance config.", GetNSLPerfLevel()))
+	else
+		ServerAdminPrint(client, string.format("NSL Plugin currently using %s performance config.", GetNSLPerfLevel()))
+	end
+end
+
+local function OnClientSVCommandSetPerfConfig(client, perfcfg)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
+	end
+	if not isRef and perfcfg then
+		UpdateNSLPerfConfig(client, perfcfg)
+	end
+end
+
+local function OnClientCommandSetPerfConfig(client, perfcfg)
+	local isRef = false
+	if client then
+		local NS2ID = client:GetUserId()
+		isRef = GetIsNSLRef(NS2ID)
+	end
+	if isRef and perfcfg then
+		UpdateNSLPerfConfig(client, perfcfg)
+	elseif isRef then
+		ServerAdminPrint(client, string.format("NSL Plugin currently using %s performance config.", GetNSLPerfLevel()))
+	end
+end
+
+Event.Hook("Console_sv_nslperfconfig",               OnClientCommandSetPerfConfig)
+CreateServerAdminCommand("Console_sv_nslperfconfig", OnClientSVCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
 local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff

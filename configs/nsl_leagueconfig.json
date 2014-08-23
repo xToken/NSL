@@ -1,5 +1,5 @@
 {
-	"Version": 1.1,
+	"Version": 1.2,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -12,11 +12,6 @@
 		"PauseMaxPauses": 						3,
 		"PausedReadyNotificationDelay": 		30,
 		"PauseEnabled": 						true,
-		"Interp": 								50,
-		"MoveRate": 							40,
-		"ClientRate": 							40,
-		"TickRate":								40,
-		"MaxDataRate": 							76800,
 		"FriendlyFireDamagePercentage": 		0.33,
 		"FriendlyFireEnabled":			 		true,
 		"TournamentModeAlertDelay": 			30,
@@ -48,13 +43,6 @@
 													3814554, 70496041, 41851898, 35329790, 1207116, 69364649, 3490104, 115723837, 
 													15097215, 95816540, 599694, 131547597, 24995964, 7246681
 												],
-		"PLAYERDATA":							{
-												"999999999999": { 
-																"NSL_Team": "ThisIsAnExample",
-																"NICK": "TestUser",
-																"S_ID": "0:1:12345678910"
-																}
-												},
 		"ConsistencyConfig":					{
 												"restrict": [ 
 															"lua/entry/*.entry"
@@ -109,11 +97,6 @@
 		"PauseMaxPauses": 						3,
 		"PausedReadyNotificationDelay": 		30,
 		"PauseEnabled": 						true,
-		"Interp": 								50,
-		"MoveRate": 							40,
-		"ClientRate": 							40,
-		"TickRate":								40,
-		"MaxDataRate": 							76800,
 		"FriendlyFireDamagePercentage": 		0.33,
 		"FriendlyFireEnabled":			 		true,
 		"TournamentModeAlertDelay": 			30,
@@ -131,14 +114,6 @@
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
 													"MercsRequireApproval": 				true
-												},
-		"REFS":									[ ],
-		"PLAYERDATA":							{
-												"999999999999": { 
-																"NSL_Team": "ThisIsAnExample", 
-																"NICK": "TestUser", 
-																"S_ID": "0:1:12345678910" 
-																}
 												},
 		"ConsistencyConfig":					{
 												"restrict": [ 
@@ -182,6 +157,46 @@
 															"sound/hitsounds_client.soundinfo"
 															]
 												}
+		},
+		{
+		"PerfLevel":							"Default",
+		"Interp": 								50,
+		"MoveRate": 							40,
+		"ClientRate": 							40,
+		"TickRate":								40,
+		"MaxDataRate": 							65
+		},
+		{
+		"PerfLevel":							"High",
+		"Interp": 								40,
+		"MoveRate": 							50,
+		"ClientRate": 							50,
+		"TickRate":								50,
+		"MaxDataRate": 							80
+		},
+		{
+		"PerfLevel":							"Extreme",
+		"Interp": 								30,
+		"MoveRate": 							65,
+		"ClientRate": 							65,
+		"TickRate":								65,
+		"MaxDataRate": 							100
+		}
+		{
+		"PerfLevel":							"Experimental",
+		"Interp": 								25,
+		"MoveRate": 							80,
+		"ClientRate": 							80,
+		"TickRate":								80,
+		"MaxDataRate": 							100
+		}
+		{
+		"PerfLevel":							"Experimental2",
+		"Interp": 								15,
+		"MoveRate": 							100,
+		"ClientRate": 							100,
+		"TickRate":								100,
+		"MaxDataRate": 							100
 		}
 	],
 	"EndOfTable": true

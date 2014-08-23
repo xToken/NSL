@@ -1,11 +1,13 @@
 //NSL Configs
 
 local configFileName = "NSLConfig.json"
-local configUpdateURL = "https://raw.github.com/xToken/NSL/master/League%20Config.lua"
+local configUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_leagueconfig.json"
+local configlocalFile = "configs/nsl_leagueconfig.json"
 local configUpdateRequestSent = false
 local configUpdateRetries = 0
 local NSL_Mode = "PCW"
 local NSL_League = "NSL"
+local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
 local CachedScoresValidFor = 10 * 60
@@ -26,12 +28,17 @@ function GetRecentScores()
 	return NSL_CachedScores
 end
 
+function GetNSLPerfLevel()
+	return NSL_PerfLevel
+end
+
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "NSL", recentgames = { } }
+	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { } }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = config.mode or "PCW"
 	NSL_League = config.league or "NSL"
+	NSL_PerfLevel = config.perf or "DEFAULT"
 	local loadedScores = config.recentgames or { }
 	local updated = false
 	for t, s in pairs(loadedScores) do
@@ -44,7 +51,7 @@ end
 LoadConfig()
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, recentgames = NSL_Scores })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores })
 end
 
 function SetNSLMode(state)
@@ -66,6 +73,19 @@ function SetActiveLeague(state)
 	if NSL_League ~= state then
 		NSL_League = state
 		SavePluginConfig()
+		if GetNSLModEnabled() then
+			EstablishConfigDependantSettings()
+		end
+	end
+end
+
+function SetPerfLevel(state)
+	if NSL_PerfLevel ~= state then
+		NSL_PerfLevel = state
+		SavePluginConfig()
+		if GetNSLModEnabled() then
+			EstablishConfigDependantSettings()
+		end
 	end
 end
 
@@ -75,94 +95,6 @@ function UpdateNSLScores(team1name, team1score, team2name, team2score)
 	SavePluginConfig()
 end
 
-local ENSLBaseConfig = {
-LeagueName 							= "NSL",
-PlayerDataURL 						= "http://www.ensl.org/plugin/user/",
-PlayerDataFormat					= "ENSL",
-PlayerRefLevel 						= 1,
-AutomaticMapCycleDelay				= 180 * 60,
-PauseEndDelay 						= 5,
-PauseStartDelay 					= 5,
-PauseMaxPauses 						= 3,
-PausedReadyNotificationDelay 		= 30,
-PauseEnabled 						= true,
-Interp 								= 50,
-MoveRate 							= 40,
-ClientRate 							= 40,
-TickRate 							= 40,
-MaxDataRate 						= 76800,
-FriendlyFireDamagePercentage 		= 0.33,
-FriendlyFireEnabled			 		= true,
-TournamentModeAlertDelay 			= 30,
-TournamentModeGameStartDelay 		= 15,
-RefereeBadge				 		= {
-										ensl_staff = 1,
-										ensl_admin = 2,
-									},
-PCW 								= {
-										PausedMaxDuration 					= 300,
-										TournamentModeForfeitClock			= 0,
-										TournamentModeRestartDuration 		= 90,
-										Limit6PlayerPerTeam 				= false,
-										MercsRequireApproval 				= false,
-									},
-OFFICIAL							= {
-										PausedMaxDuration 					= 300,
-										TournamentModeForfeitClock			= 900,
-										TournamentModeRestartDuration 		= 30,
-										Limit6PlayerPerTeam 				= true,
-										MercsRequireApproval 				= true,
-									},
-REFS								= { 37983254, 2582259, 4204158, 3834993, 9821488, 1009560, 850663, 870339, 3834993, 220612, 
-										33962486, 26400815, 4048968, 4288812, 44665807, 28798044, 40509515, 39359741, 64272164, 
-										56472390, 42416427, 7862563, 1080730, 221386, 42984531, 37996245, 49465,
-										44778147, 10498798, 24256940, 22793, 80887771, 512557, 4288812, 12482757, 54867496, 
-										711854, 6851233, 13901505, 19744894, 206793, 1561398, 8973, 50582634, 73397263, 
-										15901849,  38540300, 136317, 1592683, 7494, 20682781, 90227495, 42608442, 3023411, 81519, 
-										3814554, 70496041, 41851898, 35329790, 1207116, 69364649, 3490104, 115723837, 
-										15097215, 95816540, 599694, 131547597, 24995964, 7246681
-									},
-PLAYERDATA							= { },
-}
-
-local AUSNS2BaseConfig = {
-LeagueName 							= "AusNS2",
-PlayerDataURL 						= "http://ausns2.org/league-api.php?lookup=player&steamid=",
-PlayerDataFormat					= "AUSNS",
-PlayerRefLevel 						= 1,
-AutomaticMapCycleDelay				= 180 * 60,
-PauseEndDelay 						= 5,
-PauseStartDelay 					= 1,
-PauseMaxPauses 						= 3,
-PausedReadyNotificationDelay 		= 30,
-PauseEnabled 						= true,
-Interp 								= 50,
-MoveRate 							= 40,
-ClientRate 							= 40,
-TickRate 							= 40,
-MaxDataRate 						= 76800,
-FriendlyFireDamagePercentage 		= 0.33,
-FriendlyFireEnabled			 		= true,
-TournamentModeAlertDelay 			= 30,
-TournamentModeGameStartDelay 		= 15,
-PCW 								= {
-										PausedMaxDuration 					= 120,
-										TournamentModeForfeitClock			= 0,
-										TournamentModeRestartDuration 		= 90,
-										Limit6PlayerPerTeam 				= false,
-										MercsRequireApproval 				= false,
-									},
-OFFICIAL							= {
-										PausedMaxDuration 					= 90,
-										TournamentModeForfeitClock			= 1200,
-										TournamentModeRestartDuration 		= 30,
-										Limit6PlayerPerTeam 				= true,
-										MercsRequireApproval 				= true,
-									},
-REFS								= { },
-PLAYERDATA							= { },
-}
-
 local DefaultConfig = {
 AutomaticMapCycleDelay				= 180 * 60,
 PauseEndDelay 						= 5,
@@ -170,11 +102,6 @@ PauseStartDelay 					= 1,
 PauseMaxPauses 						= 3,
 PausedReadyNotificationDelay 		= 30,
 PauseEnabled 						= true,
-Interp 								= 100,
-MoveRate 							= 30,
-ClientRate 							= 20,
-TickRate 							= 30,
-MaxDataRate 						= 25600,
 FriendlyFireDamagePercentage 		= 0.33,
 FriendlyFireEnabled			 		= false,
 TournamentModeAlertDelay 			= 30,
@@ -183,46 +110,19 @@ PausedMaxDuration 					= 120,
 TournamentModeForfeitClock			= 0,
 TournamentModeRestartDuration 		= 90,
 Limit6PlayerPerTeam 				= false,
-MercsRequireApproval 				= false,
-RefereeBadge				 		= { },
-ConsistencyConfig 					= {	restrict = { "lua/entry/*.entry" },
-										check = { 	"game_setup.xml", 
-													"*.lua", 
-													"*.hlsl", 
-													"*.shader", 
-													"*.screenfx", 
-													"*.surface_shader", 
-													"*.fxh",
-													"*.fx", 
-													"*.render_setup", 
-													"*.shader_template",
-													"*.soundinfo",
-													"*.level", 
-													"*.dds", 
-													"*.jpg", 
-													"*.png", 
-													"*.cinematic", 
-													"*.material", 
-													"*.model", 
-													"*.animation_graph", 
-													"*.polygons", 
-													"*.fev", 
-													"*.fsb", 
-													"*.entry" },
-										ignore = { 	"ui/crosshairs.dds", 
-													"ui/crosshairs-hit.dds", 
-													"ui/exo_crosshair.dds", 
-													"ui/exosuit_HUD1.dds", 
-													"ui/exosuit_HUD4.dds", 
-													"ui/marine_minimap_blip.dds", 
-													"ui/minimap_blip.dds",
-													"sound/hitsounds_client.fev",
-													"sound/hitsounds_client.fsb",
-													"sound/hitsounds_client.soundinfo",},
-									   },
+MercsRequireApproval 				= false
+}
+
+local DefaultPerfConfig = {
+Interp 								= 100,
+MoveRate 							= 30,
+ClientRate 							= 20,
+TickRate 							= 30,
+MaxDataRate 						= 25,
 }
 
 local Configs = { }
+local PerfConfigs = { }
 
 local function OnConfigResponse(response)
 	if response then
@@ -235,20 +135,27 @@ local function OnConfigResponse(response)
 				configUpdateRetries = configUpdateRetries + 1
 			else
 				Shared.Message("Failed getting latest config from GitHub.")
-				Configs = { NSL = ENSLBaseConfig, AUSNS2 = AUSNS2BaseConfig }
+				local file = io.open(configlocalFile, "r")
+				if file then
+					responsetable = json.decode(file:read("*all"))
+					file:close()
+				end
 			end
-		else
-			if responsetable.Version and responsetable.EndOfTable then
-				for i, config in ipairs(responsetable.Configs) do
-					if config.LeagueName ~= nil then
-						//assume valid, update Configs table, always uppercase
-						//Shared.Message("Loading config " .. config.LeagueName .. " from GitHub.")
-						Configs[string.upper(config.LeagueName)] = config
-					end
+		end
+		if responsetable and responsetable.Version and responsetable.EndOfTable then
+			for i, config in ipairs(responsetable.Configs) do
+				if config.LeagueName then
+					//assume valid, update Configs table, always uppercase
+					//Shared.Message("Loading config " .. config.LeagueName .. ".")
+					Configs[string.upper(config.LeagueName)] = config
+				elseif config.PerfLevel then
+					//Performance configs
+					//Shared.Message("Loading perf config " .. config.PerfLevel .. ".")
+					PerfConfigs[string.upper(config.PerfLevel)] = config
 				end
-				if GetNSLModEnabled() then
-					EstablishConfigDependantSettings()
-				end
+			end
+			if GetNSLModEnabled() then
+				EstablishConfigDependantSettings()
 			end
 		end
 	end
@@ -265,35 +172,54 @@ Event.Hook("UpdateServer", OnServerUpdated)
 
 function GetNSLConfigValue(value)
 	//Check base config
-	if Configs[NSL_League] ~= nil and Configs[NSL_League][value] ~= nil then
+	if Configs[NSL_League] and Configs[NSL_League][value] then
 		return Configs[NSL_League][value]
 	end
 	//Check Mode Specific config
-	if Configs[NSL_League] ~= nil and Configs[NSL_League][NSL_Mode] ~= nil and Configs[NSL_League][NSL_Mode][value] ~= nil then
+	if Configs[NSL_League] and Configs[NSL_League][NSL_Mode] and Configs[NSL_League][NSL_Mode][value] then
 		return Configs[NSL_League][NSL_Mode][value]
 	end
-	if DefaultConfig[value] ~= nil then
+	if DefaultConfig[value] then
 		return DefaultConfig[value]
 	end
 	return nil
 end
 
+function GetNSLPerfValue(value)
+	//Check base config
+	if PerfConfigs[NSL_PerfLevel] and PerfConfigs[NSL_PerfLevel][value] then
+		return PerfConfigs[NSL_PerfLevel][value]
+	end
+	if DefaultPerfConfig[value] then
+		return DefaultPerfConfig[value]
+	end
+	return nil
+end
+
 function GetNSLLeagueValid(league)
-	if Configs[league] ~= nil and Configs[league].LeagueName ~= nil then
+	if Configs[league] and Configs[league].LeagueName then
 		return true
 	end
 	return false
 end
 
+function GetPerfLevelValid(level)
+	if PerfConfigs[level] and PerfConfigs[level].PerfLevel then
+		return true
+	end
+	return false
+end
+
+
 function GetIsNSLRef(ns2id)
 	local ref = false
-	if ns2id ~= nil then
+	if ns2id then
 		local cRefs = GetNSLConfigValue("REFS")
-		if cRefs ~= nil then
+		if cRefs then
 			ref = table.contains(cRefs, ns2id)
 		end
 		local pData = GetNSLUserData(ns2id)
-		if pData ~= nil and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and not ref then
+		if pData and pData.NSL_Level and tonumber(pData.NSL_Level) and not ref then
 			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
 		end
 	end
