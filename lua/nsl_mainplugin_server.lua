@@ -8,26 +8,36 @@ Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
 
 //Supposedly this still not syncronized.
-local function SetupRates()
+local function SetupClientRates()
 	if GetNSLPerfValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
 	end
 	if GetNSLPerfValue("MoveRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 	end
+end
+
+local function SetupRates()
 	if GetNSLPerfValue("TickRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
 	end
 	if GetNSLPerfValue("ClientRate") ~= 20 then
 		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
 	end
+	//This sucks.
+	//tickrate is dependant on moverate, which is dependant on tickrate... :/
+	//Just set it again to be sure...
+	if GetNSLPerfValue("TickRate") ~= 30 then
+		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
+	end
 	if GetNSLPerfValue("MaxDataRate") ~= 25 then
 		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
 	end
 end
 
-table.insert(gConnectFunctions, SetupRates)
+table.insert(gConnectFunctions, SetupClientRates)
 table.insert(gConfigLoadedFunctions, SetupRates)
+table.insert(gConfigLoadedFunctions, SetupClientRates)
 
 local originalPlayerOnJoinTeam
 //Maintain original PlayerOnJoinTeam
