@@ -25,7 +25,7 @@ local function SetupRates()
 		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
 	end
 	//This sucks.
-	//tickrate is dependant on moverate, which is dependant on tickrate... :/
+	//tickrate is required to be higher than updaterate, which is dependant on tickrate... :/
 	//Just set it again to be sure...
 	if GetNSLPerfValue("TickRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
@@ -102,19 +102,19 @@ function SendAllClientsMessage(message)
 end
 
 function SendClientMessage(client, message)
-	if client ~= nil then
+	if client then
 		Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
 	end
 end
 
 function SendTeamMessage(teamnum, message)
 	local chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
-	if tonumber(teamnum) ~= nil then
+	if tonumber(teamnum) then
 		local playerRecords = GetEntitiesForTeam("Player", teamnum)
 		for _, player in ipairs(playerRecords) do
 			
 			local client = Server.GetOwner(player)
-			if client ~= nil then
+			if client then
 				Server.SendNetworkMessage(client, "Chat", chatmessage, true)
 			end
 		
@@ -150,45 +150,22 @@ end
 Event.Hook("Console_sv_nslhelp",               OnClientCommandNSLHelp)
 
 local function UpdateNSLMode(client, mode)
+	mode = mode or ""
 	if string.lower(mode) == "pcw" then
 		SetNSLMode("PCW")
 	elseif string.lower(mode) == "official" then
 		SetNSLMode("OFFICIAL")
 	elseif string.lower(mode) == "disabled" then
 		SetNSLMode("DISABLED")
+	else
+		ServerAdminPrint(client, string.format("NSL Plugin currently running in %s config.", GetNSLMode()))
+		return
 	end
 	ServerAdminPrint(client, string.format("NSL Plugin now running in %s config.", GetNSLMode()))
 end
 
-local function OnClientSVCommandSetMode(client, mode)
-	local isRef = false
-	if client then
-		local NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if (not isRef or not GetNSLModEnabled()) and mode then
-		UpdateNSLMode(client, mode)
-	end
-end
-
-local function OnClientCommandSetMode(client, mode)
-	local isRef = false
-	if client then
-		local NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if isRef and mode ~= nil then
-		UpdateNSLMode(client, mode)
-	elseif isRef then
-		ServerAdminPrint(client, string.format("NSL Plugin currently running in %s config.", GetNSLMode()))
-	end
-end
-
-Event.Hook("Console_sv_nslcfg",               OnClientCommandSetMode)
-CreateServerAdminCommand("Console_sv_nslcfg", OnClientSVCommandSetMode, "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
-
 local function UpdateNSLLeague(client, league)
-	league = string.upper(league)
+	league = string.upper(league or "")
 	if GetNSLLeagueValid(league) then
 		SetActiveLeague(league)
 		ServerAdminPrint(client, string.format("NSL Plugin now using %s league config.", GetActiveLeague()))
@@ -197,35 +174,8 @@ local function UpdateNSLLeague(client, league)
 	end
 end
 
-local function OnClientSVCommandSetLeague(client, league)
-	local isRef = false
-	if client then
-		local NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if not isRef and league then
-		UpdateNSLLeague(client, league)
-	end
-end
-
-local function OnClientCommandSetLeague(client, league)
-	local isRef = false
-	if client then
-		local NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if isRef and league then
-		UpdateNSLLeague(client, league)
-	elseif isRef then
-		ServerAdminPrint(client, string.format("NSL Plugin currently using %s league config.", GetActiveLeague()))
-	end
-end
-
-Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
-CreateServerAdminCommand("Console_sv_nslconfig", OnClientSVCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
-
 local function UpdateNSLPerfConfig(client, perfcfg)
-	perfcfg = string.upper(perfcfg)
+	perfcfg = string.upper(perfcfg or "")
 	if GetPerfLevelValid(perfcfg) then
 		SetPerfLevel(perfcfg)
 		ServerAdminPrint(client, string.format("NSL Plugin now using %s performance config.", GetNSLPerfLevel()))
@@ -234,32 +184,49 @@ local function UpdateNSLPerfConfig(client, perfcfg)
 	end
 end
 
-local function OnClientSVCommandSetPerfConfig(client, perfcfg)
-	local isRef = false
+local function ServerAdminOrNSLRefCommand(client, parameter, functor, admin)
+	local isRef
 	if client then
 		local NS2ID = client:GetUserId()
 		isRef = GetIsNSLRef(NS2ID)
 	end
-	if not isRef and perfcfg then
-		UpdateNSLPerfConfig(client, perfcfg)
+	if isRef or admin then
+		functor(client, parameter)
 	end
+end
+
+local function OnAdminCommandSetMode(client, mode)
+	ServerAdminOrNSLRefCommand(client, mode, UpdateNSLMode, true)
+end
+
+local function OnClientCommandSetMode(client, mode)
+	ServerAdminOrNSLRefCommand(client, mode, UpdateNSLMode, false)
+end
+
+Event.Hook("Console_sv_nslcfg",               OnClientCommandSetMode)
+CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
+
+local function OnAdminCommandSetLeague(client, league)
+	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, true)
+end
+
+local function OnClientCommandSetLeague(client, league)
+	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, false)
+end
+
+Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
+CreateServerAdminCommand("Console_sv_nslconfig", OnAdminCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
+
+local function OnAdminCommandSetPerfConfig(client, perfcfg)
+	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, true)
 end
 
 local function OnClientCommandSetPerfConfig(client, perfcfg)
-	local isRef = false
-	if client then
-		local NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if isRef and perfcfg then
-		UpdateNSLPerfConfig(client, perfcfg)
-	elseif isRef then
-		ServerAdminPrint(client, string.format("NSL Plugin currently using %s performance config.", GetNSLPerfLevel()))
-	end
+	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, false)
 end
 
 Event.Hook("Console_sv_nslperfconfig",               OnClientCommandSetPerfConfig)
-CreateServerAdminCommand("Console_sv_nslperfconfig", OnClientSVCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
+CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
 local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff

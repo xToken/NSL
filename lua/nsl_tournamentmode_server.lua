@@ -34,6 +34,18 @@ originalNS2GRSetGameState = Class_ReplaceMethod("NS2Gamerules", "SetGameState",
 	end
 )
 
+//Derrrrrrrp
+//Seems wierd, but makes game start the same frame as final counter expires.
+local originalNS2GRGetPregameLength
+originalNS2GRGetPregameLength = Class_ReplaceMethod("NS2Gamerules", "GetPregameLength", 
+	function(self)
+		if GetNSLModEnabled() then
+			return -1
+		end
+		return originalNS2GRGetPregameLength(self)
+	end
+)
+
 //Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
 local function CheckTournamentModeTeamJoin(self, teamNumber)
 	if teamNumber == 1 or teamNumber == 2 and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
@@ -82,7 +94,7 @@ function OnCommanderLogOut(commander)
 end
 
 local function CheckGameStart()
-	if TournamentModeSettings.countdownstarttime < Shared.GetTime() + 0.9 then
+	if TournamentModeSettings.countdownstarttime < Shared.GetTime() then
 		GetGamerules():SetTeamsReady(true)
 		ClearTournamentModeState()
 		TournamentModeSettings.roundstarted = Shared.GetTime()
@@ -268,7 +280,6 @@ local function OnCommandNotReady(client)
 				gamerules:SetTeamsReady(false)
 				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeStartedGameCancelled"), playername, GetActualTeamName(teamnum)))
 			end
-			//gamerules:SetGameState(kGameState.PreGame)
 			ClientNotReady(client)
 		end
 	end

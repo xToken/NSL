@@ -22,7 +22,7 @@ local function NextSpectatorMode(self, mode)
 
 	local nextMode = (mode % numModes) + 1
 	// FirstPerson is only used directly through SetSpectatorMode(), never in this function.
-	if nextMode == kSpectatorMode.FirstPerson then
+	if nextMode == kSpectatorMode.FirstPerson and not GetNSLConfigValue("FirstPersonSpectate") and GetNSLModEnabled() then
 		if IsTeamSpectator(self) then
 			return kSpectatorMode.Following
 		else
@@ -58,6 +58,16 @@ local function UpdateSpectatorMode(self, input)
 			
 		elseif bit.band(input.commands, Move.Weapon3) ~= 0 then
 		
+			if not GetNSLConfigValue("FirstPersonSpectate") and GetNSLModEnabled() then
+				self:SetSpectatorMode(kSpectatorMode.Following)
+			else
+				self:SetSpectatorMode(kSpectatorMode.FirstPerson)
+			end
+			
+			self.timeFromLastAction = 0
+			
+		elseif bit.band(input.commands, Move.Weapon4) ~= 0 then
+			
 			self:SetSpectatorMode(kSpectatorMode.Following)
 			self.timeFromLastAction = 0
 			
@@ -88,7 +98,11 @@ oldNS2SpectatorOnInitialized = Class_ReplaceMethod("Spectator", "OnInitialized",
 			self:SetIsVisible(false)
 			self:SetIsAlive(false)
 			// Start us off by looking for a target to follow.
-			self:SetSpectatorMode(kSpectatorMode.Following)
+			if not GetNSLConfigValue("FirstPersonSpectate") and GetNSLModEnabled() then
+				self:SetSpectatorMode(kSpectatorMode.Following)
+			else
+				self:SetSpectatorMode(kSpectatorMode.FirstPerson)
+			end
 			
 		elseif Client then
 		

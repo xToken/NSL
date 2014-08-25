@@ -45,11 +45,3 @@ for _, badge in ipairs(gRefBadges) do
 end
 
 Shared.RegisterNetworkMessage("RefBadges", kRefBadgesMessage)
-
-function PlayerRanking:GetTrackServer()
-    return not GetServerContainsBots()
-end
-
-function PlayerRanking:GetGameMode()
-    return "ns2"
-end

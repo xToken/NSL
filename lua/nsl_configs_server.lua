@@ -110,7 +110,8 @@ PausedMaxDuration 					= 120,
 TournamentModeForfeitClock			= 0,
 TournamentModeRestartDuration 		= 90,
 Limit6PlayerPerTeam 				= false,
-MercsRequireApproval 				= false
+MercsRequireApproval 				= false,
+FirstPersonSpectate					= false
 }
 
 local DefaultPerfConfig = {

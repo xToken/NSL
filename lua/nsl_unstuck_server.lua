@@ -1,8 +1,8 @@
 //NS2 Unstuck Plugin
 
-local UnstuckOriginTracker = { }
-local LastUnstuckTracker = { }
-local UnstuckRetryTracker = { }
+local UnstuckOriginTracker = { }  	//Tracks origin of clients in unstuck Queue.
+local LastUnstuckTracker = { }		//Tracks time of clients last successful unstuck.
+local UnstuckRetryTracker = { }		//Tracks retries of unstuck up to kMaxUnstuckAttemps.
 local kUnstuckRate = 30
 local kMinUnstuckTime = 2.5
 local kMaxUnstuckTime = 5
@@ -55,6 +55,7 @@ end
 
 local function UnstuckIntialCallback(self)
 	self:AddTimedCallback(UnstuckCallback, 0.02)
+	return false
 end
 
 local function RegisterClientStuck(client)

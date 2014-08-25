@@ -1,50 +1,19 @@
 //Hmm lets see what kind of craziness THIS can cause...
 
 local ConsistencyApplied = false
-local defaultConsistency = 
-{
-	restrict = 	{ "lua/entry/*.entry" },
-	check = 	{ 	
-				"game_setup.xml", 
-				"*.lua", 
-				"*.hlsl", 
-				"*.shader", 
-				"*.screenfx", 
-				"*.surface_shader", 
-				"*.fxh",
-				"*.fx", 
-				"*.render_setup", 
-				"*.shader_template", 
-				"*.level", 
-				"*.dds", 
-				"*.jpg", 
-				"*.png", 
-				"*.cinematic", 
-				"*.material", 
-				"*.model", 
-				"*.animation_graph", 
-				"*.polygons", 
-				"*.fev", 
-				"*.fsb", 
-				"*.entry" 
-				},
-	ignore = 	{ 	
-				"ui/crosshairs.dds", 
-				"ui/crosshairs-hit.dds", 
-				"ui/exo_crosshair.dds", 
-				"ui/exosuit_HUD1.dds", 
-				"ui/exosuit_HUD4.dds", 
-				"ui/marine_minimap_blip.dds", 
-				"ui/minimap_blip.dds",
-				"sound/hitsounds_client.fev",
-				"sound/hitsounds_client.fsb",
-				"sound/hitsounds_client.soundinfo"
-				}
-}
+local consistencyLocalFile = "configs/nsl_leagueconfig.json"
 
 local function ApplyNSLConsistencyConfig()
 
-	local consistencyConfig = GetNSLConfigValue("ConsistencyConfig") or defaultConsistency
+	local consistencyConfig = GetNSLConfigValue("ConsistencyConfig")
+	
+	if not consistencyConfig then
+		local file = io.open(consistencyLocalFile, "r")
+		if file then
+			consistencyConfig = json.decode(file:read("*all"))
+			file:close()
+		end
+	end
 		
 	if consistencyConfig and not ConsistencyApplied then
 
@@ -77,7 +46,7 @@ local function ApplyNSLConsistencyConfig()
 		end
 		
 		local endTime = Shared.GetSystemTime()
-		Print("NSL Enhanced Consistency checking took " .. ToString(endTime - startTime) .. " seconds")
+		Print("NSL Enhanced Consistency checking took " .. ToString(endTime - startTime) .. " seconds.")
 		ConsistencyApplied = true
 		
 	end
