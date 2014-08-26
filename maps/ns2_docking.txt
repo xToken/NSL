@@ -1,9 +1,0 @@
-[{
-    "name":"Terminal",
-    "team":"marines",
-    "enemyspawns":    ["Generator"]
-},
-{
-    "name":"Generator",
-    "team":"aliens"
-}]
