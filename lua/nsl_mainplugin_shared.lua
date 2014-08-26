@@ -45,3 +45,10 @@ for _, badge in ipairs(gRefBadges) do
 end
 
 Shared.RegisterNetworkMessage("RefBadges", kRefBadgesMessage)
+
+local kTechTreeRequest = 
+{
+	teamNumber =  "integer (0 to 10)"
+}
+
+Shared.RegisterNetworkMessage("RequestTeamTechTree", kTechTreeRequest)

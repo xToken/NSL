@@ -6,9 +6,11 @@ Script.Load("lua/nsl_mainplugin_shared.lua")
 Script.Load("lua/nsl_eventhooks_server.lua")
 Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
+local kEnabledRates = {i = 100, m = 30, t = 30, u = 20, d = 25}
 
 //Supposedly this still not syncronized.
 local function SetupClientRates()
+	//If non-default rates, send to clients.
 	if GetNSLPerfValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
 	end
@@ -18,26 +20,39 @@ local function SetupClientRates()
 end
 
 local function SetupRates()
-	if GetNSLPerfValue("TickRate") ~= 30 then
+	if GetNSLPerfValue("TickRate") > kEnabledRates.t then
+		//Tickrate going up, increase it first.
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-	end
-	if GetNSLPerfValue("ClientRate") ~= 20 then
-		Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-	end
-	//This sucks.
-	//tickrate is required to be higher than updaterate, which is dependant on tickrate... :/
-	//Just set it again to be sure...
-	if GetNSLPerfValue("TickRate") ~= 30 then
+		kEnabledRates.t = GetNSLPerfValue("TickRate")
+		if GetNSLPerfValue("ClientRate") ~= kEnabledRates.u then
+			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+			kEnabledRates.u = GetNSLPerfValue("TickRate")
+		end
+	elseif GetNSLPerfValue("TickRate") < kEnabledRates.t then
+		//Tickrate going down, set updaterate first.
+		if GetNSLPerfValue("ClientRate") ~= kEnabledRates.u then
+			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+			kEnabledRates.u = GetNSLPerfValue("TickRate")
+		end
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
+		kEnabledRates.t = GetNSLPerfValue("TickRate")
 	end
-	if GetNSLPerfValue("MaxDataRate") ~= 25 then
+	if GetNSLPerfValue("MaxDataRate") ~= kEnabledRates.d then
 		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
+		kEnabledRates.d = GetNSLPerfValue("MaxDataRate")
+	end
+	if GetNSLPerfValue("Interp") ~= kEnabledRates.i then
+		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
+		kEnabledRates.i = GetNSLPerfValue("Interp")
+	end
+	if GetNSLPerfValue("MoveRate") ~= kEnabledRates.m then
+		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
+		kEnabledRates.m = GetNSLPerfValue("MoveRate")
 	end
 end
 
 table.insert(gConnectFunctions, SetupClientRates)
 table.insert(gConfigLoadedFunctions, SetupRates)
-table.insert(gConfigLoadedFunctions, SetupClientRates)
 
 local originalPlayerOnJoinTeam
 //Maintain original PlayerOnJoinTeam

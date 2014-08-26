@@ -182,14 +182,16 @@ local function CheckGameCountdownStart()
 	end
 end
 
-local function OnCommandForceStartRound(client)
+local function OnCommandForceStartRound(client, duration)
 	if not client then return end
 	local NS2ID = client:GetUserId()
+	local duration = tonumber(duration) or 15
 	if GetIsNSLRef(NS2ID) then
 		ClearTournamentModeState()
 		TournamentModeSettings[1].ready = true
 		TournamentModeSettings[2].ready = true
 		CheckGameCountdownStart()
+		TournamentModeSettings.countdownstarttime = Shared.GetTime() + duration
 		ServerAdminPrint(client, "Forcing game start.")
 	end
 end

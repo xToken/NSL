@@ -146,3 +146,6 @@ function Badges_GetBadgeTextures( clientId, usecase )
 	end
 	return textures, badgeNames
 end
+
+//Leeeets see how much this breaks :D
+AddClientUIScriptForClass("Spectator", "GUINSLSpectatorTechMap")

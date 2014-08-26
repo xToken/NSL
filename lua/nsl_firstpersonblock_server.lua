@@ -66,7 +66,7 @@ local function UpdateSpectatorMode(self, input)
 			
 			self.timeFromLastAction = 0
 			
-		elseif bit.band(input.commands, Move.Weapon4) ~= 0 then
+		elseif bit.band(input.commands, Move.Weapon5) ~= 0 then
 			
 			self:SetSpectatorMode(kSpectatorMode.Following)
 			self.timeFromLastAction = 0
