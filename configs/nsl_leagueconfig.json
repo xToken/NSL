@@ -199,11 +199,11 @@
 		}
 		{
 		"PerfLevel":							"Experimental",
-		"Interp": 								25,
-		"MoveRate": 							80,
-		"ClientRate": 							80,
-		"TickRate":								80,
-		"MaxDataRate": 							100
+		"Interp": 								100,
+		"MoveRate": 							30,
+		"ClientRate": 							30,
+		"TickRate":								30,
+		"MaxDataRate": 							25
 		}
 		{
 		"PerfLevel":							"Experimental2",
