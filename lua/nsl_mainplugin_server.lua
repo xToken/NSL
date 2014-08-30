@@ -6,7 +6,9 @@ Script.Load("lua/nsl_mainplugin_shared.lua")
 Script.Load("lua/nsl_eventhooks_server.lua")
 Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
-local kEnabledRates = {i = 100, m = 30, t = 30, u = 20, d = 25}
+local kCachedDataRate = 25
+local kCachedMoveRate = 30
+local kCachedInterp = 100
 
 //Supposedly this still not syncronized.
 local function SetupClientRates()
@@ -20,34 +22,31 @@ local function SetupClientRates()
 end
 
 local function SetupRates()
-	if GetNSLPerfValue("TickRate") > kEnabledRates.t then
+	
+	if GetNSLPerfValue("TickRate") > Server.GetTickrate() then
 		//Tickrate going up, increase it first.
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-		kEnabledRates.t = GetNSLPerfValue("TickRate")
-		if GetNSLPerfValue("ClientRate") ~= kEnabledRates.u then
+		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
 			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-			kEnabledRates.u = GetNSLPerfValue("TickRate")
 		end
-	elseif GetNSLPerfValue("TickRate") < kEnabledRates.t then
+	elseif GetNSLPerfValue("TickRate") <= Server.GetTickrate() then
 		//Tickrate going down, set updaterate first.
-		if GetNSLPerfValue("ClientRate") ~= kEnabledRates.u then
+		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
 			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-			kEnabledRates.u = GetNSLPerfValue("TickRate")
 		end
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-		kEnabledRates.t = GetNSLPerfValue("TickRate")
 	end
-	if GetNSLPerfValue("MaxDataRate") ~= kEnabledRates.d then
+	if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
 		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
-		kEnabledRates.d = GetNSLPerfValue("MaxDataRate")
+		kCachedDataRate = GetNSLPerfValue("MaxDataRate")
 	end
-	if GetNSLPerfValue("Interp") ~= kEnabledRates.i then
+	if GetNSLPerfValue("Interp") ~= kCachedInterp then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
-		kEnabledRates.i = GetNSLPerfValue("Interp")
+		kCachedInterp = GetNSLPerfValue("Interp")
 	end
-	if GetNSLPerfValue("MoveRate") ~= kEnabledRates.m then
+	if GetNSLPerfValue("MoveRate") ~= kCachedMoveRate then
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
-		kEnabledRates.m = GetNSLPerfValue("MoveRate")
+		kCachedMoveRate = GetNSLPerfValue("MoveRate")
 	end
 end
 
