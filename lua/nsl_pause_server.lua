@@ -135,14 +135,26 @@ originalNS2PathingMixinMoveToTarget = Class_ReplaceMethod("PathingMixin", "MoveT
 	end
 )
 
-local originalNS2AiAttacksMixinOnTag
-originalNS2AiAttacksMixinOnTag = Class_ReplaceMethod("AiAttacksMixin", "OnTag", 
+local originalNS2WhipOnTag
+originalNS2WhipOnTag = Class_ReplaceMethod("Whip", "OnTag", 
 	function(self, tagName)
 
 		if GetIsGamePaused() then
 			return
 		end
-		originalNS2AiAttacksMixinOnTag(self, tagName)		
+		originalNS2WhipOnTag(self, tagName)		
+
+	end
+)
+
+local originalNS2WhipUpdateOrders
+originalNS2WhipUpdateOrders = Class_ReplaceMethod("Whip", "UpdateOrders", 
+	function(self, deltaTime)
+
+		if GetIsGamePaused() then
+			return
+		end
+		originalNS2WhipUpdateOrders(self, deltaTime)		
 
 	end
 )
@@ -240,11 +252,15 @@ local kTimeAdjustmentUpdateRate = 1
 //This runs every tick to procedurally update any timerelevant fields of any relevant ents to insure they remain in the appropriate state.
 local function UpdateEntStates(deltatime)
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
+	local updateTime = false
+	lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate + deltatime
+	if lastTimeAdjustmentUpdate > (1 / kTimeAdjustmentUpdateRate) then
+		lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate - (1 / kTimeAdjustmentUpdateRate)
+		updateTime = true
+	end
 	for _, player in ientitylist(playerRecords) do
 		if player ~= nil then
-			lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate + deltatime
-			if lastTimeAdjustmentUpdate > (1 / kTimeAdjustmentUpdateRate) then
-				lastTimeAdjustmentUpdate = lastTimeAdjustmentUpdate - (1 / kTimeAdjustmentUpdateRate)
+			if updateTime then
 				player.timeadjustment = gSharedGetTimeAdjustments
 			end
 			player.gamepaused = gamestate.gamepaused
@@ -313,6 +329,18 @@ local function SaveEntStates()
 			//Dont wanna listen to that noise over and over and over and over and over ..
 		end
 	end
+	
+	//Cancel out whip attacks
+	local Whips = Shared.GetEntitiesWithClassname("Whip")
+	for _, Whip in ientitylist(Whips) do
+		Whip.attacking = false
+		Whip.slapping = false
+		Whip.bombarding = false
+		Whip.attackStartTime = nil
+		Whip.targetId = Entity.invalidId
+		Whip.waitingForEndAttack = false
+	end
+	
 	//Block movement instantly so that its not updated each frame needlessly
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	for _, player in ientitylist(playerRecords) do
