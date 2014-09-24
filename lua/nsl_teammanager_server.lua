@@ -3,6 +3,7 @@ local t2name = "Aliens"
 local tscores = { }
 local tqueue = { }
 local overridenames = false
+local hookedPlayers = { }
 
 Script.Load("lua/nsl_class.lua")
 
@@ -315,35 +316,20 @@ local function OnNetMsgRequestTeamTechTree(client, message)
     local player = client:GetControllingPlayer()
 	local teamNum = message.teamNumber
 	//Send stuff now, add them to table to recieve updates for that team.
-	//safty first ladies
-	local gamerules = GetGamerules()
-	if gamerules and client then
-		local team1 = gamerules:GetTeam(1)
-		local team2 = gamerules:GetTeam(2)
+	//Safty third ladies
+	if player and player:isa("Spectator") then
 		if teamNum ~= 1 and teamNum ~= 2 then
 			//Geeeeeeet outta here
-			if team1.hookedPlayers then
-				table.remove(team1.hookedPlayers, player:GetId())
-			end
-			if team2.hookedPlayers then
-				table.remove(team2.hookedPlayers, player:GetId())
-			end
+			player.hookedTechTree = 0
+			table.remove(hookedPlayers, player:GetId())
 			Server.SendNetworkMessage(player, "ClearTechTree", {}, true)
-		else
-			local selectedTeam = teamNum == 1 and team1 or team2
-			local otherTeam = teamNum == 1 and team2 or team1
-			if selectedTeam then
-				selectedTeam.techTree:SendTechTreeBase(player)
-				if selectedTeam.hookedPlayers == nil then
-					selectedTeam.hookedPlayers = { }
-				end
-				table.insertunique(selectedTeam.hookedPlayers, player:GetId())
+		elseif player.hookedTechTree ~= teamNum then
+			player.hookedTechTree = teamNum
+			local team = GetGamerules():GetTeam(teamNum)
+			if team then
+				team.techTree:SendTechTreeBase(player)
 			end
-			if otherTeam then
-				if otherTeam.hookedPlayers then
-					table.remove(otherTeam.hookedPlayers, player:GetId())
-				end
-			end
+			table.insertunique(hookedPlayers, player:GetId())
 		end
 	end
 end
@@ -351,13 +337,7 @@ end
 Server.HookNetworkMessage("RequestTeamTechTree", OnNetMsgRequestTeamTechTree)
 
 local function OnGameEndClearTechHooks()
-	local gamerules = GetGamerules()
-	if gamerules then
-		local team1 = gamerules:GetTeam(1) 
-		local team2 = gamerules:GetTeam(2)
-		team1.hookedPlayers = nil
-		team2.hookedPlayers = nil
-	end
+	hookedPlayers = { }
 end
 
 table.insert(gGameEndFunctions, OnGameEndClearTechHooks)
@@ -367,16 +347,22 @@ originalTeamGetPlayers = Class_ReplaceMethod("Team", "GetPlayers",
 	function(self)
 		//KEKEKEKEKEKEKE
 		local players = originalTeamGetPlayers(self)
-		if self.IsUpdatingTechTree and self.hookedPlayers then
+		if self.IsUpdatingTechTree and hookedPlayers then
 			local HP = { }
-			table.copy(self.hookedPlayers, HP)
-			self.hookedPlayers = { }
+			table.copy(hookedPlayers, HP)
+			hookedPlayers = { }
 			for index, pId in ipairs(HP) do
 				if pId then
 					local player = Shared.GetEntity(pId)
-					if player then
-						table.insert(players, player)
-						table.insert(self.hookedPlayers, player:GetId())
+					//This creates a bit of a mess, but no good way to make sure EntIDs stay relevant without some kind of global OnEntityIDChanged thingie... it works :/
+					if player and player:isa("Spectator") then
+						//Always readd if still a spec and has a valid hook.
+						if player.hookedTechTree == 1 or player.hookedTechTree == 2 then
+							table.insert(hookedPlayers, player:GetId())
+							if player.hookedTechTree == self:GetTeamNumber() then
+								table.insert(players, player)
+							end
+						end
 					end
 				end
 			end

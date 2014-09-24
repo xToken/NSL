@@ -79,13 +79,7 @@
 															"*.entry"
 															],
 												"ignore": 	[ 	
-															"ui/crosshairs.dds", 
-															"ui/crosshairs-hit.dds", 
-															"ui/exo_crosshair.dds", 
-															"ui/exosuit_HUD1.dds", 
-															"ui/exosuit_HUD4.dds", 
-															"ui/marine_minimap_blip.dds", 
-															"ui/minimap_blip.dds",
+															"ui/*.dds", 
 															"sound/hitsounds_client.fev",
 															"sound/hitsounds_client.fsb",
 															"sound/hitsounds_client.soundinfo"
@@ -152,13 +146,7 @@
 															"*.entry"
 															],
 												"ignore": 	[ 	
-															"ui/crosshairs.dds", 
-															"ui/crosshairs-hit.dds", 
-															"ui/exo_crosshair.dds", 
-															"ui/exosuit_HUD1.dds", 
-															"ui/exosuit_HUD4.dds", 
-															"ui/marine_minimap_blip.dds", 
-															"ui/minimap_blip.dds",
+															"ui/*.dds", 
 															"sound/hitsounds_client.fev",
 															"sound/hitsounds_client.fsb",
 															"sound/hitsounds_client.soundinfo"

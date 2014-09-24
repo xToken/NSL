@@ -48,7 +48,17 @@ Shared.RegisterNetworkMessage("RefBadges", kRefBadgesMessage)
 
 local kTechTreeRequest = 
 {
-	teamNumber =  "integer (0 to 10)"
+	teamNumber =  string.format("integer (-1 to %d)", kSpectatorIndex)
 }
 
 Shared.RegisterNetworkMessage("RequestTeamTechTree", kTechTreeRequest)
+
+local originalNS2SpectatorOnCreate
+originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 
+	function(self)
+		originalNS2SpectatorOnCreate(self)
+		self.hookedTechTree = 0
+	end
+)
+
+Class_Reload( "Spectator", {hookedTechTree = string.format("integer (-1 to %d)", kSpectatorIndex)} )
