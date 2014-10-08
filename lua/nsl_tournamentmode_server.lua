@@ -47,20 +47,21 @@ originalNS2GRGetPregameLength = Class_ReplaceMethod("NS2Gamerules", "GetPregameL
 )
 
 //Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
-local function CheckTournamentModeTeamJoin(self, teamNumber)
-	if teamNumber == 1 or teamNumber == 2 and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
-		if self:GetGameState() == kGameState.Started then
-			local team1Players = self.team1:GetNumPlayers()
-			local team2Players = self.team2:GetNumPlayers()
-			if (teamNumber == 1 and team1Players >= 6) or (teamNumber == 2 and team2Players >= 6) then
-				return false
+local originalNS2GameRulesGetCanJoinTeamNumber
+originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
+	function(self, teamNumber)
+		if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
+			if self:GetGameState() == kGameState.Started then
+				local team1Players = self.team1:GetNumPlayers()
+				local team2Players = self.team2:GetNumPlayers()
+				if (teamNumber == 1 and team1Players >= 6) or (teamNumber == 2 and team2Players >= 6) then
+					return false
+				end
 			end
 		end
+		return originalNS2GameRulesGetCanJoinTeamNumber(self, teamNumber)
 	end
-	return true
-end
-
-table.insert(gCanJoinTeamFunctions, CheckTournamentModeTeamJoin)
+)
 
 local function ClearTournamentModeState()
 	TournamentModeSettings[1] = {ready = false, lastready = 0}
@@ -234,19 +235,25 @@ local function ClientReady(client)
 	
 end
 
+local function CheckforInProgressGameToCancel(client, gamerules)
+	if gamerules:GetGameState() == kGameState.Started and (TournamentModeSettings.roundstarted or 0) + GetNSLConfigValue("TournamentModeRestartDuration") > Shared.GetTime() then
+		local player = client:GetControllingPlayer()
+		local playername = player:GetName()
+		local teamnum = player:GetTeamNumber()
+		if (teamnum == 1 or teamnum == 2) then
+			gamerules:SetTeamsReady(false)
+			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeStartedGameCancelled"), playername, GetActualTeamName(teamnum)))
+		end
+	end
+end
+
 local function OnCommandReady(client)
 	local gamerules = GetGamerules()
-	if gamerules ~= nil and client ~= nil and GetNSLModEnabled() then
-		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame or (TournamentModeSettings.roundstarted ~= 0 and TournamentModeSettings.roundstarted + GetNSLConfigValue("TournamentModeRestartDuration") > Shared.GetTime()) then
-			if gamerules:GetGameState() == kGameState.Started then
-				local player = client:GetControllingPlayer()
-				local playername = player:GetName()
-				local teamnum = player:GetTeamNumber()
-				gamerules:SetTeamsReady(false)
-				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeStartedGameCancelled"), playername, GetActualTeamName(teamnum)))
-			end
-			//gamerules:SetGameState(kGameState.PreGame)
+	if gamerules and client and GetNSLModEnabled() then
+		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame then
 			ClientReady(client)
+		else
+			CheckforInProgressGameToCancel(client, gamerules)
 		end
 	end
 end
@@ -273,16 +280,11 @@ end
 
 local function OnCommandNotReady(client)
 	local gamerules = GetGamerules()
-	if gamerules ~= nil and client ~= nil and GetNSLModEnabled() then
-		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame or (TournamentModeSettings.roundstarted ~= 0 and TournamentModeSettings.roundstarted + GetNSLConfigValue("TournamentModeRestartDuration") > Shared.GetTime()) then
-			if gamerules:GetGameState() == kGameState.Started then
-				local player = client:GetControllingPlayer()
-				local playername = player:GetName()
-				local teamnum = player:GetTeamNumber()
-				gamerules:SetTeamsReady(false)
-				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeStartedGameCancelled"), playername, GetActualTeamName(teamnum)))
-			end
+	if gamerules and client and GetNSLModEnabled() then
+		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame then
 			ClientNotReady(client)
+		else
+			CheckforInProgressGameToCancel(client, gamerules)
 		end
 	end
 end

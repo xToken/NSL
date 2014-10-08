@@ -228,8 +228,6 @@ originalNS2PlayerOnCreate = Class_ReplaceMethod("Player", "OnCreate",
 	end
 )
 
-table.insert(gCanJoinTeamFunctions, PauseBlockTeamJoins)
-
 function GetCommanderLogoutAllowed()
 	return not GetIsGamePaused()
 end

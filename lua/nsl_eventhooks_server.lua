@@ -4,8 +4,6 @@ gChatCommands = { }
 gArgumentedChatCommands = { }
 //Functions on connect
 gConnectFunctions = { }
-//Team Allowance Checks
-gCanJoinTeamFunctions = { }
 //Plugin Activation Functions
 gPluginStateChange = { }
 //Game End Functions
@@ -22,20 +20,6 @@ local function OnClientConnected(client)
 end
 
 Event.Hook("ClientConnect", OnClientConnected)
-
-local originalNS2GameRulesGetCanJoinTeamNumber
-originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
-	function(self, teamNumber)
-		if GetNSLModEnabled() then
-			for i = 1, #gCanJoinTeamFunctions do
-				if not gCanJoinTeamFunctions[i](self, teamNumber) then
-					return false
-				end
-			end
-		end
-		return originalNS2GameRulesGetCanJoinTeamNumber(self, teamNumber)
-	end
-)
 
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
