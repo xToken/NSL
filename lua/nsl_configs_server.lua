@@ -111,7 +111,9 @@ TournamentModeForfeitClock			= 0,
 TournamentModeRestartDuration 		= 90,
 Limit6PlayerPerTeam 				= false,
 MercsRequireApproval 				= false,
-FirstPersonSpectate					= false
+FirstPersonSpectate					= false,
+UseCustomSpawnConfigs				= false,
+UseFixedSpawnsPerMap				= false
 }
 
 local DefaultPerfConfig = {
