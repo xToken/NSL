@@ -27,6 +27,17 @@ local function GetMapSpecificSpawns()
 	end
 end
 
+//Need this to re-apply team values.
+local function UpdateTechPointTeamsAfterReset(techPoints)
+	for index, currentTechPoint in pairs(techPoints) do
+		for k, v in pairs(kCustomTechPointTeams) do
+			if (string.lower(k) == string.lower(currentTechPoint:GetLocationName())) then		
+				currentTechPoint.allowedTeamNumber = v
+			end
+		end
+	end
+end
+
 local originalNS2GRGetChooseTechPoint
 //Override default tech point choosing function to something that supports using the caches	
 originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTechPoint", 
@@ -44,6 +55,7 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 				end
 			elseif kValidCustomSpawnData then
 				if teamNumber == kTeam1Index then
+					UpdateTechPointTeamsAfterReset(kCustomTechPointData)
 					techPoint = originalNS2GRGetChooseTechPoint(self, kCustomTechPointData, teamNumber)
 					//Add back in this TP cause yea
 					table.insert(kCustomTechPointData, techPoint)
@@ -61,6 +73,7 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 					end
 					local randomTechPointIndex = self.techPointRandomizer:random(1, #ValidAlienSpawns)
 					kSelectedAlienSpawn = ValidAlienSpawns[randomTechPointIndex]
+					assert(kSelectedAlienSpawn ~= nil)
 				elseif teamNumber == kTeam2Index then
 					techPoint = kSelectedAlienSpawn
 				end
@@ -110,7 +123,7 @@ local function LoadCustomTechPointData()
 		end
 	end
 	
-	if #kCustomTechPointData < 2 then
+	if #kCustomTechPointData < 2 and kValidCustomSpawnData then
 		//NOT valid data
 		kValidCustomSpawnData = false
 		Shared.Message("Error configuring NSL spawns, invalid response or incorrectly configured weekly config!")
@@ -128,9 +141,12 @@ local function LoadCustomTechPointData()
 		
 		if not kValidCustomSpawnData then
 			kSelectedMarineSpawn = originalNS2GRGetChooseTechPoint(gamerules, techPoints, 1)
+			assert(kSelectedMarineSpawn ~= nil)
 			kSelectedAlienSpawn = originalNS2GRGetChooseTechPoint(gamerules, techPoints, 2)
+			assert(kSelectedAlienSpawn ~= nil)
 		else
 			kSelectedMarineSpawn = originalNS2GRGetChooseTechPoint(gamerules, kCustomTechPointData, 1)
+			assert(kSelectedMarineSpawn ~= nil)
 			//Add back in this TP cause yea
 			table.insert(kCustomTechPointData, kSelectedMarineSpawn)
 			//If getting team1 spawn location, build alien spawns for next check
@@ -147,6 +163,7 @@ local function LoadCustomTechPointData()
 			end
 			local randomTechPointIndex = gamerules.techPointRandomizer:random(1, #ValidAlienSpawns)
 			kSelectedAlienSpawn = ValidAlienSpawns[randomTechPointIndex]
+			assert(kSelectedAlienSpawn ~= nil)
 		end
 		
 		//Prevent Map Specific spawn overrides from being used
@@ -158,6 +175,33 @@ local function LoadCustomTechPointData()
 end
 
 table.insert(gConfigLoadedFunctions, LoadCustomTechPointData)
+
+local kTramTop = {"warehouse", "server room"}
+
+local function UpdateSpawnForMapSpecificSetups(teamSpawn)
+	local mapname = Shared.GetMapName()
+	if teamSpawn then
+		teamSpawn = string.lower(teamSpawn)
+		if mapname == "ns2_tram" then
+			if teamSpawn == "top" then
+				teamSpawn = kTramTop[math.random(1,2)]
+			elseif teamSpawn == "bottom" then
+				teamSpawn = "shipping"
+			end	
+		elseif mapname == "ns2_summit" then
+			if teamSpawn == "top" then
+				teamSpawn = "atrium"
+			elseif teamSpawn == "bottom" then
+				teamSpawn = "sub access"
+			elseif teamSpawn == "left" then
+				teamSpawn = "flight control"
+			elseif teamSpawn == "right" then
+				teamSpawn = "data core"
+			end	
+		end
+	end
+	return teamSpawn
+end
 
 local function SetTeamSpawns(client, ...)
 
@@ -174,9 +218,13 @@ local function SetTeamSpawns(client, ...)
 					team2Spawn = StringTrim(team2Spawn)
 				end
 				
+				team1Spawn = UpdateSpawnForMapSpecificSetups(team1Spawn)
+				team2Spawn = UpdateSpawnForMapSpecificSetups(team2Spawn)
+				
 				Server.teamSpawnOverride = { }
 				if spawns and team1Spawn and team1Spawn ~= "" and team2Spawn and team2Spawn ~= "" and team1Spawn ~= team2Spawn and not GetGamerules():GetGameStarted() then
-					table.insert(Server.teamSpawnOverride, { marineSpawn = string.lower(team1Spawn), alienSpawn = string.lower(team2Spawn) })   
+					table.insert(Server.teamSpawnOverride, { marineSpawn = string.lower(team1Spawn), alienSpawn = string.lower(team2Spawn) }) 
+					ServerAdminPrint(client, string.format("Setting spawns to %s for marines and %s for aliens.", team1Spawn, team2Spawn))
 					GetGamerules():ResetGame()
 				else
 					ServerAdminPrint(client, "Invalid usage. Usage: <marine spawn location>, <alien spawn location>")

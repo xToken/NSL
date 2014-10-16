@@ -88,42 +88,50 @@
 															]
 												},
 		"CustomSpawns":							{
-												"ns2_summit":	[
-																	{
-																		"effectiveDate":		2014.0,
-																		"expiryDate":			2014.0,
-																		"spawnData":			[
-																									{
-																										"name":				"Sub Access",
-																										"team":				"both",
-																										"enemyspawns":    	["Atrium"]
-																									},
-																									{
-																										"name":				"Data Core",
-																										"team":				"both",
-																										"enemyspawns":    	["Flight Control"]
-																									}														
-																								]											
-																	}
-																],
 												"ns2_tram":		[
 																	{
-																		"effectiveDate":		2014.0,
-																		"expiryDate":			2014.0,
+																		"effectiveDate":		2014.0910,
+																		"expiryDate":			2014.1017,
 																		"spawnData":			[
 																									{
 																										"name":				"Shipping",
-																										"team":				"both",
-																										"enemyspawns":    	["Warehouse"]
+																										"team":				"aliens",
+																										"enemyspawns":    	["Warehouse", "Server Room"]
 																									},
 																									{
 																										"name":				"Warehouse",
-																										"team":				"both",
+																										"team":				"marines",
+																										"enemyspawns":    	["Shipping"]
+																									},
+																									{
+																										"name":				"Server Room",
+																										"team":				"marines",
+																										"enemyspawns":    	["Shipping"]
+																									}
+																								]											
+																	},
+																	{
+																		"effectiveDate":		2014.1018,
+																		"expiryDate":			2014.1028,
+																		"spawnData":			[
+																									{
+																										"name":				"Shipping",
+																										"team":				"marines",
+																										"enemyspawns":    	["Warehouse", "Server Room"]
+																									},
+																									{
+																										"name":				"Warehouse",
+																										"team":				"aliens",
+																										"enemyspawns":    	["Shipping"]
+																									},
+																									{
+																										"name":				"Server Room",
+																										"team":				"aliens",
 																										"enemyspawns":    	["Shipping"]
 																									}														
 																								]											
 																	}
-																]																
+																]															
 												}
 		},
 		{
