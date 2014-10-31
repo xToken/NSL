@@ -257,3 +257,12 @@ local function SetupServerConfig()
 end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)
+
+local oldGetHasDLC = GetHasDLC
+function GetHasDLC(productId, client)
+	if GetNSLConfigValue("UseDefaultSkins")
+		return productId == nil or productId == 0
+	else
+		return oldGetHasDLC(productId, client)
+	end
+end

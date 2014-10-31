@@ -19,6 +19,7 @@
 		"FirstPersonSpectate":					false,
 		"UseCustomSpawnConfigs":				true,
 		"UseFixedSpawnsWhenLoaded":				false,
+		"UseDefaultSkins":						false,
 		"RefereeBadge":				 			{
 													"ensl_staff":							1,
 													"ensl_admin":							2
@@ -152,6 +153,7 @@
 		"FirstPersonSpectate":					false,
 		"UseCustomSpawnConfigs":				false,
 		"UseFixedSpawnsPerMap":					false,
+		"UseDefaultSkins":						false,
 		"PCW": 									{
 													"PausedMaxDuration": 					120,
 													"TournamentModeForfeitClock":			0,

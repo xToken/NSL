@@ -113,7 +113,8 @@ Limit6PlayerPerTeam 				= false,
 MercsRequireApproval 				= false,
 FirstPersonSpectate					= false,
 UseCustomSpawnConfigs				= false,
-UseFixedSpawnsPerMap				= false
+UseFixedSpawnsPerMap				= false,
+UseDefaultSkins						= false
 }
 
 local DefaultPerfConfig = {
