@@ -258,11 +258,27 @@ end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)
 
-local oldGetHasDLC = GetHasDLC
-function GetHasDLC(productId, client)
-	if GetNSLConfigValue("UseDefaultSkins")
-		return productId == nil or productId == 0
-	else
-		return oldGetHasDLC(productId, client)
+function Marine:GetIgnoreVariantModels()
+    return GetNSLConfigValue("UseDefaultSkins")
+end
+
+function MarineVariantMixin:GetGenderString()
+	if GetNSLConfigValue("UseDefaultSkins") then
+		return "male"
+	end
+    return self.isMale and "male" or "female"
+end
+
+local oldMarineVariantMixinOnClientUpdated = MarineVariantMixin.OnClientUpdated
+function MarineVariantMixin:OnClientUpdated(client)
+	oldMarineVariantMixinOnClientUpdated(self, client)
+	if GetNSLConfigValue("UseDefaultSkins") then
+		self.shoulderPadIndex = 0
+		self.isMale = true
 	end
 end
+
+function Alien:GetIgnoreVariantModels()
+    return GetNSLConfigValue("UseDefaultSkins")
+end
+
