@@ -9,7 +9,7 @@
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
 		"PauseStartDelay": 						5,
-		"PauseMaxPauses": 						3,
+		"PauseMaxPauses": 						2,
 		"PausedReadyNotificationDelay": 		30,
 		"PauseEnabled": 						true,
 		"FriendlyFireDamagePercentage": 		0.33,

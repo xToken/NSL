@@ -24,11 +24,10 @@ Event.Hook("ClientConnect", OnClientConnected)
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
 	function(self, winningTeam)
-		local value = originalNS2GameRulesEndGame(self, winningTeam)
+		originalNS2GameRulesEndGame(self, winningTeam)
 		for i = 1, #gGameEndFunctions do
 			gGameEndFunctions[i](self, winningTeam)
 		end
-		return value
 	end
 )
 
