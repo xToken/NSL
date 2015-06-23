@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_mainplugin_server.lua
+// - Dragon
+
 //NSL Main Plugin
 //Reworked to function more as a 'league' plugin, not just a ENSL plugin.
 

@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_spawns_server.lua
+// - Dragon
+
 local kSelectedMarineSpawn
 local kSelectedAlienSpawn
 local kCustomTechPointData = { }

@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_firstpersonblock_server.lua
+// - Dragon
+
 //First Person Spectator Block
 local kDeltatimeBetweenAction = 0.3
 	

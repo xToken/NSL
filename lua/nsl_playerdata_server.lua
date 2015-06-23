@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_playerdata_server.lua
+// - Dragon
+
 local C_CODE = "1A2D3E4C5F"
 local NSL_ClientData = { }
 local NSL_NS2IDLookup = { }

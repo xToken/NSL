@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_pause_server.lua
+// - Dragon
+
 //Pause
 
 Script.Load("lua/nsl_class.lua")

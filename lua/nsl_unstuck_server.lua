@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_unstuck_server.lua
+// - Dragon
+
 //NS2 Unstuck Plugin
 
 local UnstuckOriginTracker = { }  	//Tracks origin of clients in unstuck Queue.

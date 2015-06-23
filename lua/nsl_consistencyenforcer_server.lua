@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_consistencyenforcer_server.lua
+// - Dragon
+
 //Hmm lets see what kind of craziness THIS can cause...
 
 local ConsistencyApplied = false

@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_class.lua
+// - Dragon
+
 local function ReplaceMethodInDerivedClasses(className, methodName, method, original)
 
 	if _G[className][methodName] ~= original then

@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_tournamentmode_server.lua
+// - Dragon
+
 //NS2 Tournament Mod Server side script
 
 Script.Load("lua/nsl_class.lua")

@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_configs_server.lua
+// - Dragon
+
 //NSL Configs
 
 local configFileName = "NSLConfig.json"

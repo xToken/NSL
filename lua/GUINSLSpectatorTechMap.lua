@@ -1,6 +1,7 @@
-//
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
 // lua\GUINSLSpectatorTechMap.lua
-//
+// - Dragon
 
 Script.Load("lua/GUIScript.lua")
 Script.Load("lua/MarineTechMap.lua")

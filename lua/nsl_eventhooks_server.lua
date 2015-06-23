@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_eventhooks_server.lua
+// - Dragon
+
 //Functions for chat commands
 gChatCommands = { }
 //Chat functions which could use additional arguments

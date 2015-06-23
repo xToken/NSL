@@ -1,3 +1,8 @@
+// Natural Selection League Plugin
+// Source located at - https://github.com/xToken/NSL
+// lua\nsl_teammanager_server.lua
+// - Dragon
+
 local t1name = "Marines"
 local t2name = "Aliens"
 local tscores = { }
