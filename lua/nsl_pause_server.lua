@@ -116,15 +116,15 @@ end
 
 local originalNS2EntityAddTimedCallback
 originalNS2EntityAddTimedCallback = Class_ReplaceMethod("Entity", "AddTimedCallback", 
-	function(self, func, interval)
-		local function BlockCallsIfPaused(self)
+	function(self, func, interval, early)
+		local function BlockCallsIfPaused(self, deltaTime)
 			if GetIsGamePaused() then
 				return true
 			else
-				return func(self)
+				return func(self, deltaTime)
 			end
 		end
-		originalNS2EntityAddTimedCallback(self, BlockCallsIfPaused, interval)
+		originalNS2EntityAddTimedCallback(self, BlockCallsIfPaused, interval, early)
 	end
 )
 
