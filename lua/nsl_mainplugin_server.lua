@@ -155,19 +155,20 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
 			ServerAdminPrint(client, "sv_nslpause" .. ": " .. "Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.")
 			ServerAdminPrint(client, "sv_nslsetpauses" .. ": " .. "<team, pauses> - Sets the number of pauses remaining for a team.")
-			ServerAdminPrint(client, "sv_nslforcestart" .. ": " .. "Will force the countdown to start regardless of teams ready status, still requires commanders.")
+			ServerAdminPrint(client, "sv_nslforcestart" .. ": " .. "<seconds> - Will force the game start countdown to start in the provided amount of seconds, or 15 if blank.")
 			ServerAdminPrint(client, "sv_nslcancelstart" .. ": " .. "Will cancel a game start countdown currently in progress.")
 			ServerAdminPrint(client, "sv_nslsetteamnames" .. ": " .. "<team1name, team2name> Will set the team names manually, will prevent automatic team name updates.")
 			ServerAdminPrint(client, "sv_nslswitchteams" .. ": " .. "Will switch team names (best used if setting team names manually).")
 			ServerAdminPrint(client, "sv_nslsetteamscores" .. ": " .. "<t1score, t2score> Will set the team scores manually.")
 			ServerAdminPrint(client, "sv_nslsetteamspawns" .. ": " .. "marinespawnname, alienspawnname, Spawns teams at specified locations. Locations must be exact")
+			ServerAdminPrint(client, "sv_nslpassword" .. ": " .. "Sets a password on the server, works like sv_password.")
 		end
 		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
 		ServerAdminPrint(client, "sv_nslmerchelp" .. ": " .. "Displays specific help information pertaining to approving and clearing mercs.")
 	end
 end
 
-Event.Hook("Console_sv_nslhelp",               OnClientCommandNSLHelp)
+Event.Hook("Console_sv_nslhelp", OnClientCommandNSLHelp)
 
 local function UpdateNSLMode(client, mode)
 	mode = mode or ""
@@ -223,7 +224,7 @@ local function OnClientCommandSetMode(client, mode)
 	ServerAdminOrNSLRefCommand(client, mode, UpdateNSLMode, false)
 end
 
-Event.Hook("Console_sv_nslcfg",               OnClientCommandSetMode)
+Event.Hook("Console_sv_nslcfg", OnClientCommandSetMode)
 CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
 
 local function OnAdminCommandSetLeague(client, league)
@@ -234,7 +235,7 @@ local function OnClientCommandSetLeague(client, league)
 	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, false)
 end
 
-Event.Hook("Console_sv_nslconfig",               OnClientCommandSetLeague)
+Event.Hook("Console_sv_nslconfig", OnClientCommandSetLeague)
 CreateServerAdminCommand("Console_sv_nslconfig", OnAdminCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
 
 local function OnAdminCommandSetPerfConfig(client, perfcfg)
@@ -245,7 +246,7 @@ local function OnClientCommandSetPerfConfig(client, perfcfg)
 	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, false)
 end
 
-Event.Hook("Console_sv_nslperfconfig",               OnClientCommandSetPerfConfig)
+Event.Hook("Console_sv_nslperfconfig", OnClientCommandSetPerfConfig)
 CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
 local function SetupServerConfig()
@@ -286,3 +287,13 @@ function Alien:GetIgnoreVariantModels()
     return GetNSLConfigValue("UseDefaultSkins")
 end
 
+local function OnCommandNSLPassword(client, password)
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	if GetIsNSLRef(NS2ID) then
+		Server.SetPassword(password or "")
+		ServerAdminPrint(client, string.format("Setting server password to %s.", password and string.rep("*", string.len(password)) or "nothing"))
+	end
+end
+
+Event.Hook("Console_sv_nslpassword", OnCommandNSLPassword)

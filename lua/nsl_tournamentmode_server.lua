@@ -198,6 +198,7 @@ local function OnCommandForceStartRound(client, duration)
 		TournamentModeSettings[2].ready = true
 		CheckGameCountdownStart()
 		TournamentModeSettings.countdownstarttime = Shared.GetTime() + duration
+		SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), duration))
 		ServerAdminPrint(client, "Forcing game start.")
 	end
 end
