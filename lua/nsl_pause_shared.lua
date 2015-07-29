@@ -32,7 +32,7 @@ local originalNS2PlayerOnProcessMove
 originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove", 
 	function(self, input)
 
-		if self.gamepaused then
+		if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
 			return
 		else
 			originalNS2PlayerOnProcessMove(self, input)
@@ -40,31 +40,6 @@ originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove",
 		
 	end
 )
-
-//Blocks input.
-local originalNS2SpectatorOnProcessMove
-originalNS2SpectatorOnProcessMove = Class_ReplaceMethod("Spectator", "OnProcessMove", 
-	function(self, input)
-
-		if self.gamepaused then
-			if ValidateTeamNumber(self:GetTeamNumber()) then
-				return
-			else
-				gTimeBypass = true
-				originalNS2SpectatorOnProcessMove(self, input)
-				gTimeBypass = false
-			end
-		else
-			originalNS2SpectatorOnProcessMove(self, input)
-		end
-		
-	end
-)
-
-//Gah
-function GetOriginalSpecOnProcessMove()
-	return originalNS2SpectatorOnProcessMove
-end
 
 local oldCameraHolderMixinSetDesiredCamera = CameraHolderMixin.SetDesiredCamera
 function CameraHolderMixin:SetDesiredCamera(transitionDuration, mode, position, angles, distance, yOffset, callback)

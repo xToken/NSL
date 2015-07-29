@@ -116,6 +116,36 @@ end
 
 ClientUI.AddScriptCreationEventListener(ChatUICreation)
 
+local kPausedUpdateScripts = { "GUIScoreboard", "GUIChat", "GUIMinimapFrame", "GUIInsight_PlayerFrames", "GUITechMap", "GUIInsight_Overhead", 
+								"GUIInsight_PenTool", "GUIInsight_PlayerHealthbars", "GUIInsight_Graphs", "GUINSLSpectatorTechMap", "GUINSLFollowingSpectatorHUD" }
+local kPausedScoreboardUpdateRate = 0.5
+local scoreboardUpdate = 0.5
+
+function AddGUIScriptToPausedUpdates(GUIClassName)
+    table.insert(kPausedUpdateScripts, GUIClassName)
+end
+
+local originalGUIManagerUpdate
+originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update", 
+	function(self, deltaTime)
+		local player = Client.GetLocalPlayer()
+		if player and player.gamepaused then
+			for s = #self.scripts, 1, -1 do
+				local script = self.scripts[s]
+				if script and table.contains(kPausedUpdateScripts, script.classname) then
+					script.lastUpdateTime = script.lastUpdateTime - deltaTime
+				end
+			end
+			scoreboardUpdate = math.max(0, scoreboardUpdate - deltaTime)
+			if scoreboardUpdate == 0 then
+				Scoreboard_ReloadPlayerData()
+				scoreboardUpdate = kPausedScoreboardUpdateRate
+			end
+		end
+		originalGUIManagerUpdate(self, deltaTime)
+	end
+)
+
 local RefBadges = { }
 
 local function RefBadgeRecieved(msg)

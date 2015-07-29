@@ -82,7 +82,7 @@ local function UpdateSpectatorMode(self, input)
 	
 end
 
-ReplaceLocals(GetOriginalSpecOnProcessMove(), {UpdateSpectatorMode = UpdateSpectatorMode})
+ReplaceLocals(Spectator.OnProcessMove, {UpdateSpectatorMode = UpdateSpectatorMode})
 
 function FollowingSpectatorMode:FindTarget(spectator)
     if spectator.selectedId ~= Entity.invalidId then
