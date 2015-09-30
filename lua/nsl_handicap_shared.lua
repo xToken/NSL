@@ -27,6 +27,14 @@ if Server then
 		end
 		return self.name
 	end
+	
+	local originalNS2PlayerCopyPlayerDataFrom
+	originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 
+		function(self, player)
+			originalNS2PlayerCopyPlayerDataFrom(self, player)
+			self.handicap = player.handicap
+		end
+	)
 
 end
 
