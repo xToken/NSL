@@ -5,6 +5,7 @@
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_pause_shared.lua")
+Script.Load("lua/nsl_handicap_shared.lua")
 
 local kMaxTeamNameLength = 50
 local kMaxAdminChatLength = 250

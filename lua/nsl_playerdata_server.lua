@@ -316,9 +316,9 @@ local function GetPlayerString(player)
 		local gID = GetGameIDMatchingNS2ID(pNS2ID)
 		if NSLData == nil then
 			local sID = "0:" .. (pNS2ID % 2) .. ":" .. math.floor(pNS2ID / 2)
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID)
+			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, HCap : %.0f%%, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID, (1 - player:GetHandicap() ) * 100)
 		else
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, LNick : %s, LTeam : %s, LID : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, NSLData.NICK, NSLData.NSL_Team, NSLData.NSL_ID or 0)
+			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, HCap : %.0f%%, LNick : %s, LTeam : %s, LID : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, (1 - player:GetHandicap() ) * 100, NSLData.NICK, NSLData.NSL_Team, NSLData.NSL_ID or 0)
 		end				
 	end
 	return ""
@@ -329,7 +329,7 @@ local function OnClientCommandViewNSLInfo(client, team)
 		local NS2ID = client:GetUserId()
 		local playerList = GetPlayerList(team)				
 		if playerList then
-			ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, LNick = League Nickname, LTeam = League Team, LID = League UserID")
+			ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, HCap = Handicap, LNick = League Nickname, LTeam = League Team, LID = League ID")
 			for p = 1, #playerList do
 				ServerAdminPrint(client, GetPlayerString(playerList[p]))
 			end

@@ -164,6 +164,7 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslpassword" .. ": " .. "Sets a password on the server, works like sv_password.")
 		end
 		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
+		ServerAdminPrint(client, "sv_nslhandicap" .. ": " .. "<0.1 - 1> Lowers your damage to the specified percentage.")
 		ServerAdminPrint(client, "sv_nslmerchelp" .. ": " .. "Displays specific help information pertaining to approving and clearing mercs.")
 	end
 end
