@@ -8,18 +8,16 @@
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
 
+local t1name = "Frontiersmen"
+local t2name = "Kharaa"
 local kChatMinWindow = 0.005
 local kTeam1NameLocal
 local kTeam2NameLocal
+local kInsightTeamnameHack = false
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
 	kTeam2NameLocal = message.team2name
-	local GUIS = ClientUI.GetScript("GUIScoreboard")
-	if GUIS then
-		GUIS.teams[2].TeamName = kTeam1NameLocal
-		GUIS.teams[3].TeamName = kTeam2NameLocal
-	end
 	Shared.ConsoleCommand( string.format([[teams "%s" "%s"]], kTeam1NameLocal, kTeam2NameLocal) )
 	Shared.ConsoleCommand( string.format("scores %s %s", message.team1score, message.team2score) )
 end
@@ -30,6 +28,20 @@ end
 
 function ScoreboardUI_GetRedTeamName()
     return (kTeam2NameLocal and kTeam2NameLocal) or kTeam2Name
+end
+
+function InsightUI_GetTeam1Name()
+	if kInsightTeamnameHack and kTeam1NameLocal == t1name then
+		return
+	end
+    return kTeam1NameLocal
+end
+
+function InsightUI_GetTeam2Name()
+	if kInsightTeamnameHack and kTeam2NameLocal == t2name then
+		return
+	end
+    return kTeam2NameLocal
 end
 
 Client.HookNetworkMessage("TeamNames", OnNewTeamNames)
@@ -94,22 +106,57 @@ end
 
 local function ChatUICreation(scriptName, script)
 
-	function GUIChat:SendCharacterEvent(character)
-		local enteringChatMessage = ChatUI_EnteringChatMessage()
-		
-		if (Client.GetTime() - ChatUI_GetStartedChatTime()) > kChatMinWindow and enteringChatMessage then
-		
-			local currentText = self.inputItem:GetWideText()
-			if currentText:length() < kMaxChatLength then
+	if scriptName == "GUIChat" then
+
+		function GUIChat:SendCharacterEvent(character)
+			local enteringChatMessage = ChatUI_EnteringChatMessage()
 			
-				self.inputItem:SetWideText(currentText .. character)
-				return true
+			if (Client.GetTime() - ChatUI_GetStartedChatTime()) > kChatMinWindow and enteringChatMessage then
+			
+				local currentText = self.inputItem:GetWideText()
+				if currentText:length() < kMaxChatLength then
 				
+					self.inputItem:SetWideText(currentText .. character)
+					return true
+					
+				end
+				
+			end
+			
+			return false
+		end
+	
+	end
+	
+	if scriptName == "GUIGameEnd" then
+	
+		local oldGUIGameEndSetGameEnded = GUIGameEnd.SetGameEnded
+		function GUIGameEnd:SetGameEnded(playerWon, playerDraw, playerTeamType)
+			kInsightTeamnameHack = true
+			oldGUIGameEndSetGameEnded(self, playerWon, playerDraw, playerTeamType)
+			kInsightTeamnameHack = false
+		end
+		
+	end
+	
+	if scriptName == "GUIScoreboard" then
+		
+		local oldGUIScoreboardUpdateTeam = GUIScoreboard.UpdateTeam
+		function GUIScoreboard:UpdateTeam(updateTeam)
+			oldGUIScoreboardUpdateTeam(self, updateTeam)
+			local teamNameGUIItem = updateTeam["GUIs"]["TeamName"]
+			local teamNum = updateTeam["TeamNumber"]
+			local teamScores = updateTeam["GetScores"]()
+			local numPlayers = table.count(teamScores)
+			local playersOnTeamText = string.format("%d %s", numPlayers, numPlayers == 1 and Locale.ResolveString("SB_PLAYER") or Locale.ResolveString("SB_PLAYERS") )
+			if teamNum == 1 and kTeam1NameLocal ~= t1name then
+				teamNameGUIItem:SetText( string.format("%s (%s)", kTeam1NameLocal, playersOnTeamText) )
+			elseif teamNum == 2 and kTeam2NameLocal ~= t2name then
+				teamNameGUIItem:SetText( string.format("%s (%s)", kTeam2NameLocal, playersOnTeamText) )
 			end
 			
 		end
 		
-		return false
 	end
 	
 end

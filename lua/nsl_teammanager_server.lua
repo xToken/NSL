@@ -3,8 +3,8 @@
 // lua\nsl_teammanager_server.lua
 // - Dragon
 
-local t1name = "Marines"
-local t2name = "Aliens"
+local t1name = "Frontiersmen"
+local t2name = "Kharaa"
 local tscores = { }
 local tqueue = { }
 local overridenames = false
@@ -34,7 +34,7 @@ function GetActualTeamName(teamnum)
 	//Check players on team to get an idea of their 'team'
 	local teamname = ConditionalValue(teamnum == 1, t1name, t2name)
 	if not teamname then
-		teamname = ConditionalValue(teamnum == 1, "Marines", "Aliens")
+		teamname = ConditionalValue(teamnum == 1, "Frontiersmen", "Kharaa")
 	end
 	return teamname
 end
@@ -63,7 +63,7 @@ local function GetTeamNameCount(teamnum)
 end
 
 local function GetPrimaryTeam(teamnum, teamdata)
-	local team = ConditionalValue(teamnum == 1, "Marines", "Aliens")
+	local team = ConditionalValue(teamnum == 1, "Frontiersmen", "Kharaa")
 	local count = 0
 	if teamdata ~= nil then
 		for t, c in pairs(teamdata) do
@@ -82,7 +82,7 @@ local function CheckMercTeamJoin(player, teamNumber)
 		local ns2id = client:GetUserId()
 		local nsldata = GetNSLUserData(ns2id)
 		local teamname = GetPrimaryTeam(teamNumber, GetTeamNameCount(teamNumber))
-		if nsldata ~= nil and teamname ~= ConditionalValue(teamNumber == 1, "Marines", "Aliens") then
+		if nsldata ~= nil and teamname ~= ConditionalValue(teamNumber == 1, "Frontiersmen", "Kharaa") then
 			if (teamNumber == 1 or teamNumber == 2) and teamname ~= nsldata.NSL_Team then
 				if tqueue[teamNumber] == nil then
 					tqueue[teamNumber] = { }
@@ -132,7 +132,7 @@ local function UpdateTeamDataOnGameEnd(self, winningteam)
 			elseif winningteam:GetTeamType() == kMarineTeamType then
 				winningteamname = t1name
 			end
-			if winningteamname ~= "Marines" and winningteamname ~= "Aliens" then
+			if winningteamname ~= "Frontiersmen" and winningteamname ~= "Kharaa" then
 				if tscores[winningteamname] == nil then
 					tscores[winningteamname] = 1
 				else
