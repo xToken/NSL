@@ -55,7 +55,8 @@ function DamageMixin:DoDamage( damage, ... )
 
     end
 	
-	if attacker:isa("Player") then
+	//Attacker might be nil... duhhhhhh
+	if attacker and attacker:isa("Player") then
 		damage = damage * attacker:GetHandicap()
 	end
 
