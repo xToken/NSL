@@ -30,9 +30,19 @@ Shared.RegisterNetworkMessage("AdminMessage", kAdminChatMessage)
 gRefBadges = 
 {
 	{
-		name = "ensl_staff",
-		unitStatusTexture = "ui/badges/ensl_staff.dds",
-        scoreboardTexture = "ui/badges/ensl_staff.dds"
+		name = "ensl_mod",
+		unitStatusTexture = "ui/badges/ensl_mod.dds",
+        scoreboardTexture = "ui/badges/ensl_mod.dds"
+	},
+	{
+		name = "ensl_caster",
+		unitStatusTexture = "ui/badges/ensl_caster.dds",
+        scoreboardTexture = "ui/badges/ensl_caster.dds"
+	},
+	{
+		name = "ensl_ref",
+		unitStatusTexture = "ui/badges/ensl_ref.dds",
+        scoreboardTexture = "ui/badges/ensl_ref.dds"
 	},
 	{
 		name = "ensl_admin",

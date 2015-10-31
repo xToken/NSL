@@ -3,9 +3,9 @@
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
-		"PlayerDataURL": 						"http://www.ensl.org/plugin/user/",
+		"PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 		"PlayerDataFormat":						"ENSL",
-		"PlayerRefLevel": 						1,
+		"PlayerRefLevel": 						2,
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
 		"PauseStartDelay": 						5,
@@ -20,9 +20,11 @@
 		"UseCustomSpawnConfigs":				true,
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
-		"RefereeBadge":				 			{
-													"ensl_staff":							1,
-													"ensl_admin":							2
+		"Badges":				 				{
+													"1":									"ensl_mod",
+													"2":									"ensl_caster",
+													"3":									"ensl_ref",
+													"4":									"ensl_admin"
 												},
 		"PCW": 									{
 													"PausedMaxDuration": 					300,
@@ -38,16 +40,8 @@
 													"Limit6PlayerPerTeam": 					true,
 													"MercsRequireApproval": 				true
 												},
-		"REFS":									[ 	
-													870339,
+		"REFS":									[
 													344054,
-													74749557,
-													93723781,
-													4048968,
-													13592577,
-													47275422,
-													45651314,
-													50582634,
 													3490104,
 													5176141
 												],

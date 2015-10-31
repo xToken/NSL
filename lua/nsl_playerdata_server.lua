@@ -3,7 +3,6 @@
 // lua\nsl_playerdata_server.lua
 // - Dragon
 
-local C_CODE = "1A2D3E4C5F"
 local NSL_ClientData = { }
 local NSL_NS2IDLookup = { }
 local G_IDTable = { }
@@ -97,19 +96,17 @@ function GetPlayerMatching(id)
 end
 
 local function GetRefBadgeforID(ns2id)
-	if GetIsNSLRef(ns2id) then
-		local NSLBadges = GetNSLConfigValue("RefereeBadge")
-		if NSLBadges and type(NSLBadges) == "table" then
-			local level = 1
-			local pData = GetNSLUserData(ns2id)
-			if pData and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and tonumber(pData.NSL_Level) > level then
-				level = tonumber(pData.NSL_Level)
+	local NSLBadges = GetNSLConfigValue("Badges")
+	if type(NSLBadges) == "table" then
+		local level = 0 -- The default level for players, which will have no badge
+		local pData = GetNSLUserData(ns2id)
+		if pData and pData.NSL_Level ~= nil then
+			if pData.NSL_Level <= level then
+				return
 			end
-			for badge, bl in pairs(NSLBadges) do
-				if bl == level then
-					return badge
-				end
-			end
+			level = pData.NSL_Level
+			
+			return NSLBadges[tostring(level)]
 		end
 	end
 end
@@ -172,47 +169,43 @@ end
 
 local function OnClientConnectENSLResponse(response)
 	if response then
-		local responsetable = { }
-		local startpos = 0
-		for st,se in function() return string.find(response, "\r", startpos, true) end do
-			table.insert(responsetable, string.sub(response, startpos, st - 1))
-			startpos = se + 1
-		end
-		if responsetable[1] == "#FAIL#" then
+		local responsetable = json.decode(response)
+		if responsetable == nil or responsetable.id == nil then
 			//Message to user to register on ENSL site?
 			//Possible DB issue?
-		elseif responsetable[3] ~= nil then
-			local ns2id = NSL_NS2IDLookup[responsetable[3]]
+		else
+			local ns2id = NSL_NS2IDLookup[responsetable.steam.id]
 			if ns2id ~= nil then
-				//GRISSI why...
-				if responsetable[6] == "Goar" then
-					responsetable[6] = "Godar"
-				end
 				local player = GetPlayerMatchingNS2Id(ns2id)
-				NSL_ClientData[ns2id] = {
-				S_ID = responsetable[3] or "",
-				NICK = responsetable[4] or "Invalid",
-				NSL_IP = responsetable[5] or "0.0.0.0",
-				NSL_Team = responsetable[6] or "No Team",
-				NSL_ID = responsetable[7] or "",
-				NSL_TID = responsetable[8] or "",
-				NSL_Level = "0",
-				NSL_Rank = responsetable[9] or responsetable[10] or nil,
-				NSL_Icon = nil}
+				local clientData = {
+					S_ID = responsetable.steam.id or "",
+					NICK = responsetable.username or "Invalid",
+					NSL_Team = responsetable.team and responsetable.team.name or "No Team",
+					NSL_ID = responsetable.id or "",
+					NSL_TID = responsetable.team and responsetable.team.id or "",
+				}
+				
+				if responsetable.admin then
+					clientData.NSL_Level = 4
+					clientData.NSL_Rank = "Admin"
+				elseif responsetable.referee then
+					clientData.NSL_Level = 3
+					clientData.NSL_Rank = "Ref"
+				elseif responsetable.caster then
+					clientData.NSL_Level = 2
+					clientData.NSL_Rank = "Caster"
+				elseif responsetable.moderator then
+					clientData.NSL_Level = 1
+					clientData.NSL_Rank = "Mod"
+				else
+					clientData.NSL_Level = 0
+					clientData.NSL_Rank = nil
+				end
+				
+				NSL_ClientData[ns2id] = clientData;
+				
 				if player then
 					ServerAdminPrint(Server.GetOwner(player), string.format("NSL Username verified as %s", NSL_ClientData[ns2id].NICK))
-				end
-				local Groups = { }
-				table.insert(Groups, responsetable[9])
-				table.insert(Groups, responsetable[10])
-				for i, group in pairs(Groups) do
-					if string.find(group, "Admin") then
-						NSL_ClientData[ns2id].NSL_Level = 2
-						break
-					elseif string.find(group, "Referee") then
-						NSL_ClientData[ns2id].NSL_Level = 1
-						break
-					end
 				end
 				UpdateClientBadge(ns2id)
 			end
@@ -235,13 +228,11 @@ local function OnClientConnectAUSNS2Response(response)
 					NSL_ClientData[ns2id] = {
 					S_ID = responsetable.SteamID or "",
 					NICK = responsetable.UserName or "Invalid",
-					NSL_IP = nil,
 					NSL_Team = responsetable.TeamName or "No Team",
 					NSL_ID = responsetable.UserID or "",
 					NSL_TID = responsetable.TeamID or "",
-					NSL_Level = responsetable.IsAdmin and ToString(responsetable.IsAdmin) or "0",
-					NSL_Rank = nil,
-					NSL_Icon = nil}
+					NSL_Level = responsetable.IsAdmin or 0,
+					NSL_Rank = nil}
 					if player then
 						ServerAdminPrint(Server.GetOwner(player), string.format("AusNS2 Username verified as %s", NSL_ClientData[ns2id].NICK))
 					end
@@ -263,7 +254,7 @@ local function OnClientConnected(client)
 				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
 				NSL_NS2IDLookup[steamId] = NS2ID
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then
-					Shared.SendHTTPRequest(string.format("%s%s?ch=%s", QueryURL, steamId, C_CODE), "GET", OnClientConnectENSLResponse)
+					Shared.SendHTTPRequest(string.format("%s%s.steamid", QueryURL, NS2ID), "GET", OnClientConnectENSLResponse)
 				end
 				if GetNSLConfigValue("PlayerDataFormat") == "AUSNS" then
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)

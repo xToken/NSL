@@ -219,20 +219,19 @@ function GetPerfLevelValid(level)
 	return false
 end
 
-
 function GetIsNSLRef(ns2id)
-	local ref = false
 	if ns2id then
 		local cRefs = GetNSLConfigValue("REFS")
-		if cRefs then
-			ref = table.contains(cRefs, ns2id)
+		if cRefs and table.contains(cRefs, ns2id) then
+			return true
 		end
+		
 		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level and tonumber(pData.NSL_Level) and not ref then
-			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
+		if pData and pData.NSL_Level and pData.NSL_Level >= GetNSLConfigValue("PlayerRefLevel") then
+			return true
 		end
 	end
-	return ref
+	return false
 end
 
 local Messages = {
