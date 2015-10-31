@@ -1,6 +1,7 @@
-modEntry = [[
-	Client: lua/nsl_client.lua,
-	Predict: lua/nsl_predict.lua,
-	Server: lua/nsl_server.lua,
-	Priority: 5
-]]
+modEntry = {
+Client = "lua/nsl_client.lua",
+Server = "lua/nsl_server.lua",
+Predict = "lua/nsl_predict.lua",
+FileHooks = "lua/nsl_filehooks.lua",
+Priority = 5
+}
