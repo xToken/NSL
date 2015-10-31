@@ -15,7 +15,9 @@ local NSL_League = "NSL"
 local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
-local CachedScoresValidFor = 10 * 60
+local NSL_LeagueAdminsAccess = false
+local cachedScoresValidFor = 10 * 60
+local expectedNSLConfigVersion = 1.4
 
 function GetNSLMode()
 	return NSL_Mode
@@ -37,17 +39,22 @@ function GetNSLPerfLevel()
 	return NSL_PerfLevel
 end
 
+function GetNSLLeagueAdminsAccess()
+	return NSL_LeagueAdminsAccess
+end
+
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { } }
+	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { }, adminaccess = false }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = config.mode or "PCW"
 	NSL_League = config.league or "NSL"
 	NSL_PerfLevel = config.perf or "DEFAULT"
+	NSL_LeagueAdminsAccess = config.adminaccess or false
 	local loadedScores = config.recentgames or { }
 	local updated = false
 	for t, s in pairs(loadedScores) do
-		if type(s) == "table" and (Shared.GetSystemTime() - (s.scoretime or 0) < CachedScoresValidFor) and (s.score or 0) > 0 then
+		if type(s) == "table" and (Shared.GetSystemTime() - (s.scoretime or 0) < cachedScoresValidFor) and (s.score or 0) > 0 then
 			NSL_CachedScores[t] = s.score or 0
 		end
 	end
@@ -56,7 +63,7 @@ end
 LoadConfig()
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess })
 end
 
 function SetNSLMode(state)
@@ -91,6 +98,13 @@ function SetPerfLevel(state)
 		if GetNSLModEnabled() then
 			EstablishConfigDependantSettings()
 		end
+	end
+end
+
+function SetNSLAdminAccess(state)
+	if NSL_LeagueAdminsAccess ~= state then
+		NSL_LeagueAdminsAccess = state
+		SavePluginConfig()
 	end
 end
 
@@ -152,6 +166,14 @@ local function OnConfigResponse(response)
 			end
 		end
 		if responsetable and responsetable.Version and responsetable.EndOfTable then
+			if responsetable.Version < expectedNSLConfigVersion then
+				//Old version still on github, use local cache
+				local file = io.open(configlocalFile, "r")
+				if file then
+					responsetable = json.decode(file:read("*all"))
+					file:close()
+				end
+			end
 			for i, config in ipairs(responsetable.Configs) do
 				if config.LeagueName then
 					//assume valid, update Configs table, always uppercase
@@ -221,18 +243,62 @@ end
 
 
 function GetIsNSLRef(ns2id)
-	local ref = false
 	if ns2id then
 		local cRefs = GetNSLConfigValue("REFS")
-		if cRefs then
-			ref = table.contains(cRefs, ns2id)
-		end
 		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level and tonumber(pData.NSL_Level) and not ref then
-			ref = tonumber(pData.NSL_Level) >= GetNSLConfigValue("PlayerRefLevel")
+		if cRefs then
+			if table.contains(cRefs, ns2id) then
+				//A manually configured 'Ref' - give them ref level
+				if pData then
+					pData.NSL_Level = 3
+				end
+				return true
+			end
+		end
+		if pData and pData.NSL_Level then
+			return pData.NSL_Level >= GetNSLConfigValue("PlayerRefLevel")
 		end
 	end
-	return ref
+	return false
+end
+
+local function GetGroupCanRunCommand(groupData, commandName)
+    
+	local existsInList = false
+	local commands = groupData.commands
+	
+	if commands then
+		for c = 1, #groupData.commands do
+			if groupData.commands[c] == commandName then
+				existsInList = true
+				break
+			end
+		end
+	end
+	
+	if groupData.type == "allowed" then
+		return existsInList
+	elseif groupData.type == "disallowed" then
+		return not existsInList
+	else
+		//Invalid structure
+		return false
+	end
+	
+end
+
+function GetCanRunCommandviaNSL(ns2id, commandName)
+	if NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
+		local pData = GetNSLUserData(ns2id)
+		if pData and pData.NSL_Level then
+			local level = tostring(pData.NSL_Level)
+			local groupData = GetNSLConfigValue("AdminGroups")
+			if groupData and groupData[level] then
+				return GetGroupCanRunCommand(groupData[level], commandName)
+			end
+		end		
+	end
+	return false
 end
 
 local Messages = {

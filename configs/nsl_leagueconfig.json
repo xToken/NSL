@@ -1,5 +1,5 @@
 {
-	"Version": 1.3,
+	"Version": 1.4,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -21,8 +21,8 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"RefereeBadge":				 			{
-													"ensl_staff":							1,
-													"ensl_admin":							2
+													"ensl_staff":							2,
+													"ensl_admin":							3
 												},
 		"PCW": 									{
 													"PausedMaxDuration": 					300,
@@ -51,6 +51,41 @@
 													3490104,
 													5176141
 												],
+		"AdminGroups":							{
+													"2":{
+														"commands": 
+														[
+															"sv_kick", 
+															"sv_say", 
+															"sv_changemap"
+														],
+														"type": "allowed"
+													},
+													"3":{
+														"commands": 
+														[
+															"sv_ban", 
+															"sv_unban", 
+															"sv_kick", 
+															"sv_say", 
+															"sv_changemap", 
+															"sv_reset",
+															"sv_switchteam", 
+															"sv_rrall", 
+															"sv_eject", 
+															"sv_tsay", 
+															"sv_psay"
+														],
+														"type": "allowed"
+													},
+													"4":{
+														"commands": 
+														[
+															"sv_rcon"
+														],
+														"type": "disallowed"
+													}		
+												},
 		"ConsistencyConfig":					{
 												"restrict": [ 
 															"lua/entry/*.entry"
