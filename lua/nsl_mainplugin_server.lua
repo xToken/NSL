@@ -162,6 +162,7 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslsetteamscores" .. ": " .. "<t1score, t2score> Will set the team scores manually.")
 			ServerAdminPrint(client, "sv_nslsetteamspawns" .. ": " .. "marinespawnname, alienspawnname, Spawns teams at specified locations. Locations must be exact")
 			ServerAdminPrint(client, "sv_nslpassword" .. ": " .. "Sets a password on the server, works like sv_password.")
+			ServerAdminPrint(client, "sv_nslleagueadmins" .. ": " .. "Toggles league staff having access to administrative commands on server.")
 		end
 		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
 		ServerAdminPrint(client, "sv_nslhandicap" .. ": " .. "<0.1 - 1> Lowers your damage to the specified percentage.")
@@ -203,6 +204,15 @@ local function UpdateNSLPerfConfig(client, perfcfg)
 		ServerAdminPrint(client, string.format("NSL Plugin now using %s performance config.", GetNSLPerfLevel()))
 	else
 		ServerAdminPrint(client, string.format("NSL Plugin currently using %s performance config.", GetNSLPerfLevel()))
+	end
+end
+
+local function UpdateNSLLeagueAccess(client)
+	SetNSLAdminAccess(not GetNSLLeagueAdminsAccess())
+	if GetNSLLeagueAdminsAccess() then
+		ServerAdminPrint(client,"NSL Plugin now allowing access to server admin commands.")
+	else
+		ServerAdminPrint(client, "NSL Plugin now dis-allowing access to server admin commands.")
 	end
 end
 
@@ -249,6 +259,12 @@ end
 
 Event.Hook("Console_sv_nslperfconfig", OnClientCommandSetPerfConfig)
 CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
+
+local function OnAdminCommandSetLeagueAccess(client, league)
+	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeagueAccess, true)
+end
+
+CreateServerAdminCommand("Console_sv_nslleagueadmins", OnAdminCommandSetLeagueAccess, "Toggles league staff having access to administrative commands on server.")
 
 local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
