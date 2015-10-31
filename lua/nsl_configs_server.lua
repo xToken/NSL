@@ -241,7 +241,6 @@ function GetPerfLevelValid(level)
 	return false
 end
 
-
 function GetIsNSLRef(ns2id)
 	if ns2id then
 		local cRefs = GetNSLConfigValue("REFS")
