@@ -102,8 +102,8 @@ local function GetRefBadgeforID(ns2id)
 		if NSLBadges and type(NSLBadges) == "table" then
 			local level = 1
 			local pData = GetNSLUserData(ns2id)
-			if pData and pData.NSL_Level ~= nil and tonumber(pData.NSL_Level) ~= nil and tonumber(pData.NSL_Level) > level then
-				level = tonumber(pData.NSL_Level)
+			if pData and pData.NSL_Level and pData.NSL_Level > level then
+				level = pData.NSL_Level
 			end
 			for badge, bl in pairs(NSLBadges) do
 				if bl == level then
@@ -196,7 +196,7 @@ local function OnClientConnectENSLResponse(response)
 				NSL_Team = responsetable[6] or "No Team",
 				NSL_ID = responsetable[7] or "",
 				NSL_TID = responsetable[8] or "",
-				NSL_Level = "0",
+				NSL_Level = 0,
 				NSL_Rank = responsetable[9] or responsetable[10] or nil,
 				NSL_Icon = nil}
 				if player then
@@ -207,9 +207,12 @@ local function OnClientConnectENSLResponse(response)
 				table.insert(Groups, responsetable[10])
 				for i, group in pairs(Groups) do
 					if string.find(group, "Admin") then
+						NSL_ClientData[ns2id].NSL_Level = 3
+						break
+					elseif string.find(group, "Referee") or string.find(group, "Shoutcaster") then
 						NSL_ClientData[ns2id].NSL_Level = 2
 						break
-					elseif string.find(group, "Referee") then
+					elseif string.find(group, "Gather Mod") then
 						NSL_ClientData[ns2id].NSL_Level = 1
 						break
 					end
@@ -239,7 +242,7 @@ local function OnClientConnectAUSNS2Response(response)
 					NSL_Team = responsetable.TeamName or "No Team",
 					NSL_ID = responsetable.UserID or "",
 					NSL_TID = responsetable.TeamID or "",
-					NSL_Level = responsetable.IsAdmin and ToString(responsetable.IsAdmin) or "0",
+					NSL_Level = responsetable.IsAdmin and 1 or 0,
 					NSL_Rank = nil,
 					NSL_Icon = nil}
 					if player then
