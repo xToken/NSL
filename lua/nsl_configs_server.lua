@@ -243,17 +243,7 @@ end
 
 function GetIsNSLRef(ns2id)
 	if ns2id then
-		local cRefs = GetNSLConfigValue("REFS")
 		local pData = GetNSLUserData(ns2id)
-		if cRefs then
-			if table.contains(cRefs, ns2id) then
-				//A manually configured 'Ref' - give them ref level
-				if pData then
-					pData.NSL_Level = 3
-				end
-				return true
-			end
-		end
 		if pData and pData.NSL_Level then
 			return pData.NSL_Level >= GetNSLConfigValue("PlayerRefLevel")
 		end

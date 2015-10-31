@@ -183,7 +183,6 @@ local function OnClientConnectENSLResponse(response)
 					NSL_ID = responsetable.id or "",
 					NSL_TID = responsetable.team and responsetable.team.id or "",
 				}
-				
 				if responsetable.admin then
 					clientData.NSL_Level = 4
 					clientData.NSL_Rank = "Admin"
@@ -199,6 +198,16 @@ local function OnClientConnectENSLResponse(response)
 				else
 					clientData.NSL_Level = 0
 					clientData.NSL_Rank = nil
+				end
+				
+				//Check config refs here
+				local cRefs = GetNSLConfigValue("REFS")
+				if cRefs and table.contains(cRefs, ns2id) then
+					//A manually configured 'Ref' - give them ref level
+					if not clientData.NSL_Rank then
+						clientData.NSL_Level = 3
+						clientData.NSL_Rank = "Ref"
+					end
 				end
 				
 				NSL_ClientData[ns2id] = clientData;
