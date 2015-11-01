@@ -98,7 +98,7 @@ end
 local function GetRefBadgeforID(ns2id)
 	local NSLBadges = GetNSLConfigValue("Badges")
 	if NSLBadges and type(NSLBadges) == "table" then
-		local level = 0 -- The default level for players, which will have no badge
+		local level = 0
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
 			if pData.NSL_Level <= level then
@@ -126,7 +126,7 @@ local function UpdateClientBadge(ns2id)
 	local teamBadge = GetTeamBadgeForTeamName(NSL_ClientData[ns2id].NSL_Team)
 	if GiveBadge then
 		//Yay for badges+ mod.
-		//Give badge if ref, and ref badge configured.
+		//Give badge if ref and ref badge configured.
 		local succes, row
 		row = 1
 		if refBadge then
@@ -134,7 +134,6 @@ local function UpdateClientBadge(ns2id)
 			row = row + 1
 		end
 		if teamBadge then
-			Shared.Message(ToString(kBadges))
 			success = success and GiveBadge(ns2id, teamBadge, row)
 		end
 	else
@@ -152,12 +151,8 @@ local function UpdateClientBadge(ns2id)
 				//Set current NSL badge to true.
 				newmsg["has_" .. refBadge .. "_badge"] = true
 				
+				//Sends new badge info to all connected users.
 				Server.SendNetworkMessage("RefBadges", newmsg, true)
-				
-				// Send this client info for all existing clients.
-				for clientId, msg in pairs(RefBadges) do
-					Server.SendNetworkMessage( client, "RefBadges", msg, true )
-				end
 				
 				// Store it ourselves as well for future clients
 				RefBadges[ newmsg.clientId ] = newmsg
@@ -268,6 +263,13 @@ local function OnClientConnected(client)
 				if GetNSLConfigValue("PlayerDataFormat") == "AUSNS" then
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
 				end
+			end
+		end
+		//Dont think badges+ needs this..
+		if not GiveBadge and #RefBadges > 0 then
+			//Sync user all badge data
+			for clientId, msg in pairs(RefBadges) do
+				Server.SendNetworkMessage( client, "RefBadges", msg, true )
 			end
 		end
 	end
