@@ -185,6 +185,7 @@ local function UpdateNSLMode(client, mode)
 		return
 	end
 	ServerAdminPrint(client, string.format("NSL Plugin now running in %s config.", GetNSLMode()))
+	ServerAdminPrint(client, "NOTE: If NSL Mod was Enabled or Disabled, map will need to change for seasonal content to work as expected.")
 end
 
 local function UpdateNSLLeague(client, league)

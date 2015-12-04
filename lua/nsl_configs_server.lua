@@ -62,6 +62,14 @@ end
 
 LoadConfig()
 
+local function SetSeasonOnLoad()
+	if GetNSLModEnabled() then
+		Server.SetServerProperty(Seasons.kPropertyKey, Seasons.kNone)
+	end
+end
+
+SetSeasonOnLoad()
+
 local function SavePluginConfig()
 	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess })
 end
