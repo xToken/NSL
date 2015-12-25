@@ -11,7 +11,7 @@ Script.Load("lua/nsl_mainplugin_shared.lua")
 Script.Load("lua/nsl_eventhooks_server.lua")
 Script.Load("lua/nsl_playerdata_server.lua")
 Script.Load("lua/nsl_teammanager_server.lua")
-local kCachedDataRate = 25
+local kCachedDataRate = 50
 local kCachedMoveRate = 30
 local kCachedInterp = 100
 
