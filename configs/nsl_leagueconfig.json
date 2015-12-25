@@ -241,7 +241,7 @@
 		"MoveRate": 							30,
 		"ClientRate": 							20,
 		"TickRate":								30,
-		"MaxDataRate": 							40
+		"MaxDataRate": 							50
 		},
 		{
 		"PerfLevel":							"Medium",
@@ -273,7 +273,7 @@
 		"MoveRate": 							50,
 		"ClientRate": 							20,
 		"TickRate":								30,
-		"MaxDataRate": 							25
+		"MaxDataRate": 							50
 		},
 		{
 		"PerfLevel":							"Experimental2",

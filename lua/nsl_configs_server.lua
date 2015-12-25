@@ -149,7 +149,7 @@ Interp 								= 100,
 MoveRate 							= 30,
 ClientRate 							= 20,
 TickRate 							= 30,
-MaxDataRate 						= 25,
+MaxDataRate 						= 50,
 }
 
 local Configs = { }
