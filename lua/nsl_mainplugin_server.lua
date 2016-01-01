@@ -16,7 +16,7 @@ local kCachedMoveRate = 30
 local kCachedInterp = 100
 
 //Supposedly this still not syncronized.
-local function SetupClientRates()
+local function SetupClientRatesandConfig(client)
 	//If non-default rates, send to clients.
 	if GetNSLPerfValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
@@ -24,6 +24,7 @@ local function SetupClientRates()
 	if GetNSLPerfValue("MoveRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 	end
+	Server.SendNetworkMessage(client, "NSLPluginConfig", {config = kNSLPluginConfigs[GetNSLMode()]}, true)
 end
 
 local function SetupRates()
@@ -55,8 +56,20 @@ local function SetupRates()
 	end
 end
 
-table.insert(gConnectFunctions, SetupClientRates)
+table.insert(gConnectFunctions, SetupClientRatesandConfig)
 table.insert(gConfigLoadedFunctions, SetupRates)
+
+local function SendClientUpdatedMode(newState)
+	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
+	for p = 1, #playerList do
+		local playerClient = Server.GetOwner(playerList[p])
+		if playerClient then
+			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState]}, true)
+		end
+	end
+end
+
+table.insert(gPluginStateChange, SendClientUpdatedMode)
 
 local originalPlayerOnJoinTeam
 //Maintain original PlayerOnJoinTeam

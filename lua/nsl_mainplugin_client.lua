@@ -14,6 +14,8 @@ local kChatMinWindow = 0.005
 local kTeam1NameLocal
 local kTeam2NameLocal
 local kInsightTeamnameHack = false
+local kNSLMode
+local kNSLConfigUpdateFunctions = { }
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -64,6 +66,30 @@ local function AdminMessageRecieved(message)
 end
 
 Client.HookNetworkMessage("AdminMessage", AdminMessageRecieved)
+
+function OnNSLConfigRecieved(message)
+	kNSLMode = message.config
+	for i = 1, #kNSLConfigUpdateFunctions do
+		kNSLConfigUpdateFunctions[i](kNSLMode)
+	end
+	Print("NSL Mode set to " .. EnumToString(kNSLPluginConfigs, kNSLMode))
+end
+
+Client.HookNetworkMessage("NSLPluginConfig", OnNSLConfigRecieved)
+
+//Call this with a function if it needs to be updated when/if mode changes.
+function RegisterNSLModeSensitiveFunction(method)
+	if type(method) == "function" then
+		table.insert(kNSLConfigUpdateFunctions, method)
+	else
+		Shared.Message("Attempted to register non-function argument for NSL Config callback")
+		Shared.Message(Script.CallStack())
+	end
+end
+
+function GetNSLMode()
+	return kNSLMode
+end
 
 AddClientUIScriptForClass("Spectator", "GUINSLFollowingSpectatorHUD")
 

@@ -27,6 +27,13 @@ local kAdminChatMessage =
 
 Shared.RegisterNetworkMessage("AdminMessage", kAdminChatMessage)
 
+local kNSLPluginConfig =
+{
+    config = "enum kNSLPluginConfigs",
+}
+
+Shared.RegisterNetworkMessage("NSLPluginConfig", kNSLPluginConfig)
+
 gRefBadges = 
 {
 	{
