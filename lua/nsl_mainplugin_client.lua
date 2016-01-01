@@ -73,7 +73,7 @@ function OnNSLConfigRecieved(message)
 		for i = 1, #kNSLConfigUpdateFunctions do
 			kNSLConfigUpdateFunctions[i](kNSLMode)
 		end
-		Print("NSL Mode set to " .. kNSLMode)
+		Shared.Message("NSL Plugin currently running " .. kNSLMode .. " configuration.")
 	end
 end
 
