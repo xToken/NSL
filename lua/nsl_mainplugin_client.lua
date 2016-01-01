@@ -68,11 +68,13 @@ end
 Client.HookNetworkMessage("AdminMessage", AdminMessageRecieved)
 
 function OnNSLConfigRecieved(message)
-	kNSLMode = EnumToString(kNSLPluginConfigs, kNSLMode)
-	for i = 1, #kNSLConfigUpdateFunctions do
-		kNSLConfigUpdateFunctions[i](kNSLMode)
+	if message then
+		kNSLMode = EnumToString(kNSLPluginConfigs, message.config)
+		for i = 1, #kNSLConfigUpdateFunctions do
+			kNSLConfigUpdateFunctions[i](kNSLMode)
+		end
+		Print("NSL Mode set to " .. kNSLMode)
 	end
-	Print("NSL Mode set to " .. kNSLMode)
 end
 
 Client.HookNetworkMessage("NSLPluginConfig", OnNSLConfigRecieved)
