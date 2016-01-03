@@ -9,6 +9,7 @@ Script.Load("lua/nsl_handicap_shared.lua")
 
 local kMaxTeamNameLength = 50
 local kMaxAdminChatLength = 250
+local kMaxViolationMessageLength = 25
 
 local kTeamNameUpdateMessage =
 {
@@ -37,21 +38,25 @@ Shared.RegisterNetworkMessage("NSLPluginConfig", kNSLPluginConfig)
 gRefBadges = 
 {
 	{
+		fname = "NSL Moderator",
 		name = "ensl_mod",
 		unitStatusTexture = "ui/badges/ensl_mod.dds",
         scoreboardTexture = "ui/badges/ensl_mod.dds"
 	},
 	{
+		fname = "NSL Caster",
 		name = "ensl_caster",
 		unitStatusTexture = "ui/badges/ensl_caster.dds",
         scoreboardTexture = "ui/badges/ensl_caster.dds"
 	},
 	{
+		fname = "NSL Referee",
 		name = "ensl_ref",
 		unitStatusTexture = "ui/badges/ensl_ref.dds",
         scoreboardTexture = "ui/badges/ensl_ref.dds"
 	},
 	{
+		fname = "NSL Admin",
 		name = "ensl_admin",
 		unitStatusTexture = "ui/badges/ensl_admin.dds",
         scoreboardTexture = "ui/badges/ensl_admin.dds"
@@ -75,6 +80,13 @@ local kTechTreeRequest =
 }
 
 Shared.RegisterNetworkMessage("RequestTeamTechTree", kTechTreeRequest)
+
+local kViolationTrigger = 
+{
+	detectionType = string.format("string (%d)", kMaxViolationMessageLength + 1),
+}
+
+Shared.RegisterNetworkMessage("ClientViolationReport", kViolationTrigger)
 
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 
