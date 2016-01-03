@@ -114,7 +114,8 @@
 															"ui/*.dds", 
 															"sound/hitsounds_client.fev",
 															"sound/hitsounds_client.fsb",
-															"sound/hitsounds_client.soundinfo"
+															"sound/hitsounds_client.soundinfo",
+															"shaders/DarkVision.hlsl"
 															]
 												},
 		"CustomSpawns":							{
@@ -231,7 +232,8 @@
 															"ui/*.dds", 
 															"sound/hitsounds_client.fev",
 															"sound/hitsounds_client.fsb",
-															"sound/hitsounds_client.soundinfo"
+															"sound/hitsounds_client.soundinfo",
+															"shaders/DarkVision.hlsl"
 															]
 												}
 		},
