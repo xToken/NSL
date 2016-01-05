@@ -257,5 +257,18 @@ function Badges_GetBadgeTextures( clientId, usecase )
 	return textures, badgeNames
 end
 
+local oldGetBadgeFormalName = GetBadgeFormalName
+function GetBadgeFormalName(name)
+	local fname = oldGetBadgeFormalName(name)
+	if fname == "Custom Badge" then
+		for _, info in ipairs(gRefBadges) do
+			if info.name == name then
+				return info.fname
+			end
+		end
+	end
+	return fname
+end
+
 //Leeeets see how much this breaks :D
 AddClientUIScriptForTeam(kSpectatorIndex, "GUINSLSpectatorTechMap")
