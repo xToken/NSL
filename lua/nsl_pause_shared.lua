@@ -86,6 +86,21 @@ originalNS2PlayerModifyGravityForce = Class_ReplaceMethod("Player", "ModifyGravi
 	end
 )
 
+//Fix for healing effects not working after pause.
+local oldLiveMixinAddHealth = LiveMixin.AddHealth
+function LiveMixin:AddHealth(...)
+	gTimeBypass = true
+	oldLiveMixinAddHealth(self, ...)
+	gTimeBypass = false
+end
+
+local oldLiveMixinSetArmor = LiveMixin.SetArmor
+function LiveMixin:SetArmor(...)
+	gTimeBypass = true
+	oldLiveMixinSetArmor(self, ...)
+	gTimeBypass = false
+end
+
 //Pause Projectiles (some/most)
 if Server then
     local originalNS2PredictedProjectileShooterMixinOnProcessMove = PredictedProjectileShooterMixin.OnProcessMove
