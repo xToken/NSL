@@ -5,4 +5,6 @@
 
 if Server then
 	ModLoader.SetupFileHook( "lua/ServerAdmin.lua", "lua/nsl_serveradmin.lua", "post" )
+elseif Client then
+	ModLoader.SetupFileHook( "lua/ClientResources.lua", "lua/nsl_filehooks_client.lua", "pre" )
 end
