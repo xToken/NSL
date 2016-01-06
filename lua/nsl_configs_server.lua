@@ -17,7 +17,7 @@ local NSL_CachedScores = { }
 local NSL_Scores = { }
 local NSL_LeagueAdminsAccess = false
 local cachedScoresValidFor = 10 * 60
-local expectedNSLConfigVersion = 1.4
+local expectedNSLConfigVersion = 1.5
 
 function GetNSLMode()
 	return NSL_Mode
@@ -141,7 +141,8 @@ MercsRequireApproval 				= false,
 FirstPersonSpectate					= false,
 UseCustomSpawnConfigs				= false,
 UseFixedSpawnsPerMap				= false,
-UseDefaultSkins						= false
+UseDefaultSkins						= false,
+PauseOnDisconnect					= false
 }
 
 local DefaultPerfConfig = {
@@ -309,6 +310,7 @@ PauseTeamReadyMessage				= "%s readied for %s, waiting for the %s.",
 PauseTeamReadyPeriodicMessage		= "%s are ready, waiting for the %s.",
 PauseNoTeamReadyMessage				= "No team is ready to resume, type unpause in console to ready for your team.",
 PauseCancelledMessage				= "Game Pause Cancelled.",
+PauseDisconnectedMessage			= "%s disconnected, pausing game.",
 PauseTooManyPausesMessage			= "Your team is out of pauses.",
 TournamentModeTeamReadyAlert 		= "%s are ready, waiting on %s to start game.",
 TournamentModeCountdown 			= "Game will start in %s seconds!",
