@@ -105,6 +105,10 @@ table.insert(TimeBypassFunctions, {name = "BiteLeap", func = "CreateBloodEffect"
 table.insert(TimeBypassFunctions, {name = "LerkBite", func = "CreateBloodEffect", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "DetectableMixin", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "ClientWeaponEffectsMixin", func = "UpdateAttackEffects", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "UmbraMixin", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "CloakableMixin", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "Fade", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "Player", func = "OnUpdateRender", oldFunc = nil })
 
 for i, classarray in pairs(TimeBypassFunctions) do
 	classarray.oldFunc = Class_ReplaceMethod(classarray.name, classarray.func, 
@@ -191,7 +195,7 @@ end
 
 ClientUI.AddScriptCreationEventListener(ChatUICreation)
 
-local kPausedUpdateScripts = { "GUIScoreboard", "GUIChat", "GUIMinimapFrame", "GUIInsight_PlayerFrames", "GUITechMap", "GUIInsight_Overhead", 
+local kPausedUpdateScripts = { "GUIScoreboard", "GUIChat", "GUIMinimapFrame", "GUIInsight_PlayerFrames", "GUITechMap", "GUIInsight_Overhead", "GUIMainMenu",
 								"GUIInsight_PenTool", "GUIInsight_PlayerHealthbars", "GUIInsight_Graphs", "GUINSLSpectatorTechMap", "GUINSLFollowingSpectatorHUD" }
 local kPausedScoreboardUpdateRate = 0.5
 local scoreboardUpdate = 0.5
