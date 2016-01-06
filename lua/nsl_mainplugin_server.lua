@@ -176,6 +176,8 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslsetteamspawns" .. ": " .. "marinespawnname, alienspawnname, Spawns teams at specified locations. Locations must be exact")
 			ServerAdminPrint(client, "sv_nslpassword" .. ": " .. "Sets a password on the server, works like sv_password.")
 			ServerAdminPrint(client, "sv_nslleagueadmins" .. ": " .. "Toggles league staff having access to administrative commands on server.")
+			ServerAdminPrint(client, "sv_nslreplaceplayer" .. ": " .. "<newPlayer, oldPlayer> Will force different player to take crashed/disconnect players place.")
+			ServerAdminPrint(client, "sv_nsllistcachedplayers" .. ": " .. "Will list currently cached players names and steamIDs, for sv_nslreplaceplayer cmd.")
 		end
 		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
 		ServerAdminPrint(client, "sv_nslhandicap" .. ": " .. "<0.1 - 1> Lowers your damage to the specified percentage.")
