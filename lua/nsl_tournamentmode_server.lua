@@ -266,6 +266,7 @@ end
 
 Event.Hook("Console_ready",                 OnCommandReady)
 gChatCommands["ready"] = OnCommandReady
+gChatCommands["!ready"] = OnCommandReady
 gChatCommands["rdy"] = OnCommandReady
 
 local function ClientNotReady(client)
@@ -297,4 +298,5 @@ end
 
 Event.Hook("Console_notready",                 OnCommandNotReady)
 gChatCommands["notready"] = OnCommandNotReady
+gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady
