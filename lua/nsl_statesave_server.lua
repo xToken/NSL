@@ -46,9 +46,8 @@ function NS2Gamerules:OnClientDisconnect(client)
 	StoreDisconnectedTeamPlayer(self, client)
 	oldNS2GamerulesOnClientDisconnect(self, client)
 end
-local oldNS2GamerulesResetGame = NS2Gamerules.ResetGame
-function NS2Gamerules:ResetGame()
-	oldNS2GamerulesResetGame(self)
+
+function CleanupCachedPlayers()
 	//Delete ents if still valid
 	for k, v in pairs(NSL_DisconnectedPlayers) do
 		if NSL_DisconnectedPlayers[k] then
@@ -58,6 +57,12 @@ function NS2Gamerules:ResetGame()
 	end
 	//Clear ref table
 	NSL_DisconnectedIDs = { }
+end
+
+local oldNS2GamerulesResetGame = NS2Gamerules.ResetGame
+function NS2Gamerules:ResetGame()
+	oldNS2GamerulesResetGame(self)
+	CleanupCachedPlayers()
 end
 
 local function CleanupIDTable(ns2ID)
