@@ -15,24 +15,27 @@ local function StoreDisconnectedTeamPlayer(self, client)
 		if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 			//Valid team, player, config opt.  Check gamestate.
 			if self:GetGameStarted() then
-				//Do things
-				//Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
-				local id = client:GetUserId()
-				local name = player:GetName()
-				local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
-				player.client = nil
-				tempplayer:SetControllerClient(client)
-				//Just delete this NOW
-				if player.playerInfo then
-					DestroyEntity(player.playerInfo)
-					player.playerInfo = nil
+				//Dont save comms.  It works, but seems to break the GUI entirely
+				if not player:GetIsCommander() then
+					//Do things
+					//Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
+					local id = client:GetUserId()
+					local name = player:GetName()
+					local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
+					player.client = nil
+					tempplayer:SetControllerClient(client)
+					//Just delete this NOW
+					if player.playerInfo then
+						DestroyEntity(player.playerInfo)
+						player.playerInfo = nil
+					end
+					//Player ENT should be disjoined, cache to table.
+					NSL_DisconnectedPlayers[id] = player
+					NSL_DisconnectedIDs[name] = id
+					//Force Pause
+					//Will consume a pause for the team, but will always pause even if out.
+					//During crash, team may pause before, so check.
 				end
-				//Player ENT should be disjoined, cache to table.
-				NSL_DisconnectedPlayers[id] = player
-				NSL_DisconnectedIDs[name] = id
-				//Force Pause
-				//Will consume a pause for the team, but will always pause even if out.
-				//During crash, team may pause before, so check.
 				if not GetIsGamePaused() then
 					TriggerDisconnectNSLPause(name, teamNumber, 1, true)
 				end
@@ -81,9 +84,9 @@ function MoveClientToStoredPlayer(client, ns2ID)
 	player.client = nil
 	newplayer:SetControllerClient(client)
 	newplayer:SetPlayerInfo(player.playerInfo)
-	newplayer:SetName(name)
 	player.playerInfo = nil
 	DestroyEntity(player)
+	newplayer:SetName(name)
 	NSL_DisconnectedPlayers[ns2ID] = nil
 	CleanupIDTable(ns2ID)
 end
