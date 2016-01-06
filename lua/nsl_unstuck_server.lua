@@ -67,6 +67,11 @@ local function RegisterClientStuck(client)
 	if client ~= nil then
 		local ns2id = client:GetUserId()
 		if LastUnstuckTracker[ns2id] == nil or LastUnstuckTracker[ns2id] + kUnstuckRate < Shared.GetTime() then
+			if GetIsGamePaused() then
+				//fucking sploiters
+				SendClientMessage(client, "Cannot unstuck during pause!")
+				return
+			end
 			local player = client:GetControllingPlayer()
 			local unstucktime = math.random(kMinUnstuckTime, kMaxUnstuckTime)
 			UnstuckOriginTracker[ns2id] = player:GetOrigin()
