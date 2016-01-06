@@ -312,6 +312,9 @@ local function ResumeEntStates()
 			end
 		end
 	end
+	
+	//Clean any cachedplayers
+	CleanupCachedPlayers()
 
 end
 
