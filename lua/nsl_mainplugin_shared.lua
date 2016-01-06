@@ -9,7 +9,7 @@ Script.Load("lua/nsl_handicap_shared.lua")
 
 local kMaxTeamNameLength = 50
 local kMaxAdminChatLength = 250
-local kMaxViolationMessageLength = 25
+local kMaxFunctionMessageLength = 80
 
 local kTeamNameUpdateMessage =
 {
@@ -81,12 +81,12 @@ local kTechTreeRequest =
 
 Shared.RegisterNetworkMessage("RequestTeamTechTree", kTechTreeRequest)
 
-local kViolationTrigger = 
+local kFunctionTrigger = 
 {
-	detectionType = string.format("string (%d)", kMaxViolationMessageLength + 1),
+	detectionType = string.format("string (%d)", kMaxFunctionMessageLength + 1),
 }
 
-Shared.RegisterNetworkMessage("ClientViolationReport", kViolationTrigger)
+Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
 
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 

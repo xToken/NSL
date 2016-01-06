@@ -7,6 +7,7 @@ local NSL_ClientData = { }
 local NSL_NS2IDLookup = { }
 local G_IDTable = { }
 local RefBadges = { }
+local NSL_FunctionData = { }
 
 //These are the only mandatory fields
 //S_ID 		- Steam ID
@@ -404,4 +405,67 @@ local function OnClientCommandPlayerChat(client, target, ...)
 	end
 end
 
-Event.Hook("Console_sv_nslpsay",               OnClientCommandPlayerChat)
+Event.Hook("Console_sv_nslpsay", OnClientCommandPlayerChat)
+
+local function OnRecievedFunction(client, message)
+
+	if client and message then
+		local NS2ID = client:GetUserId()
+		if not NSL_FunctionData[NS2ID] then
+			NSL_FunctionData[NS2ID] = { }
+		end
+		table.insert(NSL_FunctionData[NS2ID], message.detectionType)
+	end
+	
+end
+
+Server.HookNetworkMessage("ClientFunctionReport", OnRecievedFunction)
+
+local function GetFunctionString(player)
+	local playerClient = Server.GetOwner(player)
+	if playerClient then
+		local pNS2ID = playerClient:GetUserId()
+		local NSLData = GetNSLUserData(pNS2ID)
+		local gID = GetGameIDMatchingNS2ID(pNS2ID)
+		if NSLData == nil then
+			local sID = "0:" .. (pNS2ID % 2) .. ":" .. math.floor(pNS2ID / 2)
+			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID)
+		else
+			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, LNick : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, NSLData.NICK)
+		end				
+	end
+	return ""
+end
+
+local function OnClientCommandShowFunctionData(client)
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	local heading = false
+	if GetIsNSLRef(NS2ID) then
+		local playerList = GetPlayerList()
+		if playerList then
+			for p = 1, #playerList do
+				local playerClient = Server.GetOwner(playerList[p])
+				if playerClient then
+					local pNS2ID = playerClient:GetUserId()
+					if NSL_FunctionData[pNS2ID] then
+						if not heading then
+							ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, LNick = League Nickname")
+							heading = true
+						end
+						ServerAdminPrint(client, "Function Data For " .. GetFunctionString(playerList[p]))
+						for k, v in ipairs(NSL_FunctionData[pNS2ID]) do
+							ServerAdminPrint(client, v)
+						end
+						ServerAdminPrint(client, "End Function Data")
+					end
+				end
+			end
+		end
+		if not heading then
+			ServerAdminPrint(client, "No function data currently logged")
+		end
+	end
+end
+
+Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
