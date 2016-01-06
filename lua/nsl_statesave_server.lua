@@ -125,7 +125,7 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 					//Name
 					id = tonumber(NSL_DisconnectedIDs[oldPlayer])
 				end
-				if replaceClient and id then
+				if replaceClient and id and NSL_DisconnectedPlayers[id] then
 					//it worked, holy shit
 					MoveClientToStoredPlayer(replaceClient, id)
 					ServerAdminPrint(client, "Set " .. tostring(newPlayer) .. " as replacement for " .. tostring(oldPlayer) .. ".")
