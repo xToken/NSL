@@ -468,8 +468,33 @@ local function OnCommandPause(client)
 	
 end
 
+//Trigger pause from somewhere else
+function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
+	
+	if GetGamerules():GetGameStarted() and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then
+		if not GetIsGamePaused() and gamestate.gamepausedcountdown == 0 and pausingTeam and ValidateTeamNumber(pausingTeam) then
+			local validpause = false
+			if (gamestate.teampauses[GetActualTeamName(pausingTeam)] or 0) < GetNSLConfigValue("PauseMaxPauses") then
+				gamestate.teampauses[GetActualTeamName(pausingTeam)] = (gamestate.teampauses[GetActualTeamName(pausingTeam)] or 0) + 1
+				validpause = true
+			end
+			if validpause or forcePause then
+				gamestate.team1resume = false
+				gamestate.team2resume = false
+				gamestate.gamepausedcountdown = pauseDelay
+				gamestate.gamepausingteam = pausingTeam
+				gamestate.serverprepauseloopenabled = true
+				SendAllClientsMessage(string.format(GetNSLMessage("PauseDisconnectedMessage"), name))
+			else
+				SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
+			end
+		end
+	end
+end
+
 Event.Hook("Console_gpause",               OnCommandPause)
 gChatCommands["pause"] = OnCommandPause
+gChatCommands["!pause"] = OnCommandPause
 
 local function OnCommandUnPause(client)
 	
@@ -502,7 +527,9 @@ end
 
 Event.Hook("Console_unpause",               OnCommandUnPause)
 gChatCommands["unpause"] = OnCommandUnPause
+gChatCommands["!unpause"] = OnCommandUnPause
 gChatCommands["resume"] = OnCommandUnPause
+gChatCommands["!resume"] = OnCommandUnPause
 
 local function OnCommandAdminPause(client)
 	
