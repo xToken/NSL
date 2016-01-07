@@ -83,6 +83,7 @@ table.insert(ClassUpdatesBlock, {name = "TeleportMixin", OnProcessMove = nil })
 table.insert(ClassUpdatesBlock, {name = "TunnelUserMixin", OnProcessMove = nil })
 table.insert(ClassUpdatesBlock, {name = "UmbraMixin", OnProcessMove = nil })
 table.insert(ClassUpdatesBlock, {name = "VortexAbleMixin", OnProcessMove = nil })
+
 local ProcessTechTreeActionBlock = { }
 table.insert(ProcessTechTreeActionBlock, {name = "Commander", ProcessTechTreeAction = nil })
 table.insert(ProcessTechTreeActionBlock, {name = "AlienCommander", ProcessTechTreeAction = nil })
