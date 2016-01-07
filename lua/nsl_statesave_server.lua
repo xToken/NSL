@@ -15,27 +15,27 @@ local function StoreDisconnectedTeamPlayer(self, client)
 		if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 			//Valid team, player, config opt.  Check gamestate.
 			if self:GetGameStarted() then
-				//Dont save comms.  It works, but seems to break the GUI entirely
-				if not player:GetIsCommander() then
-					//Do things
-					//Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
-					local id = client:GetUserId()
-					local name = player:GetName()
-					local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
-					player.client = nil
-					tempplayer:SetControllerClient(client)
-					//Just delete this NOW
-					if player.playerInfo then
-						DestroyEntity(player.playerInfo)
-						player.playerInfo = nil
-					end
-					//Player ENT should be disjoined, cache to table.
-					NSL_DisconnectedPlayers[id] = player
-					NSL_DisconnectedIDs[name] = id
-					//Force Pause
-					//Will consume a pause for the team, but will always pause even if out.
-					//During crash, team may pause before, so check.
+				//Do things
+				//Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
+				local id = client:GetUserId()
+				local name = player:GetName()
+				local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
+				player.client = nil
+				player:RemoveSpectators(tempplayer)
+				tempplayer:SetControllerClient(client)
+				//Just delete this NOW
+				if player.playerInfo then
+					DestroyEntity(player.playerInfo)
+					player.playerInfo = nil
 				end
+				//Block ragdoll destruction
+				player.blockRagdollDestruction = true
+				//Player ENT should be disjoined, cache to table.
+				NSL_DisconnectedPlayers[id] = player
+				NSL_DisconnectedIDs[name] = id
+				//Force Pause
+				//Will consume a pause for the team, but will always pause even if out.
+				//During crash, team may pause before, so check.
 				if not GetIsGamePaused() then
 					TriggerDisconnectNSLPause(name, teamNumber, 1, true)
 				end
@@ -68,6 +68,18 @@ function NS2Gamerules:ResetGame()
 	CleanupCachedPlayers()
 end
 
+//Hook into this shiz
+local oldRagdollMixinOnTag= RagdollMixin.OnTag
+function RagdollMixin:OnTag(tagName)
+	if not self.blockRagdollDestruction then
+		oldRagdollMixinOnTag(self, tagName)
+	end
+end
+
+function Player:GetDestructionAllowed(destructionAllowedTable)
+    destructionAllowedTable.allowed = destructionAllowedTable.allowed and not self.blockRagdollDestruction
+end
+
 local function CleanupIDTable(ns2ID)
 	for k, v in pairs(NSL_DisconnectedIDs) do
 		if v == ns2ID then
@@ -76,19 +88,33 @@ local function CleanupIDTable(ns2ID)
 	end
 end
 
+local function RemoveRagdollBlock(self)
+	self.blockRagdollDestruction = false
+	return false
+end
+
 function MoveClientToStoredPlayer(client, ns2ID)
 	//So we found a stored player, and we are still paused
 	local player = client:GetControllingPlayer()
+	local success = false
 	local name = player:GetName()
 	local newplayer = NSL_DisconnectedPlayers[ns2ID]
-	player.client = nil
-	newplayer:SetControllerClient(client)
-	newplayer:SetPlayerInfo(player.playerInfo)
-	player.playerInfo = nil
-	DestroyEntity(player)
-	newplayer:SetName(name)
+	//Dont want to stick them back into a ragdoll, as funny as it would be :D - anddddd thats now what we do cause its fun :D:D
+	if newplayer then
+		player.client = nil
+		newplayer:SetControllerClient(client)
+		newplayer:SetPlayerInfo(player.playerInfo)
+		player.playerInfo = nil
+		DestroyEntity(player)
+		newplayer:SetName(name)
+		//Need to send tech tree to player
+		newplayer.sendTechTreeBase = true
+		newplayer:AddTimedCallback(RemoveRagdollBlock, 0.1)
+		success = true
+	end
 	NSL_DisconnectedPlayers[ns2ID] = nil
 	CleanupIDTable(ns2ID)
+	return success
 end
 
 local function OnClientConnected(client)
@@ -130,8 +156,11 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 				end
 				if replaceClient and id and NSL_DisconnectedPlayers[id] then
 					//it worked, holy shit
-					MoveClientToStoredPlayer(replaceClient, id)
-					ServerAdminPrint(client, "Set " .. tostring(newPlayer) .. " as replacement for " .. tostring(oldPlayer) .. ".")
+					if MoveClientToStoredPlayer(replaceClient, id) then
+						ServerAdminPrint(client, "Set " .. tostring(newPlayer) .. " as replacement for " .. tostring(oldPlayer) .. ".")
+					else
+						ServerAdminPrint(client, "Something went wrong when caching the player :(.")
+					end
 				else
 					ServerAdminPrint(client, "Couldn't find cached player " .. tostring(oldPlayer) .. ".")
 				end
@@ -157,3 +186,5 @@ local function OnClientCommandListCachedPlayers(client, team)
 end
 
 Event.Hook("Console_sv_nsllistcachedplayers", OnClientCommandListCachedPlayers)
+
+Class_Reload( "Player" )
