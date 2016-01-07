@@ -90,8 +90,9 @@ originalNS2PlayerModifyGravityForce = Class_ReplaceMethod("Player", "ModifyGravi
 local oldLiveMixinAddHealth = LiveMixin.AddHealth
 function LiveMixin:AddHealth(...)
 	gTimeBypass = true
-	oldLiveMixinAddHealth(self, ...)
+	local healed = oldLiveMixinAddHealth(self, ...)
 	gTimeBypass = false
+	return healed
 end
 
 local oldLiveMixinSetArmor = LiveMixin.SetArmor
