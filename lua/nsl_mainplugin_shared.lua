@@ -88,6 +88,14 @@ local kFunctionTrigger =
 
 Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
 
+local kFunctionMessage = 
+{
+	functionName = string.format("string (%d)", kMaxFunctionMessageLength + 1),
+	newValue = string.format("string (%d)", kMaxFunctionMessageLength + 1)
+}
+
+Shared.RegisterNetworkMessage("ClientFunctionUpdate", kFunctionMessage)
+
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 
 	function(self)
