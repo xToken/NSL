@@ -260,4 +260,7 @@ local UpdateAnimationState = GetUpValue(BaseModelMixin.ProcessMoveOnModel, "Upda
 ReplaceLocals(UpdateAnimationState, { Shared_GetTime = Shared.GetTime })
 ReplaceLocals(UpdateAnimationState, { Shared_GetPreviousTime = Shared.GetPreviousTime })
 
-Class_Reload( "Player", {timeadjustment = "time", timepaused = "time", gamepaused = "compensated boolean"} )
+//Time paused set on pause, used for smooth prediction on the client during pause.
+//Time adjustment set on resume, used for adjusting all time based on the delta.
+//Ideally I could network these at different precisions to save bw, but I dont know the efficiency of time vs float so....
+Class_Reload( "Player", {timeadjustment = "time", timepaused = "time", gamepaused = "boolean"} )
