@@ -15,15 +15,17 @@ local funcNameMin = 2
 local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient", "GetGameStarted", "GetIsPlaying", "kMinTimeBeforeConcede", "PlayerUI_GetWeaponLevel",
 						"gCHUDHiddenViewModel", "PlayerUI_GetCanDisplayRequestMenu", "kWorldDamageNumberAnimationSpeed", "ChatUI_EnterChatMessage", "PlayerUI_GetPlayerResources",
 						"PlayerUI_GetArmorLevel", "CommanderUI_Logout", "upgradeLevelThree" , "upgradeLevelTwo", "nearestLocationName", "gPreviousPausedTime", "sortById",
-						"position", "SetItemInvisible", "gTimePositionChanged", "techId", "screenPos", "CHUDStatsVisible", "iconCoordinates", "css"
-					}
+						"position", "SetItemInvisible", "gTimePositionChanged", "techId", "screenPos", "CHUDStatsVisible", "iconCoordinates", "css", "gArmoryHealthHeight",
+						"useColorCHUD", "gCurrentHostStructureId", "direction", "attachEntity", "intensity", "start", "player"
+						}
 local excludeClassFuncs = { 
 						"Commander:UpdateMisc", "Commander:OnDestroy", "ExoWeaponHolder:OnUpdateRender", "PlayerMapBlip:GetMapBlipColor", "ActiveControls:NumMembers",
 						"Locale:ResolveString", "AlienCommander:UpdateMisc", "AlienCommander:OnDestroy", "MapBlip:GetMapBlipColor", "ClientUI:EvaluateUIVisibility",
 						"MarineCommander:UpdateMisc", "MarineCommander:OnDestroy", "HiveVisionExtra_screenEffect", "screenEffects:darkVision", "HiveVision_screenEffect",
-						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate", "CystGhostModel:Update", "addedBlip:Time", "kWorkerIcon:Width", "kWorkerIcon:Height", 
+						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate", "CystGhostModel:Update", "addedBlip:Time", "addedBlip:Item", "kWorkerIcon:Width", "kWorkerIcon:Height", 
 						"kEggsIcon:Width", "kEggsIcon:Height", "kResourceTowerIcon:Width", "kResourceTowerIcon:Height", "kPersonalResourceIcon:Width", "kPersonalResourceIcon:Height",
-						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height", "Player:kShowGiveDamageTime"
+						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height", "Player:kShowGiveDamageTime", "startDetails:Position", "startDetails:InfoColor", "startDetails:IconSize",
+						"startDetails:ShadowColor", "startDetails:IconColor"
 					 }
 local excludeClasses = { 
 						"GUIMainMenu", "GUIScoreboard", "GUIGameEnd", "GUIChat", "GUIDeathMessages", "GUIExoHUD", "GUIHoverTooltip", "GUIMarineBuyMenu",
@@ -159,8 +161,10 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 	end
 	if modString then
 		for k, v in ipairs(split(modString, ";")) do
-		  Client.SendNetworkMessage("ClientFunctionReport", {detectionType = v}, true)
-		  table.insert(rTable, v)
+			if not table.contains(rTable, r) then
+				Client.SendNetworkMessage("ClientFunctionReport", {detectionType = v}, true)
+				table.insert(rTable, v)
+			end
 		end
 		modString = nil
 	end
