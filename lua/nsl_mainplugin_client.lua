@@ -99,6 +99,7 @@ AddClientUIScriptForClass("Spectator", "GUINSLFollowingSpectatorHUD")
 //This sucks, but should hopefully fix those issues.
 //This might be the most epic hack in all of ns2 :<
 
+local tablebuilt = false
 local TimeBypassFunctions = { }
 table.insert(TimeBypassFunctions, {name = "Alien", func = "UpdateClientEffects", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "BiteLeap", func = "CreateBloodEffect", oldFunc = nil })
@@ -109,16 +110,38 @@ table.insert(TimeBypassFunctions, {name = "UmbraMixin", func = "OnUpdateRender",
 table.insert(TimeBypassFunctions, {name = "CloakableMixin", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "Fade", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "Player", func = "OnUpdateRender", oldFunc = nil })
+table.insert(TimeBypassFunctions, {name = "ExoWeaponHolder", func = "OnUpdateRender", oldFunc = nil })
 
-for i, classarray in pairs(TimeBypassFunctions) do
-	classarray.oldFunc = Class_ReplaceMethod(classarray.name, classarray.func, 
+local function BuildTableEntry(tableEntry)
+	tableEntry.oldFunc = Class_ReplaceMethod(tableEntry.name, tableEntry.func, 
 		function(...)
 			gTimeBypass = true
-			classarray.oldFunc(...)
+			tableEntry.oldFunc(...)
 			gTimeBypass = false
 		end
 	)
 end
+
+local function BuildTimeBypassTable()
+	for i, classarray in pairs(TimeBypassFunctions) do
+		BuildTableEntry(classarray)
+	end
+	tablebuilt = true
+end
+
+function AddClassFunctionToTimeBypassTable(className, methodName)
+	local cTable =  {name = className, func = methodName, oldFunc = nil }
+	table.insert(TimeBypassFunctions, cTable)
+	if tablebuilt then
+		BuildTableEntry(cTable)
+	end
+end
+
+local function OnLoadComplete()
+	BuildTimeBypassTable()
+end
+
+Event.Hook("LoadComplete", OnLoadComplete)
 
 //FFFFFFFFFFFFFFFF
 local startedChatTime = 0
@@ -234,27 +257,20 @@ end
 
 Client.HookNetworkMessage("RefBadges", RefBadgeRecieved)
 
-local CTextureCache = { }
-local CNameCache = { }
-
 local oldBadges_GetBadgeTextures = Badges_GetBadgeTextures
 function Badges_GetBadgeTextures( clientId, usecase )
 	local textures, badgeNames
 	local badges = RefBadges[ clientId ]
 	textures, badgeNames = oldBadges_GetBadgeTextures(clientId, usecase)
     if badges then
-		if not CTextureCache[clientId] then
-			//These seem to get cached somewhere now, so once we have reported back on teh badges once, dont add them anymore...
-			local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
-			for _, info in ipairs(gRefBadges) do
-				if badges[ "has_" .. info.name .. "_badge" ] == true then
-					table.insert( textures, info[textureKey] )
-					table.insert( badgeNames, info.name )
-					CTextureCache[clientId] = info[textureKey]
-					CNameCache[clientId] = info.name
-					break
-					//Can only have 1 nsl badge, sorry dudes
-				end
+		//These seem to get cached somewhere now, so check the table to be sure....
+		local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
+		for _, info in ipairs(gRefBadges) do
+			if not table.contains(badgeNames, info.name) and badges[ "has_" .. info.name .. "_badge" ] == true then
+				table.insert( textures, info[textureKey] )
+				table.insert( badgeNames, info.name )
+				break
+				//Can only have 1 nsl badge, sorry dudes
 			end
 		end
 	end
