@@ -5,60 +5,22 @@
 
 //NSL Client File Hooks
 local runDetectionAt = math.random() * 10
-local function GetUpValue(origfunc, name)
-
-	local index = 1
-	local foundValue = nil
-	while true do
-	
-		local n, v = debug.getupvalue(origfunc, index)
-		if not n then
-			break
-		end
-		
-		if n == name then
-			foundValue = v
-		end
-		
-		index = index + 1
-		
-	end
-	
-	return foundValue
-	
-end
-
-local origGetMaxDistanceFor
-local actualHVMValue = 63
-
-local function CheckHiveVisionMixin()
-	origGetMaxDistanceFor = GetUpValue(HiveVisionMixin.OnUpdate, "GetMaxDistanceFor")
-	local player = Client.GetLocalPlayer()
-	if player and origGetMaxDistanceFor then
-		if origGetMaxDistanceFor(player) > actualHVMValue then
-			//Report to server
-			Client.SendNetworkMessage("ClientFunctionReport", {detectionType = "HiveVision"}, true)
-		end
-	end
-end
-
 local C = { }
 local gBuilt = false
 local recursiveLimit = 3
 local sleepDetections = 0
 local funcNameMin = 2
+
 //Waaaay to much is whitelisted here, really this would only pick up lazy hooks at this point, value probably doesnt justify the complexity.
-local excludeFuncs = { 
-						"Commander:UpdateMisc", "Commander:UpdateGhostGuides", "Commander:OnDestroy", "Commander:OnInitLocalClient", "ExoWeaponHolder:OnUpdateRender",
-						"PlayerMapBlip:GetMapBlipColor", "gCHUDHiddenViewModel", "Locale:ResolveString", "PlayerUI_GetCanDisplayRequestMenu", "AlienCommander:UpdateMisc",
-						"AlienCommander:UpdateGhostGuides", "AlienCommander:OnInitLocalClient", "AlienCommander:OnDestroy", "MapBlip:GetMapBlipColor", 
-						"MarineCommander:UpdateMisc", "MarineCommander:UpdateGhostGuides", "MarineCommander:OnDestroy", "MarineCommander:OnInitLocalClient",
-						"kWorldDamageNumberAnimationSpeed", "HiveVisionExtra_screenEffect", "screenEffects:darkVision", "HiveVision_screenEffect",
-						"Player:SendKeyEvent", "Alien:SendKeyEvent", "Skulk:SendKeyEvent", "Gorge:SendKeyEvent", "Lerk:SendKeyEvent", "Fade:SendKeyEvent", "Onos:SendKeyEvent",
-						"Marine:SendKeyEvent", "AlienSpectator:SendKeyEvent", "ReadyRoomExo:SendKeyEvent", "MarineSpectator:SendKeyEvent", "JetpackMarine:SendKeyEvent",
-						"Spectator:SendKeyEvent", "ReadyRoomPlayer:SendKeyEvent", "TeamSpectator:SendKeyEvent", "Exo:SendKeyEvent", "Embryo:SendKeyEvent",
-						"ReadyRoomEmbryo:SendKeyEvent", "FilmSpectator:SendKeyEvent", "ChatUI_EnterChatMessage", "ClientUI:EvaluateUIVisibility",
-						"ActiveControls:NumMembers", "CommanderUI_Logout", "kMinTimeBeforeConcede", "Script:Load"
+local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient", "GetGameStarted", "GetIsPlaying", "kMinTimeBeforeConcede", "PlayerUI_GetWeaponLevel",
+						"gCHUDHiddenViewModel", "PlayerUI_GetCanDisplayRequestMenu", "kWorldDamageNumberAnimationSpeed", "ChatUI_EnterChatMessage", "PlayerUI_GetPlayerResources",
+						"PlayerUI_GetArmorLevel", "CommanderUI_Logout"
+					}
+local excludeClassFuncs = { 
+						"Commander:UpdateMisc", "Commander:OnDestroy", "ExoWeaponHolder:OnUpdateRender", "PlayerMapBlip:GetMapBlipColor", "ActiveControls:NumMembers",
+						"Locale:ResolveString", "AlienCommander:UpdateMisc", "AlienCommander:OnDestroy", "MapBlip:GetMapBlipColor", "ClientUI:EvaluateUIVisibility",
+						"MarineCommander:UpdateMisc", "MarineCommander:OnDestroy", "HiveVisionExtra_screenEffect", "screenEffects:darkVision", "HiveVision_screenEffect",
+						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate"
 					 }
 local excludeClasses = { 
 						"GUIMainMenu", "GUIScoreboard", "GUIGameEnd", "GUIChat", "GUIDeathMessages", "GUIExoHUD", "GUIHoverTooltip", "GUIMarineBuyMenu",
@@ -67,12 +29,36 @@ local excludeClasses = {
 						"GUISpectator", "GUIEvent", "GUIMarineHUD", "GUIMarineTeamMessage", "GUIMinimapConnection", "GUIMinimap", "GUICrosshair",
 						"GUIProduction", "GUISensorBlips", "GUIUnitStatus", "GUIAlienHUD", "GUIJetpackFuel", "GUIAlienTeamMessage"
 						}
+local excludeHooks = { "Console_debugcommander", "Console_cents", "Console_jm", "Console_team1", "Console_r_aa", "Console_print_bindings", "Console_hud_rate", 
+						"Console_resetcommandertutorial", "Console_debugcyst", "Console_setvoicevolume", "Console_unfairadvantage", "Console_animinputs", 
+						"Console_sh_alltalklocal_cl", "Console_guiinfo", "Console_drawdecal", "Console_propnames", "Console_r_glass", "Console_sh_animateui", "Console_ma",
+						"Console_distance", "Console_bind", "Console_sv_nslhandicap", "Console_score1", "Console_ironhorsemode", "Console_mantis_s3", "Console_sh_clientconfigmenu",
+						"Console_unl", "Console_alienvision", "Console_score2", "Console_iamthelaw", "Console_pen", "Console_filmsmoothing", "Console_name", "Console_debugnotifications",
+						"Console_sh_disableweb", "Console_reset_help", "Console_sh_chatbox", "Console_r_animation", "Console_perfmon", "Console_setvv", "Console_dbg_value", 
+						"Console_r_ao", "Console_say", "Console_mca", "Console_print_client_ui", "Console_sh_errorreport", "Console_mcg", "Console_reject", "Console_setmusicvolume",
+						"Console_soundgeometry", "Console_chuckle", "Console_ssv", "Console_hivevision", "Console_mcr", "Console_print_client_resources", "Console_setmaplocationcolor",
+						"Console_r_mode", "Console_swalkmode", "Console_savelights", "Console_connect", "Console_cjit", "Console_oneffectdebug", "Console_sh_loadplugin_cl", 
+						"Console_r_shadows", "Console_locate", "Console_r_fog", "Console_team_say", "Console_iamgolden", "Console_scaremode", "Console_mantis_accept", "Console_chatwrapamount",
+						"Console_mct", "Console_chattime", "Console_minimapnames", "Console_slot6", "Console_tracereticle", "Console_allbadges", "Console_dumpguiscripts", "Console_resettipvids",
+						"Console_requestweld", "Console_badge", "Console_ironmode", "Console_badges", "Console_perfdbg", "Console_unbind", "Console_goldenmode", "Console_swalkmode_cameraspeed",
+						"Console_swalkmode_vmspeed", "Console_trollrate", "Console_selecthallucinations", "Console_plus_export", "Console_setplusversion", "Console_r_poseparams", "Console_swapres",
+						"Console_mariomode", "Console_cfindref", "Console_changegcsettingclient", "Console_trollmode", "Console_random_debug", "Console_setsensitivity", "Console_accept",
+						"Console_displayannotations", "Console_outline", "Console_clear_binding", "Console_teams", "Console_sleeping", "Console_mynameisgolden", "Console_r_pq", "Console_annotate",
+						"Console_scores", "Console_mantis_login", "Console_reconnect", "Console_r_gamma", "Console_hitreg_always", "Console_removeoption", "Console_iamsquad5", "Console_sethudmap",
+						"Console_johnmadden", "Console_sh_viewwebinsteam", "Console_debuggui", "Console_changeminizoom", "Console_lerk_view_tilt", "Console_locateorigin", "Console_debugspeed",
+						"Console_testsentry", "Console_playmusic", "Console_cleardebuglines", "Console_music", "Console_sh_votemenu", "Console_plus", "Console_location", "Console_retry",
+						"Console_mapinfo", "Console_showviewangles", "Console_team2", "Console_r_bloom", "Console_map", "Console_r_atmospherics", "Console_minimap_rate", "Console_hitreg",
+						"Console_sh_unloadplugin_cl", "Console_mantis_reject", "Console_sysdev", "Console_pathingfill", "Console_r_healthrings", "Console_debugtext", "Console_setsoundvolume",
+						"NotifyGUIItemDestroyed", "MapPostLoad", "ProcessGameInput", "MapPreLoad", "PhysicsTrigger", "ClientConnect", "DebugState", "UpdateServer", "ClientConnected", 
+						"ResolutionChanged", "WebViewCall", "PhysicsCollision", "LoadComplete", "ClientDisconnected", "DisplayChanged", "MapLoadEntity", "ClientDisconnect", 
+						"ConnectRequested", "SoundDeviceListChanged", "LocalPlayerChanged", "OptionsChanged"
+					}
 local modString
 local rTable = { }
 	
 local function CopyGTable(G, t, R)
 	for k, v in pairs(G) do
-		if k ~= "_G" and not t[k] then
+		if not t[k] then
 			if type(v) == "table" then
 				if R <= recursiveLimit then
 					if not t[k] then
@@ -89,18 +75,16 @@ end
 
 local function UpdateMainCopyWithDiffs(G, q, t, R)
 	for k, v in pairs(G) do
-		if k ~= "_G" then
-			if type(v) == "table" then
-				if R <= recursiveLimit then
-					if not t[k] then
-						t[k] = { }
-					end
-					UpdateMainCopyWithDiffs(v, q and q[k] or nil, t[k], R + 1)
+		if type(v) == "table" then
+			if R <= recursiveLimit then
+				if not t[k] then
+					t[k] = { }
 				end
-			else
-				if not q or not q[k] or q[k] ~= v then
-					t[k] = v
-				end
+				UpdateMainCopyWithDiffs(v, q and q[k] or nil, t[k], R + 1)
+			end
+		else
+			if not q or not q[k] or q[k] ~= v then
+				t[k] = v
 			end
 		end
 	end
@@ -108,8 +92,8 @@ end
 
 local function UpdateFuncString(s, new, h)
 	if not new or string.len(new) <= funcNameMin then return s end
+	if h and h ~= "_G" then new = h .. ":" .. new end
 	if table.contains(rTable, new) then return s end
-	if h then new = h .. ":" .. new end
 	if not s then
 		s = new
 	else
@@ -143,26 +127,36 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 		return
 	end
 	for k, v in pairs(G) do
-		if k ~= "_G" then
-			if type(v) == "table" then
-				if R <= recursiveLimit and t[k] and not table.contains(excludeClasses, k) then
-					CheckGlobalFunctionTable(v, t[k], R + 1, k)
+		if type(v) == "table" then
+			if R <= recursiveLimit and t[k] and not table.contains(excludeClasses, k) then
+				CheckGlobalFunctionTable(v, t[k], R + 1, k)
+			end
+		else
+			if S then
+				if t[k] and t[k] ~= v and not table.contains(excludeClassFuncs, S .. ":" .. k) and not table.contains(excludeFuncs, k) then
+					modString = UpdateFuncString(modString, k, S)
 				end
 			else
-				if S then
-					if t[k] and t[k] ~= v and not table.contains(excludeFuncs, S .. ":" .. k) then
-						modString = UpdateFuncString(modString, k, S)
-					end
-				else
-					if t[k] and t[k] ~= v and not table.contains(excludeFuncs, k) then
-						modString = UpdateFuncString(modString, k, S)
-					end
+				if t[k] and t[k] ~= v and not table.contains(excludeClassFuncs, k) and not table.contains(excludeFuncs, k) then
+					modString = UpdateFuncString(modString, k, S)
 				end
 			end
 		end
 	end
 	if R > 1 then
 		return
+	end
+	local HookTable = debug.getregistry()["Event.HookTable"]
+	if HookTable then
+		for k, v in pairs(HookTable) do
+			if type(v) == "table" and not table.contains(excludeHooks, k) then
+				if modString then
+					modString = modString .. ";" .. k .. ":Hooks(" .. tostring(#v) .. ")"
+				else
+					modString = k .. ":Hooks(" .. tostring(#v) .. ")"
+				end
+			end
+		end
 	end
 	if modString then
 		for k, v in ipairs(split(modString, ";")) do
@@ -235,8 +229,6 @@ local function OnUpdateClientTimers(deltaTime)
 	
 	runDetectionAt = math.max(runDetectionAt - deltaTime, 0)
 	if runDetectionAt == 0 then
-		//First detection
-		CheckHiveVisionMixin()
 		CheckGlobalFunctionTable(_G, C, 1)
 		//TakeTextureRenderCameraSnapshot()
 		runDetectionAt = math.random() * 10 + 30
@@ -245,3 +237,17 @@ local function OnUpdateClientTimers(deltaTime)
 end
 
 Event.Hook("UpdateClient", OnUpdateClientTimers)
+
+local function OnNSLFunctionDataReceived(message)
+	if message and message.functionName then
+		if _G[message.functionName] and message.newValue then
+			_G[message.functionName] = ConditionalValue(tonumber(message.newValue), tonumber(message.newValue), message.newValue)
+		end
+	end
+end
+
+local function OnLoadComplete()
+	Client.HookNetworkMessage("ClientFunctionUpdate", OnNSLFunctionDataReceived)
+end
+
+Event.Hook("LoadComplete", OnLoadComplete)
