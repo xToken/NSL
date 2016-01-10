@@ -414,7 +414,10 @@ local function OnRecievedFunction(client, message)
 		if not NSL_FunctionData[NS2ID] then
 			NSL_FunctionData[NS2ID] = { }
 		end
-		table.insert(NSL_FunctionData[NS2ID], message.detectionType)
+		if not table.contains(NSL_FunctionData[NS2ID], message.detectionType) then
+			//Reconnects could re-add duplicate stuff.
+			table.insert(NSL_FunctionData[NS2ID], message.detectionType)
+		end
 	end
 	
 end
