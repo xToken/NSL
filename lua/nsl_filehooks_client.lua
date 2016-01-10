@@ -14,13 +14,16 @@ local funcNameMin = 2
 //Waaaay to much is whitelisted here, really this would only pick up lazy hooks at this point, value probably doesnt justify the complexity.
 local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient", "GetGameStarted", "GetIsPlaying", "kMinTimeBeforeConcede", "PlayerUI_GetWeaponLevel",
 						"gCHUDHiddenViewModel", "PlayerUI_GetCanDisplayRequestMenu", "kWorldDamageNumberAnimationSpeed", "ChatUI_EnterChatMessage", "PlayerUI_GetPlayerResources",
-						"PlayerUI_GetArmorLevel", "CommanderUI_Logout"
+						"PlayerUI_GetArmorLevel", "CommanderUI_Logout", "upgradeLevelThree" , "upgradeLevelTwo", "nearestLocationName", "gPreviousPausedTime", "sortById",
+						"position", "SetItemInvisible", "gTimePositionChanged", "techId", "screenPos", "CHUDStatsVisible", "iconCoordinates", "css"
 					}
 local excludeClassFuncs = { 
 						"Commander:UpdateMisc", "Commander:OnDestroy", "ExoWeaponHolder:OnUpdateRender", "PlayerMapBlip:GetMapBlipColor", "ActiveControls:NumMembers",
 						"Locale:ResolveString", "AlienCommander:UpdateMisc", "AlienCommander:OnDestroy", "MapBlip:GetMapBlipColor", "ClientUI:EvaluateUIVisibility",
 						"MarineCommander:UpdateMisc", "MarineCommander:OnDestroy", "HiveVisionExtra_screenEffect", "screenEffects:darkVision", "HiveVision_screenEffect",
-						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate"
+						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate", "CystGhostModel:Update", "addedBlip:Time", "kWorkerIcon:Width", "kWorkerIcon:Height", 
+						"kEggsIcon:Width", "kEggsIcon:Height", "kResourceTowerIcon:Width", "kResourceTowerIcon:Height", "kPersonalResourceIcon:Width", "kPersonalResourceIcon:Height",
+						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height"
 					 }
 local excludeClasses = { 
 						"GUIMainMenu", "GUIScoreboard", "GUIGameEnd", "GUIChat", "GUIDeathMessages", "GUIExoHUD", "GUIHoverTooltip", "GUIMarineBuyMenu",
@@ -150,11 +153,7 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 	if HookTable then
 		for k, v in pairs(HookTable) do
 			if type(v) == "table" and not table.contains(excludeHooks, k) then
-				if modString then
-					modString = modString .. ";" .. k .. ":Hooks(" .. tostring(#v) .. ")"
-				else
-					modString = k .. ":Hooks(" .. tostring(#v) .. ")"
-				end
+				modString = UpdateFuncString(modString, "Hooks(" .. tostring(#v) .. ")", k)
 			end
 		end
 	end
@@ -165,7 +164,7 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 		end
 		modString = nil
 	end
-	sleepDetections = 10
+	sleepDetections = 1
 end
 
 local oldScriptLoad = Script.Load
@@ -231,7 +230,7 @@ local function OnUpdateClientTimers(deltaTime)
 	if runDetectionAt == 0 then
 		CheckGlobalFunctionTable(_G, C, 1)
 		//TakeTextureRenderCameraSnapshot()
-		runDetectionAt = math.random() * 10 + 30
+		runDetectionAt = math.random() * 10// + 30
 	end
 
 end
