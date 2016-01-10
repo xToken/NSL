@@ -23,7 +23,7 @@ local excludeClassFuncs = {
 						"MarineCommander:UpdateMisc", "MarineCommander:OnDestroy", "HiveVisionExtra_screenEffect", "screenEffects:darkVision", "HiveVision_screenEffect",
 						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate", "CystGhostModel:Update", "addedBlip:Time", "kWorkerIcon:Width", "kWorkerIcon:Height", 
 						"kEggsIcon:Width", "kEggsIcon:Height", "kResourceTowerIcon:Width", "kResourceTowerIcon:Height", "kPersonalResourceIcon:Width", "kPersonalResourceIcon:Height",
-						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height"
+						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height", "Player:kShowGiveDamageTime"
 					 }
 local excludeClasses = { 
 						"GUIMainMenu", "GUIScoreboard", "GUIGameEnd", "GUIChat", "GUIDeathMessages", "GUIExoHUD", "GUIHoverTooltip", "GUIMarineBuyMenu",
@@ -164,7 +164,7 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 		end
 		modString = nil
 	end
-	sleepDetections = 1
+	sleepDetections = 10
 end
 
 local oldScriptLoad = Script.Load
@@ -230,7 +230,7 @@ local function OnUpdateClientTimers(deltaTime)
 	if runDetectionAt == 0 then
 		CheckGlobalFunctionTable(_G, C, 1)
 		//TakeTextureRenderCameraSnapshot()
-		runDetectionAt = math.random() * 10// + 30
+		runDetectionAt = math.random() * 10 + 30
 	end
 
 end
