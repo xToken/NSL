@@ -109,7 +109,6 @@ table.insert(TimeBypassFunctions, {name = "ClientWeaponEffectsMixin", func = "Up
 table.insert(TimeBypassFunctions, {name = "UmbraMixin", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "CloakableMixin", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "Fade", func = "OnUpdateRender", oldFunc = nil })
-table.insert(TimeBypassFunctions, {name = "Player", func = "OnUpdateRender", oldFunc = nil })
 table.insert(TimeBypassFunctions, {name = "ExoWeaponHolder", func = "OnUpdateRender", oldFunc = nil })
 
 local function BuildTableEntry(tableEntry)
