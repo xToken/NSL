@@ -444,7 +444,7 @@ local function OnClientCommandShowFunctionData(client)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local heading = false
-	if GetIsNSLRef(NS2ID) then
+	if GetIsNSLAdmin(NS2ID) then
 		local playerList = GetPlayerList()
 		if playerList then
 			for p = 1, #playerList do
@@ -473,10 +473,12 @@ end
 
 Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
 
-local function OnClientCommandSetFunctionData(client, target, functionName, newValue)
+//Disabled for now.
+/*local function OnClientCommandSetFunctionData(client, target, functionName, newValue)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local player = GetPlayerMatching(target)
+	
 	if GetIsNSLRef(NS2ID) and player then
 		if functionName and newValue then
 			local playerClient = Server.GetOwner(player)
@@ -488,4 +490,4 @@ local function OnClientCommandSetFunctionData(client, target, functionName, newV
 	end
 end
 
-Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)
+Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)*/
