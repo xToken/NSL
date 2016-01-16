@@ -17,7 +17,7 @@ local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient"
 						"PlayerUI_GetArmorLevel", "CommanderUI_Logout", "upgradeLevelThree" , "upgradeLevelTwo", "nearestLocationName", "gPreviousPausedTime", "sortById",
 						"position", "SetItemInvisible", "gTimePositionChanged", "techId", "screenPos", "CHUDStatsVisible", "iconCoordinates", "css", "gArmoryHealthHeight",
 						"useColorCHUD", "gCurrentHostStructureId", "direction", "attachEntity", "intensity", "start", "player", "velocity", "kRowSize", "kRowPlayerNameOffset",
-						"kTableContainerOffset", "kCommanderMessageVerticalOffset", "color"
+						"kTableContainerOffset", "kCommanderMessageVerticalOffset", "color", "defaultValue", "oldValue", "animStartTime"
 						}
 local excludeClassFuncs = { 
 						"Commander:UpdateMisc", "Commander:OnDestroy", "ExoWeaponHolder:OnUpdateRender", "PlayerMapBlip:GetMapBlipColor", "ActiveControls:NumMembers",
@@ -26,7 +26,11 @@ local excludeClassFuncs = {
 						"Script:Load", "ActiveControls:Position", "AlienTeamInfo:OnUpdate", "CystGhostModel:Update", "addedBlip:Time", "addedBlip:Item", "kWorkerIcon:Width", "kWorkerIcon:Height", 
 						"kEggsIcon:Width", "kEggsIcon:Height", "kResourceTowerIcon:Width", "kResourceTowerIcon:Height", "kPersonalResourceIcon:Width", "kPersonalResourceIcon:Height",
 						"kTeamResourceIcon:Width", "kTeamResourceIcon:Height", "Player:kShowGiveDamageTime", "startDetails:Position", "startDetails:InfoColor", "startDetails:IconSize",
-						"startDetails:ShadowColor", "startDetails:IconColor", "startDetails:InfoScale"
+						"startDetails:ShadowColor", "startDetails:IconColor", "startDetails:InfoScale", "Fade:OnUpdateRender", "Gorge:UpdateClientEffects", "LerkBite:CreateBloodEffect",
+						"Lerk:UpdateClientEffects", "BiteLeap:CreateBloodEffect", "ClientWeaponEffectsMixin:UpdateAttackEffects", "Skulk:UpdateClientEffects", "XenocideLeap:CreateBloodEffect",
+						"Embryo:UpdateClientEffects", "Alien:UpdateClientEffects", "UmbraMixin:OnUpdateRender", "DetectableMixin:OnUpdateRender", "CloakableMixin:OnUpdateRender",
+						"option:sort", "option:currentValue", "option:tooltip", "option:label", "option:inputClass", "option:valueType", "option:name", "option:defaultValue",
+						"GUI:MouseObjects"
 					 }
 local excludeClasses = { 
 						"GUIMainMenu", "GUIScoreboard", "GUIGameEnd", "GUIChat", "GUIDeathMessages", "GUIExoHUD", "GUIHoverTooltip", "GUIMarineBuyMenu",
