@@ -17,7 +17,7 @@ local NSL_CachedScores = { }
 local NSL_Scores = { }
 local NSL_LeagueAdminsAccess = false
 local cachedScoresValidFor = 10 * 60
-local expectedNSLConfigVersion = 1.5
+local expectedNSLConfigVersion = 1.6
 
 function GetNSLMode()
 	return NSL_Mode
@@ -255,6 +255,16 @@ function GetIsNSLRef(ns2id)
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
 			return pData.NSL_Level >= GetNSLConfigValue("PlayerRefLevel")
+		end
+	end
+	return false
+end
+
+function GetIsNSLAdmin(ns2id)
+	if ns2id then
+		local pData = GetNSLUserData(ns2id)
+		if pData and pData.NSL_Level then
+			return pData.NSL_Level >= GetNSLConfigValue("PlayerAdminLevel")
 		end
 	end
 	return false

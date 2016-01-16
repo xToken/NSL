@@ -1,11 +1,12 @@
 {
-	"Version": 1.5,
+	"Version": 1.6,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
 		"PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 		"PlayerDataFormat":						"ENSL",
 		"PlayerRefLevel": 						2,
+		"PlayerAdminLevel":						3,
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
 		"PauseStartDelay": 						5,
@@ -171,6 +172,7 @@
 		"PlayerDataURL": 						"http://ausns2.org/league-api.php?lookup=player&steamid=",
 		"PlayerDataFormat":						"AUSNS",
 		"PlayerRefLevel": 						1,
+		"PlayerAdminLevel":						1,
 		"AutomaticMapCycleDelay":				10800,
 		"PauseEndDelay": 						5,
 		"PauseStartDelay": 						1,
