@@ -6,7 +6,6 @@
 //NSL Client File Hooks
 local runDetectionAt = math.random() * 10
 local C = { }
-local gBuilt = false
 local recursiveLimit = 3
 local sleepDetections = 0
 local funcNameMin = 2
@@ -112,7 +111,7 @@ local function UpdateFuncString(s, new, h)
 	return s
 end
 
-function split(str, pat)
+local function split(str, pat)
    local t = {}
    local fpat = "(.-)" .. pat
    local last_end = 1
