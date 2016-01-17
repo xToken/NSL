@@ -7,10 +7,36 @@ Script.Load("lua/nsl_class.lua")
 
 gTimeBypass = false
 gPreviousPausedTime = 0
+local kClientPaused
+local kClientView = { yaw = 0, pitch = 0 }
 local kJetpackJumpWindow = 0.001
 
 local function ValidateTeamNumber(teamnum)
 	return teamnum ~= 3
+end
+
+local function SaveClientViewAngles(player, input)
+	if Client then
+		if not kClientPaused then
+			kClientPaused = true
+			kClientView.yaw = input.yaw
+			kClientView.pitch = input.pitch
+			return true
+		else
+			Client.SetYaw(kClientView.yaw)
+			Client.SetPitch(kClientView.pitch)
+		end
+	end
+	return false
+end
+
+local function RestoreClientViewAngles()
+	if Client and kClientPaused then
+		Client.SetYaw(kClientView.yaw)
+		Client.SetPitch(kClientView.pitch)
+		kClientPaused = false
+		kClientView = { yaw = 0, pitch = 0 }
+	end
 end
 
 //Blocks input.
@@ -19,9 +45,14 @@ originalNS2PlayerOnProcessIntermediate = Class_ReplaceMethod("Player", "OnProces
 	function(self, input)
 
 		if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
+			if SaveClientViewAngles(self, input) then
+				//Run this if this returns true, to update the view angles one last time.
+				originalNS2PlayerOnProcessIntermediate(self, input)
+			end
 			return
 		else
 			originalNS2PlayerOnProcessIntermediate(self, input)
+			RestoreClientViewAngles()
 		end
 		
 	end
@@ -260,7 +291,16 @@ local UpdateAnimationState = GetUpValue(BaseModelMixin.ProcessMoveOnModel, "Upda
 ReplaceLocals(UpdateAnimationState, { Shared_GetTime = Shared.GetTime })
 ReplaceLocals(UpdateAnimationState, { Shared_GetPreviousTime = Shared.GetPreviousTime })
 
+//Sample of 'time' accuracy
+//Server  : 19.716058198363
+//Predict : 19.71484375
+//Client  : 19.71484375
+//Sample of 'float' accuracy
+//Server  : 21.63121445477
+//Predict : 21.631214141846
+//Client  : 21.631214141846
 //Time paused set on pause, used for smooth prediction on the client during pause.
 //Time adjustment set on resume, used for adjusting all time based on the delta.
 //Ideally I could network these at different precisions to save bw, but I dont know the efficiency of time vs float so....
-Class_Reload( "Player", {timeadjustment = "time", timepaused = "time", gamepaused = "boolean"} )
+//Considering how important these are for EVERYTHING, a little extra bandwidth on ent creation seems to be plenty acceptable.
+Class_Reload( "Player", {timeadjustment = "float", timepaused = "float", gamepaused = "boolean"} )
