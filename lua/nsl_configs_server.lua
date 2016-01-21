@@ -17,7 +17,7 @@ local NSL_CachedScores = { }
 local NSL_Scores = { }
 local NSL_LeagueAdminsAccess = false
 local cachedScoresValidFor = 10 * 60
-local expectedNSLConfigVersion = 1.6
+local expectedNSLConfigVersion = 1.7
 
 function GetNSLMode()
 	return NSL_Mode
@@ -142,7 +142,8 @@ FirstPersonSpectate					= false,
 UseCustomSpawnConfigs				= false,
 UseFixedSpawnsPerMap				= false,
 UseDefaultSkins						= false,
-PauseOnDisconnect					= false
+PauseOnDisconnect					= false,
+SavePlayerStates					= true
 }
 
 local DefaultPerfConfig = {

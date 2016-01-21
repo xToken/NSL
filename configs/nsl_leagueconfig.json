@@ -1,5 +1,5 @@
 {
-	"Version": 1.6,
+	"Version": 1.7,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -22,6 +22,7 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
+		"SavePlayerStates":						true,
 		"Badges":				 				{
 													"1":									"ensl_mod",
 													"2":									"ensl_caster",
@@ -188,6 +189,7 @@
 		"UseFixedSpawnsPerMap":					false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
+		"SavePlayerStates":						true,
 		"PCW": 									{
 													"PausedMaxDuration": 					120,
 													"TournamentModeForfeitClock":			0,

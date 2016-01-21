@@ -10,7 +10,7 @@ local NSLPauseDisconnectOverride = false
 
 local function StoreDisconnectedTeamPlayer(self, client)
 	local player = client:GetControllingPlayer()
-	if player and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
+	if player and GetNSLConfigValue("SavePlayerStates") then
 		local teamNumber = player:GetTeamNumber()
 		if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 			//Valid team, player, config opt.  Check gamestate.
@@ -36,7 +36,7 @@ local function StoreDisconnectedTeamPlayer(self, client)
 				//Force Pause
 				//Will consume a pause for the team, but will always pause even if out.
 				//During crash, team may pause before, so check.
-				if not GetIsGamePaused() then
+				if not GetIsGamePaused() and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
 					TriggerDisconnectNSLPause(name, teamNumber, 1, true)
 				end
 			end
@@ -69,9 +69,9 @@ function NS2Gamerules:ResetGame()
 end
 
 //Hook into this shiz
-local oldRagdollMixinOnTag= RagdollMixin.OnTag
+local oldRagdollMixinOnTag = RagdollMixin.OnTag
 function RagdollMixin:OnTag(tagName)
-	if not self.blockRagdollDestruction then
+	if not (self.blockRagdollDestruction and tagName == "destroy") then
 		oldRagdollMixinOnTag(self, tagName)
 	end
 end
@@ -118,10 +118,10 @@ function MoveClientToStoredPlayer(client, ns2ID)
 end
 
 local function OnClientConnected(client)
-	if client and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
+	if client and GetNSLConfigValue("SavePlayerStates") then
 		local NS2ID = client:GetUserId()
-		if NSL_DisconnectedPlayers[NS2ID] and GetIsGamePaused() then
-			//So we found a stored player, and we are still paused
+		if NSL_DisconnectedPlayers[NS2ID] then
+			//So we found a stored player
 			MoveClientToStoredPlayer(client, NS2ID)
 		end
 	end
