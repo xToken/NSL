@@ -15,7 +15,7 @@ local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient"
 						"gCHUDHiddenViewModel", "PlayerUI_GetCanDisplayRequestMenu", "kWorldDamageNumberAnimationSpeed", "ChatUI_EnterChatMessage", "PlayerUI_GetPlayerResources",
 						"PlayerUI_GetArmorLevel", "CommanderUI_Logout", "upgradeLevelThree" , "upgradeLevelTwo", "nearestLocationName", "gPreviousPausedTime", "sortById",
 						"position", "SetItemInvisible", "gTimePositionChanged", "techId", "screenPos", "CHUDStatsVisible", "iconCoordinates", "css", "gArmoryHealthHeight",
-						"useColorCHUD", "gCurrentHostStructureId", "direction", "attachEntity", "intensity", "start", "player", "velocity", "kRowSize", "kRowPlayerNameOffset",
+						"useColorCHUD", "gCurrentHostStructureId", "direction", "attachEntity", "intensity", "start", "player", "veloctiy", "kRowSize", "kRowPlayerNameOffset",
 						"kTableContainerOffset", "kCommanderMessageVerticalOffset", "color", "defaultValue", "oldValue", "animStartTime"
 						}
 local excludeClassFuncs = { 
