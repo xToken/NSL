@@ -7,13 +7,16 @@ Script.Load("lua/nsl_class.lua")
 
 local NSL_VirtualClients = { }
 local NSL_DisconnectedIDs = { }
+local NSL_VirtualClientCount = 0
 local NSLPauseDisconnectOverride = false
+local NSLStateSaveOverride = false
 local NSLDontGenPlayerOnConnect = false
 
 local function StoreDisconnectedTeamPlayer(self, client)
 	if client then
 		local player = client:GetControllingPlayer()
-		if player and GetNSLConfigValue("SavePlayerStates") then
+		//If we kicked already cached player, just assume something might have gone wrong, and dont save again.
+		if player and not player.isCached and (GetNSLConfigValue("SavePlayerStates") or NSLStateSaveOverride) then
 			local teamNumber = player:GetTeamNumber()
 			if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 				//Valid team, player, config opt.  Check gamestate.
@@ -35,6 +38,7 @@ local function StoreDisconnectedTeamPlayer(self, client)
 					//Player ENT should be disjoined, cache to table.
 					NSL_VirtualClients[id] = newclient
 					NSL_DisconnectedIDs[name] = id
+					NSL_VirtualClientCount = NSL_VirtualClientCount + 1
 					//Force Pause
 					//Will consume a pause for the team, but will always pause even if out.
 					//During crash, team may pause before, so check.
@@ -75,6 +79,8 @@ function CleanupCachedPlayers()
 	NSL_DisconnectedIDs = { }
 	//Clear this too
 	NSL_VirtualClients = { }
+	//No virtual clients here dawg
+	NSL_VirtualClientCount = 0
 end
 
 local oldNS2GamerulesResetGame = NS2Gamerules.ResetGame
@@ -129,12 +135,13 @@ function MoveClientToStoredPlayer(client, ns2ID)
 		success = true
 	end
 	NSL_VirtualClients[ns2ID] = nil
+	NSL_VirtualClientCount = math.max(NSL_VirtualClientCount - 1, 0)
 	CleanupIDTable(ns2ID)
 	return success
 end
 
 local function OnClientConnected(client)
-	if client and GetNSLConfigValue("SavePlayerStates") then
+	if client and (GetNSLConfigValue("SavePlayerStates") or NSLStateSaveOverride) then
 		local NS2ID = client:GetUserId()
 		if NSL_VirtualClients[NS2ID] then
 			//So we found a stored player
@@ -145,7 +152,7 @@ end
 
 table.insert(gConnectFunctions, OnClientConnected)
 
-local function OnClientCommandEnablePauseTesting(client, team)
+local function OnClientCommandEnablePauseTesting(client)
 	if client then
 		local NS2ID = client:GetUserId()	
 		if GetIsNSLRef(NS2ID) then
@@ -156,6 +163,18 @@ local function OnClientCommandEnablePauseTesting(client, team)
 end
 
 Event.Hook("Console_sv_nslpausedisconnect", OnClientCommandEnablePauseTesting)
+
+local function OnClientCommandEnableStateSaving(client)
+	if client then
+		local NS2ID = client:GetUserId()	
+		if GetIsNSLRef(NS2ID) then
+			NSLStateSaveOverride = not NSLStateSaveOverride
+			ServerAdminPrint(client, "NSL State Saving on Disconnect " .. ConditionalValue(NSLStateSaveOverride, "enabled.", "disabled."))
+		end
+	end
+end
+
+Event.Hook("Console_sv_nslstatesave", OnClientCommandEnableStateSaving)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
@@ -218,3 +237,60 @@ function OnVirtualClientMove(client)
 end
 
 Event.Hook("VirtualClientMove", OnVirtualClientMove)
+
+//This is seriously retarded...
+local function OnCheckConnectionAllowed(userId)
+
+    --check if the user is banned
+	local bannedPlayers = GetBannedPlayersList()
+    for b = #bannedPlayers, 1, -1 do
+        local ban = bannedPlayers[b]
+        if ban.id == userId then
+            local now = Shared.GetSystemTime()
+            if ban.time == 0 or now < ban.time then
+                Shared.Message(string.format("Rejected connection to banned client %s", userId))
+                return false
+            else
+				//Send Cvar (sv_unban)
+				break
+            end
+        end
+    end
+
+    local reservedSlots = Server.GetReservedSlotsConfig()
+    if not reservedSlots or not reservedSlots.amount or not reservedSlots.ids then
+        return true
+    end
+
+    local newPlayerIsReserved = false
+    for name, id in pairs(reservedSlots.ids) do
+        if id == userId then
+            newPlayerIsReserved = true
+            break
+        end
+    end
+
+	//Dont count NSLVirtualClients in MaxPlayers
+    local numPlayers = Server.GetNumPlayers() - NSL_VirtualClientCount
+    local maxPlayers = Server.GetMaxPlayers()
+    if (numPlayers < (maxPlayers - reservedSlots.amount)) or (newPlayerIsReserved and (numPlayers < maxPlayers)) then
+        return true
+    end
+
+    Shared.Message(string.format("Rejected connection to client %s as there are no free slots avaible.", userId))
+    return false
+
+end
+
+//Find old reserveslot hook
+local HookTable = debug.getregistry()["Event.HookTable"]
+if HookTable then
+	for k, v in pairs(HookTable) do
+		if k == "CheckConnectionAllowed" then
+			Event.RemoveHook("CheckConnectionAllowed", v[1])
+			break
+		end
+	end
+end
+
+Event.Hook("CheckConnectionAllowed", OnCheckConnectionAllowed)
