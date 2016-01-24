@@ -1,4 +1,11 @@
 # Changelog
+
+* 1-24-16
+
+Updated state saving to account for NS2 not counting bot clients as players in the server browser, but counting them in the reserve-slot system.  This would cause anyone rejoining after a d/c on a full server to be kicked.
+
+State saving defaults to disabled now, can be toggled on with: sv_nslstatesave
+
 * 1-6-16
 
 Updated with dev version of state saving for players that crash/disconnect.
