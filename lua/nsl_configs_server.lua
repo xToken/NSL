@@ -143,7 +143,7 @@ UseCustomSpawnConfigs				= false,
 UseFixedSpawnsPerMap				= false,
 UseDefaultSkins						= false,
 PauseOnDisconnect					= false,
-SavePlayerStates					= true
+SavePlayerStates					= false
 }
 
 local DefaultPerfConfig = {
