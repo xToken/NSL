@@ -22,7 +22,7 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
-		"SavePlayerStates":						true,
+		"SavePlayerStates":						false,
 		"Badges":				 				{
 													"1":									"ensl_mod",
 													"2":									"ensl_caster",
@@ -189,7 +189,7 @@
 		"UseFixedSpawnsPerMap":					false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
-		"SavePlayerStates":						true,
+		"SavePlayerStates":						false,
 		"PCW": 									{
 													"PausedMaxDuration": 					120,
 													"TournamentModeForfeitClock":			0,
