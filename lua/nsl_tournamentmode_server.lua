@@ -86,18 +86,20 @@ local function CheckCancelGameStart()
 	end
 end
 
-local originalNS2OnCommanderLogOut = OnCommanderLogOut
-function OnCommanderLogOut(commander)
-	originalNS2OnCommanderLogOut(commander)
-	if commander and GetNSLModEnabled() then
-		local teamnum = commander:GetTeamNumber()
-		if TournamentModeSettings[teamnum].ready and (GetGamerules():GetGameState() == kGameState.NotStarted or GetGamerules():GetGameState() == kGameState.PreGame) then
-			TournamentModeSettings[teamnum].ready = false
-			CheckCancelGameStart()
-			SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
+local originalNS2GameRulesOnCommanderLogout
+originalNS2GameRulesOnCommanderLogout = Class_ReplaceMethod("NS2Gamerules", "OnCommanderLogout", 
+	function(self, commandStructure, oldCommander)
+		originalNS2GameRulesOnCommanderLogout(self, commandStructure, oldCommander)
+		if oldCommander and GetNSLModEnabled() then
+			local teamnum = oldCommander:GetTeamNumber()
+			if TournamentModeSettings[teamnum].ready and (GetGamerules():GetGameState() == kGameState.NotStarted or GetGamerules():GetGameState() == kGameState.PreGame) then
+				TournamentModeSettings[teamnum].ready = false
+				CheckCancelGameStart()
+				SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
+			end
 		end
 	end
-end
+)
 
 local function CheckGameStart()
 	if TournamentModeSettings.countdownstarttime < Shared.GetTime() then
