@@ -252,6 +252,14 @@
 		"MaxDataRate": 							50
 		},
 		{
+		"PerfLevel":							"Low",
+		"Interp": 								80,
+		"MoveRate": 							33,
+		"ClientRate": 							33,
+		"TickRate":								33,
+		"MaxDataRate": 							65
+		},
+		{
 		"PerfLevel":							"Medium",
 		"Interp": 								50,
 		"MoveRate": 							40,
