@@ -23,25 +23,29 @@
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						false,
+		"PausedMaxDuration": 					300,
 		"Badges":				 				{
 													"1":									"ensl_mod",
 													"2":									"ensl_caster",
 													"3":									"ensl_ref",
 													"4":									"ensl_admin"
 												},
+		"GATHER": 								{
+													"OverrideTeamNames": 					false
+												},
 		"PCW": 									{
-													"PausedMaxDuration": 					300,
 													"TournamentModeForfeitClock":			0,
 													"TournamentModeRestartDuration": 		90,
 													"Limit6PlayerPerTeam": 					false,
-													"MercsRequireApproval": 				false
+													"MercsRequireApproval": 				false,
+													"OverrideTeamNames": 					true
 												},
 		"OFFICIAL":								{
-													"PausedMaxDuration": 					300,
 													"TournamentModeForfeitClock":			900,
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
 													"MercsRequireApproval": 				true
+													"OverrideTeamNames": 					true
 												},
 		"REFS":									[
 													344054,
