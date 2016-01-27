@@ -108,7 +108,7 @@ originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam",
 			return false, player
 		end
 		local success, player = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
-		if success and not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() then
+		if success and not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
 			//Joined team, update
 			local ntname = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
 			if newTeamNumber == 1 and ntname ~= t1name then
