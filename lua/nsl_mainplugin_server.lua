@@ -16,6 +16,8 @@ local kCachedMoveRate = 30
 local kCachedInterp = 100
 local kCachedSendRate = 20
 local kCachedTickRate = 30
+local kNSLTag = "nsl"
+local kNSLAltChatMode = false
 
 //Supposedly this still not syncronized.
 local function SetupClientRatesandConfig(client)
@@ -27,6 +29,13 @@ local function SetupClientRatesandConfig(client)
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 	end
 	Server.SendNetworkMessage(client, "NSLPluginConfig", {config = kNSLPluginConfigs[GetNSLMode()]}, true)
+end
+
+local function SetupNSLTag()
+	Server.RemoveTag(kNSLTag)
+	if GetNSLModEnabled() then
+		Server.AddTag(kNSLTag)
+	end
 end
 
 local function SetupRates()
@@ -60,33 +69,11 @@ local function SetupRates()
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 		kCachedMoveRate = GetNSLPerfValue("MoveRate")
 	end
+	SetupNSLTag()
 end
 
 table.insert(gConnectFunctions, SetupClientRatesandConfig)
 table.insert(gConfigLoadedFunctions, SetupRates)
-
-local function RemoveTag(tagName)
-        local tags = { }
-        Server.GetTags(tags)
-
-        for t = 1, #tags do
-
-            if string.find(tags[t], tagName) then
-                Server.RemoveTag(tags[t])
-            end
-
-        end
-
-    end
-
-local function SetupNSLTag()
-	RemoveTag("NSL")
-	if GetNSLModEnabled() then
-		Server.AddTag("NSL")
-	end
-end
-
-SetupNSLTag()
 
 local function SendClientUpdatedMode(newState)
 	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
@@ -159,25 +146,63 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
 //Simple functions to make sending messages easier.
+local function BuildAdminMessage(message, teamname, client)
+	local t = { }
+	if client then
+		local name
+		local player = client:GetControllingPlayer()
+        if player then
+			name = player:GetName()
+		end
+		if name then
+			t.message = string.sub(string.format("(%s)(%s) %s", GetNSLConfigValue("LeagueName"), name, message), 1, 250)
+		else
+			t.message = string.sub(string.format("(%s) %s", GetNSLConfigValue("LeagueName"), message), 1, 250)
+		end
+	elseif teamname then
+		t.message = string.sub(string.format("(%s)(%s) %s", GetNSLConfigValue("LeagueName"), teamname, message), 1, 250)
+	else
+		t.message = string.sub(string.format("(%s) %s", GetNSLConfigValue("LeagueName"), message), 1, 250)
+	end
+	return t
+end
+
 function SendAllClientsMessage(message)
-	Server.SendNetworkMessage("Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	if kNSLAltChatMode then
+		Server.SendNetworkMessage("AdminMessage", BuildAdminMessage(message), true)
+	else
+		Server.SendNetworkMessage("Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+	end
 end
 
 function SendClientMessage(client, message)
 	if client then
-		Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+		if kNSLAltChatMode then
+			Server.SendNetworkMessage(client, "AdminMessage", BuildAdminMessage(message, nil, client), true)
+		else
+			Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
+		end
 	end
 end
 
 function SendTeamMessage(teamnum, message)
-	local chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
+	local chatmessage
+	if kNSLAltChatMode then
+		chatmessage = BuildAdminMessage(message, GetActualTeamName(teamnum))
+	else
+		chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
+	end
 	if tonumber(teamnum) then
 		local playerRecords = GetEntitiesForTeam("Player", teamnum)
 		for _, player in ipairs(playerRecords) do
 			
 			local client = Server.GetOwner(player)
 			if client then
-				Server.SendNetworkMessage(client, "Chat", chatmessage, true)
+				if kNSLAltChatMode then
+					Server.SendNetworkMessage(client, "AdminMessage", chatmessage, true)
+				else
+					Server.SendNetworkMessage(client, "Chat", chatmessage, true)
+				end
 			end
 		
 		end
@@ -191,7 +216,7 @@ local function OnClientCommandNSLHelp(client)
 			ServerAdminPrint(client, "sv_nslsay" .. ": " .. "<message> - Will send a message to all connected players that displays in yellow.")
 			ServerAdminPrint(client, "sv_nsltsay" .. ": " .. "<team, message> - Will send a message to all players on the team provided that displays in yellow.")
 			ServerAdminPrint(client, "sv_nslpsay" .. ": " .. "<player, message> - Will send a message to the provided player that displays in yellow.")
-			ServerAdminPrint(client, "sv_nslcfg" .. ": " .. "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
+			ServerAdminPrint(client, "sv_nslcfg" .. ": " .. "<state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.")
 			ServerAdminPrint(client, "sv_nslconfig" .. ": " .. "<league> - Changes the league settings used by the NSL plugin.")
 			ServerAdminPrint(client, "sv_nslperfconfig" .. ": " .. "<config> - Changes the performance config used by the NSL plugin.")
 			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
@@ -219,7 +244,9 @@ Event.Hook("Console_sv_nslhelp", OnClientCommandNSLHelp)
 
 local function UpdateNSLMode(client, mode)
 	mode = mode or ""
-	if string.lower(mode) == "pcw" then
+	if string.lower(mode) == "gather" then
+		SetNSLMode("GATHER")
+	elseif string.lower(mode) == "pcw" then
 		SetNSLMode("PCW")
 	elseif string.lower(mode) == "official" then
 		SetNSLMode("OFFICIAL")
@@ -282,7 +309,7 @@ local function OnClientCommandSetMode(client, mode)
 end
 
 Event.Hook("Console_sv_nslcfg", OnClientCommandSetMode)
-CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,pcw,official - Changes the configuration mode of the NSL plugin.")
+CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.")
 
 local function OnAdminCommandSetLeague(client, league)
 	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, true)
@@ -360,3 +387,14 @@ local function OnCommandNSLPassword(client, password)
 end
 
 Event.Hook("Console_sv_nslpassword", OnCommandNSLPassword)
+
+local function OnCommandNSLAltChat(client)
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	if GetIsNSLRef(NS2ID) then
+		kNSLAltChatMode = not kNSLAltChatMode
+		ServerAdminPrint(client, string.format("Setting alternate chat mode to %s.", ToString(kNSLAltChatMode)))
+	end
+end
+
+Event.Hook("Console_sv_nslaltchat", OnCommandNSLAltChat)
