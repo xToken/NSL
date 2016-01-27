@@ -289,6 +289,15 @@ local function UpdateNSLLeagueAccess(client)
 	end
 end
 
+local function UpdateNSLPerfConfigAccess(client)
+	SetNSLPerfConfigAccess(not GetNSLPerfConfigsAllowed())
+	if GetNSLPerfConfigsAllowed() then
+		ServerAdminPrint(client,"NSL Plugin now allowing access to set performance configs.")
+	else
+		ServerAdminPrint(client, "NSL Plugin now dis-allowing access to set performance configs.")
+	end
+end
+
 local function ServerAdminOrNSLRefCommand(client, parameter, functor, admin)
 	local isRef
 	if client then
@@ -333,11 +342,17 @@ end
 Event.Hook("Console_sv_nslperfconfig", OnClientCommandSetPerfConfig)
 CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
-local function OnAdminCommandSetLeagueAccess(client, league)
-	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeagueAccess, true)
+local function OnAdminCommandSetLeagueAccess(client)
+	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLLeagueAccess, true)
 end
 
 CreateServerAdminCommand("Console_sv_nslleagueadmins", OnAdminCommandSetLeagueAccess, "Toggles league staff having access to administrative commands on server.")
+
+local function OnAdminCommandSetPerfConfigAccess(client)
+	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLPerfConfigAccess, true)
+end
+
+CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetLeagueAccess, "Toggles league staff having access set performance configs.")
 
 local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
