@@ -16,7 +16,7 @@ local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
 local NSL_LeagueAdminsAccess = false
-local NSL_PerfConfigsAllowed = true
+local NSL_PerfConfigsBlocked = false
 local cachedScoresValidFor = 10 * 60
 local expectedNSLConfigVersion = 1.7
 
@@ -44,19 +44,19 @@ function GetNSLLeagueAdminsAccess()
 	return NSL_LeagueAdminsAccess
 end
 
-function GetNSLPerfConfigsAllowed()
-	return NSL_PerfConfigsAllowed
+function GetNSLPerfConfigsBlocked()
+	return NSL_PerfConfigsBlocked
 end
 
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigs = true }
+	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = config.mode or "PCW"
 	NSL_League = config.league or "NSL"
 	NSL_PerfLevel = config.perf or "DEFAULT"
 	NSL_LeagueAdminsAccess = config.adminaccess or false
-	NSL_PerfConfigsAllowed = config.perfconfigs or true
+	NSL_PerfConfigsBlocked = config.perfconfigsblocked or false
 	local loadedScores = config.recentgames or { }
 	local updated = false
 	for t, s in pairs(loadedScores) do
@@ -77,7 +77,7 @@ end
 SetSeasonOnLoad()
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigs = NSL_PerfConfigsAllowed })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked })
 end
 
 function SetNSLMode(state)
@@ -123,8 +123,8 @@ function SetNSLAdminAccess(state)
 end
 
 function SetNSLPerfConfigAccess(state)
-	if NSL_PerfConfigsAllowed ~= state then
-		NSL_PerfConfigsAllowed = state
+	if NSL_PerfConfigsBlocked ~= state then
+		NSL_PerfConfigsBlocked = state
 		SavePluginConfig()
 	end
 end

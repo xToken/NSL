@@ -272,7 +272,7 @@ end
 
 local function UpdateNSLPerfConfig(client, perfcfg)
 	perfcfg = string.upper(perfcfg or "")
-	if GetPerfLevelValid(perfcfg) then
+	if GetPerfLevelValid(perfcfg) and not GetNSLPerfConfigsBlocked() then
 		SetPerfLevel(perfcfg)
 		ServerAdminPrint(client, string.format("NSL Plugin now using %s performance config.", GetNSLPerfLevel()))
 	else
@@ -290,11 +290,11 @@ local function UpdateNSLLeagueAccess(client)
 end
 
 local function UpdateNSLPerfConfigAccess(client)
-	SetNSLPerfConfigAccess(not GetNSLPerfConfigsAllowed())
-	if GetNSLPerfConfigsAllowed() then
-		ServerAdminPrint(client,"NSL Plugin now allowing access to set performance configs.")
-	else
+	SetNSLPerfConfigAccess(not GetNSLPerfConfigsBlocked())
+	if GetNSLPerfConfigsBlocked() then
 		ServerAdminPrint(client, "NSL Plugin now dis-allowing access to set performance configs.")
+	else
+		ServerAdminPrint(client,"NSL Plugin now allowing access to set performance configs.")
 	end
 end
 
@@ -352,7 +352,7 @@ local function OnAdminCommandSetPerfConfigAccess(client)
 	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLPerfConfigAccess, true)
 end
 
-CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetLeagueAccess, "Toggles league staff having access set performance configs.")
+CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetPerfConfigAccess, "Toggles league staff having access set performance configs.")
 
 local function SetupServerConfig()
 	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
