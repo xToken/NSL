@@ -5,4 +5,4 @@
 
 //NSL Shared references
 
-kNSLPluginConfigs =  enum( {'DISABLED', 'PCW', 'OFFICIAL'} )
+kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL'} )

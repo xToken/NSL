@@ -282,7 +282,7 @@ end
 table.insert(gConnectFunctions, OnClientConnected)
 
 local function UpdatePlayerDataOnActivation(newState)
-	if newState == "PCW" or newState == "OFFICIAL" then
+	if newState == "PCW" or newState == "OFFICIAL" or newState == "GATHER" then
 		local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
 		for p = 1, #playerList do
 			local playerClient = Server.GetOwner(playerList[p])
