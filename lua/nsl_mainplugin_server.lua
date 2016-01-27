@@ -14,6 +14,8 @@ Script.Load("lua/nsl_teammanager_server.lua")
 local kCachedDataRate = 50
 local kCachedMoveRate = 30
 local kCachedInterp = 100
+local kCachedSendRate = 20
+local kCachedTickRate = 30
 
 //Supposedly this still not syncronized.
 local function SetupClientRatesandConfig(client)
@@ -29,18 +31,22 @@ end
 
 local function SetupRates()
 	
-	if GetNSLPerfValue("TickRate") > Server.GetTickrate() then
+	if GetNSLPerfValue("TickRate") > kCachedTickRate then
 		//Tickrate going up, increase it first.
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
+		kCachedTickRate = GetNSLPerfValue("TickRate")
+		if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
 			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+			kCachedSendRate = GetNSLPerfValue("ClientRate")
 		end
-	elseif GetNSLPerfValue("TickRate") <= Server.GetTickrate() then
+	elseif GetNSLPerfValue("TickRate") <= kCachedTickRate then
 		//Tickrate going down, set updaterate first.
-		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
+		if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
 			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+			kCachedSendRate = GetNSLPerfValue("ClientRate")
 		end
 		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
+		kCachedTickRate = GetNSLPerfValue("TickRate")
 	end
 	if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
 		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
@@ -59,6 +65,29 @@ end
 table.insert(gConnectFunctions, SetupClientRatesandConfig)
 table.insert(gConfigLoadedFunctions, SetupRates)
 
+local function RemoveTag(tagName)
+        local tags = { }
+        Server.GetTags(tags)
+
+        for t = 1, #tags do
+
+            if string.find(tags[t], tagName) then
+                Server.RemoveTag(tags[t])
+            end
+
+        end
+
+    end
+
+local function SetupNSLTag()
+	RemoveTag("NSL")
+	if GetNSLModEnabled() then
+		Server.AddTag("NSL")
+	end
+end
+
+SetupNSLTag()
+
 local function SendClientUpdatedMode(newState)
 	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
 	for p = 1, #playerList do
@@ -67,6 +96,7 @@ local function SendClientUpdatedMode(newState)
 			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState]}, true)
 		end
 	end
+	SetupNSLTag()
 end
 
 table.insert(gPluginStateChange, SendClientUpdatedMode)
