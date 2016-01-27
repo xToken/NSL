@@ -143,7 +143,8 @@ UseCustomSpawnConfigs				= false,
 UseFixedSpawnsPerMap				= false,
 UseDefaultSkins						= false,
 PauseOnDisconnect					= false,
-SavePlayerStates					= false
+SavePlayerStates					= false,
+OverrideTeamNames					= false
 }
 
 local DefaultPerfConfig = {
@@ -212,14 +213,18 @@ end
 Event.Hook("UpdateServer", OnServerUpdated)
 
 function GetNSLConfigValue(value)
-	//Check base config
-	if Configs[NSL_League] and Configs[NSL_League][value] then
-		return Configs[NSL_League][value]
+	//Check League config
+	if Configs[NSL_League] then
+		//Check League/Mode Specific config
+		if Configs[NSL_League][NSL_Mode] and Configs[NSL_League][NSL_Mode][value] then
+			return Configs[NSL_League][NSL_Mode][value]
+		end
+		//Check League Specific config
+		if Configs[NSL_League][value] then
+			return Configs[NSL_League][value]
+		end
 	end
-	//Check Mode Specific config
-	if Configs[NSL_League] and Configs[NSL_League][NSL_Mode] and Configs[NSL_League][NSL_Mode][value] then
-		return Configs[NSL_League][NSL_Mode][value]
-	end
+	//Base Config
 	if DefaultConfig[value] then
 		return DefaultConfig[value]
 	end
