@@ -127,6 +127,9 @@ function SetNSLPerfConfigAccess(state)
 		NSL_PerfConfigsBlocked = state
 		SavePluginConfig()
 	end
+	if NSL_PerfConfigsBlocked then
+		SetPerfLevel("DEFAULT")
+	end
 end
 
 function UpdateNSLScores(team1name, team1score, team2name, team2score)
