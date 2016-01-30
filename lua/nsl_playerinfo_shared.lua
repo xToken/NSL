@@ -60,7 +60,6 @@ end
 
 function PlayerInfoEntity:SetupNSLData(nsldata)
 	if nsldata then
-		nsldata.NSL_Rank = nil
 		self.NSL_ID = tonumber(nsldata.NSL_ID) or 0
 		self.NSL_TID = tonumber(nsldata.NSL_TID) or 0
 		self.NSL_NICK = nsldata.NICK or ""
