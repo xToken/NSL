@@ -54,8 +54,10 @@ local function SetupRates()
 			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
 			kCachedSendRate = GetNSLPerfValue("ClientRate")
 		end
-		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-		kCachedTickRate = GetNSLPerfValue("TickRate")
+		if GetNSLPerfValue("TickRate") ~= kCachedTickRate then
+			Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
+			kCachedTickRate = GetNSLPerfValue("TickRate")
+		end
 	end
 	if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
 		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
