@@ -162,6 +162,15 @@ local function UpdateClientBadge(ns2id)
 	end
 end
 
+local function UpdateCallbacksWithNSLData(player, nslData)
+	if player then
+		for i = 1, #gPlayerDataUpdatedFunctions do
+			gPlayerDataUpdatedFunctions[i](player, nslData)
+		end
+		ServerAdminPrint(Server.GetOwner(player), string.format("%s Username verified as %s", GetActiveLeague(), nslData.NICK))
+	end
+end
+
 local function OnClientConnectENSLResponse(response)
 	if response then
 		local responsetable = json.decode(response)
@@ -206,11 +215,8 @@ local function OnClientConnectENSLResponse(response)
 					end
 				end
 				
-				NSL_ClientData[ns2id] = clientData;
-				
-				if player then
-					ServerAdminPrint(Server.GetOwner(player), string.format("NSL Username verified as %s", NSL_ClientData[ns2id].NICK))
-				end
+				NSL_ClientData[ns2id] = clientData
+				UpdateCallbacksWithNSLData(player, clientData)
 				UpdateClientBadge(ns2id)
 			end
 		end
@@ -238,9 +244,8 @@ local function OnClientConnectAUSNS2Response(response)
 					NSL_Level = responsetable.IsAdmin and 1 or 0,
 					NSL_Rank = nil,
 					NSL_Icon = nil}
-					if player then
-						ServerAdminPrint(Server.GetOwner(player), string.format("AusNS2 Username verified as %s", NSL_ClientData[ns2id].NICK))
-					end
+					
+					UpdateCallbacksWithNSLData(player, NSL_ClientData[ns2id])
 					UpdateClientBadge(ns2id)
 				end				
 			end

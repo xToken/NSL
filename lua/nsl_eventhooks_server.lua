@@ -15,6 +15,8 @@ gPluginStateChange = { }
 gGameEndFunctions = { }
 //Config Loaded Functions
 gConfigLoadedFunctions = { }
+//PlayerData Updated Functions
+gPlayerDataUpdatedFunctions = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
