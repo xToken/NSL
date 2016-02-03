@@ -8,6 +8,8 @@ local NSL_NS2IDLookup = { }
 local G_IDTable = { }
 local RefBadges = { }
 local NSL_FunctionData = { }
+local NSL_PlayerDataRetries = { }
+local NSL_PlayerDataMaxRetries = 3
 
 //These are the only mandatory fields
 //S_ID 		- Steam ID
@@ -174,7 +176,7 @@ end
 local function OnClientConnectENSLResponse(response)
 	if response then
 		local responsetable = json.decode(response)
-		if responsetable == nil or responsetable.id == nil then
+		if responsetable == nil or responsetable.steam == nil or responsetable.steam.id == nil then
 			//Message to user to register on ENSL site?
 			//Possible DB issue?
 		else
@@ -204,15 +206,13 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Level = 0
 					clientData.NSL_Rank = nil
 				end
-				
+
 				//Check config refs here
 				local cRefs = GetNSLConfigValue("REFS")
 				if cRefs and table.contains(cRefs, ns2id) then
 					//A manually configured 'Ref' - give them ref level
-					if not clientData.NSL_Rank then
-						clientData.NSL_Level = 3
-						clientData.NSL_Rank = "Ref"
-					end
+					clientData.NSL_Level = 3
+					clientData.NSL_Rank = "Ref"
 				end
 				
 				NSL_ClientData[ns2id] = clientData
@@ -256,13 +256,14 @@ end
 local function OnClientConnected(client)
 	local NS2ID = client:GetUserId()
 	if GetNSLModEnabled() then
-		if GetNSLUserData(NS2ID) == nil then
+		if GetNSLUserData(NS2ID) == nil and ((NSL_PlayerDataRetries[NS2ID] or 0) < NSL_PlayerDataMaxRetries) then
 			//Doesnt have data, query
 			local QueryURL = GetNSLConfigValue("PlayerDataURL")
 			if QueryURL then
 				//PlayerDataFormat
 				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
 				NSL_NS2IDLookup[steamId] = NS2ID
+				NSL_PlayerDataRetries[NS2ID] = (NSL_PlayerDataRetries[NS2ID] or 0) + 1
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then
 					Shared.SendHTTPRequest(string.format("%s%s.steamid", QueryURL, NS2ID), "GET", OnClientConnectENSLResponse)
 				end
