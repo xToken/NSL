@@ -9,14 +9,13 @@ local NSL_VirtualClients = { }
 local NSL_DisconnectedIDs = { }
 local NSL_VirtualClientCount = 0
 local NSLPauseDisconnectOverride = false
-local NSLStateSaveOverride = false
 local NSLDontGenPlayerOnConnect = false
 
 local function StoreDisconnectedTeamPlayer(self, client)
 	if client then
 		local player = client:GetControllingPlayer()
 		//If we kicked already cached player, just assume something might have gone wrong, and dont save again.
-		if player and not player.isCached and (GetNSLConfigValue("SavePlayerStates") or NSLStateSaveOverride) then
+		if player and not player.isCached and GetNSLConfigValue("SavePlayerStates") then
 			local teamNumber = player:GetTeamNumber()
 			if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 				//Valid team, player, config opt.  Check gamestate.
@@ -141,7 +140,7 @@ function MoveClientToStoredPlayer(client, ns2ID)
 end
 
 local function OnClientConnected(client)
-	if client and (GetNSLConfigValue("SavePlayerStates") or NSLStateSaveOverride) then
+	if client and GetNSLConfigValue("SavePlayerStates") then
 		local NS2ID = client:GetUserId()
 		if NSL_VirtualClients[NS2ID] then
 			//So we found a stored player
@@ -163,18 +162,6 @@ local function OnClientCommandEnablePauseTesting(client)
 end
 
 Event.Hook("Console_sv_nslpausedisconnect", OnClientCommandEnablePauseTesting)
-
-local function OnClientCommandEnableStateSaving(client)
-	if client then
-		local NS2ID = client:GetUserId()	
-		if GetIsNSLRef(NS2ID) then
-			NSLStateSaveOverride = not NSLStateSaveOverride
-			ServerAdminPrint(client, "NSL State Saving on Disconnect " .. ConditionalValue(NSLStateSaveOverride, "enabled.", "disabled."))
-		end
-	end
-end
-
-Event.Hook("Console_sv_nslstatesave", OnClientCommandEnableStateSaving)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
