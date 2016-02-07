@@ -10,6 +10,7 @@ local RefBadges = { }
 local NSL_FunctionData = { }
 local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
+local NSL_PlayerDataTimeout = 5
 
 //These are the only mandatory fields
 //S_ID 		- Steam ID
@@ -24,19 +25,6 @@ local NSL_PlayerDataMaxRetries = 3
 //NSL_Rank	- Rank
 //NSL_Icon 	- Assigned Icon
 //Would like to USE these icons :S
-
-local TeamnameToBadgeNames = { }
-TeamnameToBadgeNames["all-in"] = { "all-in" }
-TeamnameToBadgeNames["calamity_gaming"] = { "calamitygaming" }
-TeamnameToBadgeNames["dark_legion"] = { "darklegion" }
-TeamnameToBadgeNames["godar"] = { "godar" }
-TeamnameToBadgeNames["legendary_snails"] = { "legendarysnails" }
-TeamnameToBadgeNames["lucky_fkers"] = { "luckyfkers" }
-TeamnameToBadgeNames["mimic"] = { "mimic" }
-TeamnameToBadgeNames["saunamen"] = { "saunamen" }
-TeamnameToBadgeNames["scurvy"] = { "scurvy" }
-TeamnameToBadgeNames["singularity"] = { "singularity" }
-TeamnameToBadgeNames["titus"] = { "titusgaming" }
 
 Script.Load("lua/nsl_class.lua")
 
@@ -113,12 +101,14 @@ local function GetRefBadgeforID(ns2id)
 	end
 end
 
-local function GetTeamBadgeForTeamName(teamName)
+function GetNSLBadgeNameFromTeamName(teamName)
 	if teamName and teamName ~= "" then
 		teamName = string.lower(teamName)
-		for badge, names in pairs(TeamnameToBadgeNames) do
-			if table.contains(names, teamName) then
-				return badge
+		if GetNSLConfigValue("TeamNames") then
+			for badge, names in pairs(GetNSLConfigValue("TeamNames")) do
+				if table.contains(names, teamName) then
+					return badge
+				end
 			end
 		end
 	end
@@ -126,7 +116,7 @@ end
 
 local function UpdateClientBadge(ns2id)
 	local refBadge = GetRefBadgeforID(ns2id)
-	local teamBadge = GetTeamBadgeForTeamName(NSL_ClientData[ns2id].NSL_Team)
+	local teamBadge = GetNSLBadgeNameFromTeamName(NSL_ClientData[ns2id].NSL_Team)
 	if GiveBadge then
 		//Yay for badges+ mod.
 		//Give badge if ref and ref badge configured.
@@ -214,10 +204,10 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				end
-				
 				NSL_ClientData[ns2id] = clientData
 				UpdateCallbacksWithNSLData(player, clientData)
 				UpdateClientBadge(ns2id)
+				NSL_PlayerDataRetries[ns2id] = nil
 			end
 		end
 	end
@@ -247,23 +237,28 @@ local function OnClientConnectAUSNS2Response(response)
 					
 					UpdateCallbacksWithNSLData(player, NSL_ClientData[ns2id])
 					UpdateClientBadge(ns2id)
+					NSL_PlayerDataRetries[ns2id] = nil
 				end				
 			end
 		end
 	end
 end
 
-local function OnClientConnected(client)
-	local NS2ID = client:GetUserId()
-	if GetNSLModEnabled() then
-		if GetNSLUserData(NS2ID) == nil and ((NSL_PlayerDataRetries[NS2ID] or 0) < NSL_PlayerDataMaxRetries) then
+function UpdateNSLPlayerData(NS2ID)
+	if not GetNSLUserData(NS2ID) then
+		//Check for retry
+		if not NSL_PlayerDataRetries[NS2ID] then
+			NSL_PlayerDataRetries[NS2ID] = {attemps = 0, time = 0}
+		end
+		if NSL_PlayerDataRetries[NS2ID].attemps < NSL_PlayerDataMaxRetries then
 			//Doesnt have data, query
 			local QueryURL = GetNSLConfigValue("PlayerDataURL")
 			if QueryURL then
 				//PlayerDataFormat
 				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
 				NSL_NS2IDLookup[steamId] = NS2ID
-				NSL_PlayerDataRetries[NS2ID] = (NSL_PlayerDataRetries[NS2ID] or 0) + 1
+				NSL_PlayerDataRetries[NS2ID].attemps = NSL_PlayerDataRetries[NS2ID].attemps + 1
+				NSL_PlayerDataRetries[NS2ID].time = NSL_PlayerDataTimeout
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then
 					Shared.SendHTTPRequest(string.format("%s%s.steamid", QueryURL, NS2ID), "GET", OnClientConnectENSLResponse)
 				end
@@ -271,7 +266,17 @@ local function OnClientConnected(client)
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
 				end
 			end
+		else
+			//Shared.Message(string.format("Failed to get valid response from %s site for ns2id %s.", GetActiveLeague(), tostring(NS2ID)))
+			NSL_PlayerDataRetries[NS2ID].time = NSL_PlayerDataTimeout * 10
 		end
+	end
+end
+
+local function OnClientConnected(client)
+	local NS2ID = client:GetUserId()
+	if GetNSLModEnabled() then
+		UpdateNSLPlayerData(NS2ID)
 		//Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
 			//Sync user all badge data
@@ -286,6 +291,21 @@ local function OnClientConnected(client)
 end
 
 table.insert(gConnectFunctions, OnClientConnected)
+
+local function OnServerUpdated(deltaTime)
+	if GetNSLModEnabled() then
+		for k, v in pairs(NSL_PlayerDataRetries) do
+			if v and v.time > 0 then
+				v.time = math.max(0, v.time - deltaTime)
+				if v.time == 0 then
+					UpdateNSLPlayerData(k)
+				end
+			end
+		end
+	end
+end
+
+Event.Hook("UpdateServer", OnServerUpdated)
 
 local function UpdatePlayerDataOnActivation(newState)
 	if newState == "PCW" or newState == "OFFICIAL" or newState == "GATHER" then
@@ -348,20 +368,34 @@ end
 
 Event.Hook("Console_sv_nslinfo",               OnClientCommandViewNSLInfo)
 
+local function ConvertTabletoOrigin(t)
+	if t and type(t) == "table" and #t == 3 then
+		return Vector(t[1], t[2], t[3])
+	end
+	return nil
+end
+
+local function MakeNSLMessage(message)
+	local m = { }
+	m.message = string.sub(message, 1, 250)
+	m.color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor"))
+	return m
+end
+
 local function OnCommandChat(client, target, message)
 	if target == nil then
-		Server.SendNetworkMessage("AdminMessage", {message = string.sub(message, 1, 250)}, true)
+		Server.SendNetworkMessage("NSLSystemMessage", MakeNSLMessage(message), true)
 	else
 		if type(target) == "number" then
 			local playerRecords = GetEntitiesForTeam("Player", target)
 			for _, player in ipairs(playerRecords) do
 				local pclient = Server.GetOwner(player)
 				if pclient ~= nil then
-					Server.SendNetworkMessage(pclient, "AdminMessage", {message = string.sub(message, 1, 250)}, true)
+					Server.SendNetworkMessage(pclient, "NSLSystemMessage", MakeNSLMessage(message), true)
 				end
 			end
 		elseif type(target) == "userdata" and target:isa("Player") then
-			Server.SendNetworkMessage(target, "AdminMessage", {message = string.sub(message, 1, 250)}, true)
+			Server.SendNetworkMessage(target, "NSLSystemMessage", MakeNSLMessage(message), true)
 		end
 	end
 end
