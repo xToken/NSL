@@ -82,6 +82,16 @@ originalNS2PlayerOnProcessIntermediate = Class_ReplaceMethod("Player", "OnProces
 	end
 )
 
+//FJDKOSFHJDKSHFKJDSHFKJSDHFKJSDHFKJSDLFHDSIJRFYU*W#$IHATENS2
+local oldFollowMoveMixinUpdateMove = FollowMoveMixin.UpdateMove
+function FollowMoveMixin:UpdateMove(input)
+	if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
+		return
+	else
+		oldFollowMoveMixinUpdateMove(self, input)
+	end
+end
+
 //Blocks input.
 local originalNS2PlayerOnProcessMove
 originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove", 
@@ -103,6 +113,20 @@ function CameraHolderMixin:SetDesiredCamera(transitionDuration, mode, position, 
 	end
 	oldCameraHolderMixinSetDesiredCamera(self, transitionDuration, mode, position, angles, distance, yOffset, callback)
 end
+
+//Blocks buying things.
+local originalNS2PlayerProcessBuyAction
+originalNS2PlayerProcessBuyAction = Class_ReplaceMethod("Player", "ProcessBuyAction", 
+	function(self, upgrades)
+
+		if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
+			return false
+		else
+			return originalNS2PlayerProcessBuyAction(self, upgrades)
+		end
+		
+	end
+)
 
 //Blocks input.
 local originalNS2PlayerGetCanControl
