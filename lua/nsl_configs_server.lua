@@ -18,7 +18,7 @@ local NSL_Scores = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
 local cachedScoresValidFor = 10 * 60
-local expectedNSLConfigVersion = 1.7
+local expectedNSLConfigVersion = 1.8
 
 function GetNSLMode()
 	return NSL_Mode
@@ -160,7 +160,8 @@ UseFixedSpawnsPerMap				= false,
 UseDefaultSkins						= false,
 PauseOnDisconnect					= false,
 SavePlayerStates					= false,
-OverrideTeamNames					= false
+OverrideTeamNames					= false,
+MessageColor						= {0.5, 0, 0.5}
 }
 
 local DefaultPerfConfig = {
