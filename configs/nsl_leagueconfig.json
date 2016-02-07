@@ -1,5 +1,5 @@
 {
-	"Version": 1.7,
+	"Version": 1.8,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -22,7 +22,8 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
-		"SavePlayerStates":						false,
+		"SavePlayerStates":						true,
+		"MessageColor":							[0.5, 0, 0.5],
 		"PausedMaxDuration": 					300,
 		"Badges":				 				{
 													"1":									"ensl_mod",
@@ -44,7 +45,7 @@
 													"TournamentModeForfeitClock":			900,
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
-													"MercsRequireApproval": 				true
+													"MercsRequireApproval": 				true,
 													"OverrideTeamNames": 					true
 												},
 		"REFS":									[
@@ -52,6 +53,61 @@
 													3490104,
 													5176141
 												],
+		"TeamNames":							{
+													"all-in":				[ "all-in" ],
+													"calamity_gaming":		[ "calamitygaming" ],
+													"dark_legion":			[ "darklegion" ],
+													"godar":				[ "godar" ],
+													"legendary_snails":		[ "legendarysnails" ],
+													"lucky_fkers":			[ "luckyfkers" ],
+													"mimic":				[ "mimic" ],
+													"saunamen":				[ "saunamen" ],
+													"scurvy":				[ "scurvy" ],
+													"singularity":			[ "singularity" ],
+													"titus":				[ "titusgaming" ]
+												},
+		"LogoLocations":						{
+													"ns2_veil":
+														{
+															"control": {"origin": [55.65, 0, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0}
+														},
+													"ns2_summit":
+														{
+														
+														
+														
+														},
+													"ns2_tram":
+														{
+														
+														
+														
+														},
+													"ns2_biodome":
+														{
+														
+														
+														
+														},
+													"ns2_derelict":
+														{
+														
+														
+														
+														},
+													"ns2_descent":
+														{
+														
+														
+														
+														},
+													"ns2_jambi":
+														{
+														
+														
+														
+														}		
+												},
 		"AdminGroups":							{
 													"2":{
 														"commands": 
