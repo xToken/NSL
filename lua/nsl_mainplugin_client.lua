@@ -14,8 +14,33 @@ local kChatMinWindow = 0.005
 local kTeam1NameLocal
 local kTeam2NameLocal
 local kInsightTeamnameHack = false
+local kNSLDecals = { }
 local kNSLMode
 local kNSLConfigUpdateFunctions = { }
+
+local function GetUpValue(origfunc, name)
+
+	local index = 1
+	local foundValue = nil
+	while true do
+	
+		local n, v = debug.getupvalue(origfunc, index)
+		if not n then
+			break
+		end
+		
+		-- Find the highest index matching the name.
+		if n == name then
+			foundValue = v
+		end
+		
+		index = index + 1
+		
+	end
+	
+	return foundValue
+	
+end
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -61,11 +86,50 @@ function InsightUI_GetTechPointData()
 	return techPointData
 end
 
-local function AdminMessageRecieved(message)
-	ChatUI_AddSystemMessage(message.message)
+local NSLMessages = { }
+local kNSLDefaultMessageColor = Color(1, 0, 0, 1)
+local kNSLMessageHexColor = 0x800080
+
+//Meh
+local function BuildColorFromVector(v)
+	if v and type(v) == "cdata" and v.isa and v:isa("Vector") then
+		return Color(v.x, v.y, v.z, 1)
+	end
+	return kNSLDefaultMessageColor
 end
 
-Client.HookNetworkMessage("AdminMessage", AdminMessageRecieved)
+local oldChatUI_GetMessages = ChatUI_GetMessages
+function ChatUI_GetMessages()
+	local cM = oldChatUI_GetMessages()
+	if table.maxn(NSLMessages) > 0 then
+        table.copy(NSLMessages, cM, true)
+        NSLMessages = { }
+    end
+	return cM
+end
+
+local function AdminMessageRecieved(message)
+	local player = Client.GetLocalPlayer()    
+	if message and player then
+	
+        table.insert(NSLMessages, kNSLMessageHexColor)
+        table.insert(NSLMessages, "")
+		table.insert(NSLMessages, BuildColorFromVector(message.color))
+        table.insert(NSLMessages, message.message)
+		
+		//No idea what this crap is for...
+        table.insert(NSLMessages, false)
+        table.insert(NSLMessages, false)
+        table.insert(NSLMessages, 0)
+        table.insert(NSLMessages, 0)
+
+        StartSoundEffect(player:GetChatSound())
+		Shared.Message(message.message)
+        
+	end
+end
+
+Client.HookNetworkMessage("NSLSystemMessage", AdminMessageRecieved)
 
 function OnNSLConfigRecieved(message)
 	if message then
@@ -291,3 +355,73 @@ end
 
 //Leeeets see how much this breaks :D
 AddClientUIScriptForTeam(kSpectatorIndex, "GUINSLSpectatorTechMap")
+
+local function InitNSLDecal(decal, origin, yaw, pitch, roll)
+	
+	local renderDecal = Client.CreateRenderDecal()
+	local coords = Angles(pitch, yaw, roll):GetCoords(origin)
+	renderDecal:SetCoords(coords)
+	renderDecal:SetMaterial(decal)
+	renderDecal:SetExtents(Vector(2, 2, 2))
+	
+	table.insert(kNSLDecals, {decal = renderDecal, origin = origin, yaw = yaw})
+	if Client.decalList == nil then
+		Client.decalList = { }
+	end
+	table.insert(Client.decalList, renderDecal)
+	
+end
+
+local function OnNewNSLDecal(message)
+	if message then
+		InitNSLDecal(message.decalMaterial, message.origin, message.yaw, message.pitch, message.roll)
+	end
+end
+
+Client.HookNetworkMessage("NSLDecal", OnNewNSLDecal)
+
+local kOriginVec = Vector(0, 0, 0)
+local function OnClearNSLDecal(message)
+	if message then
+		for i = #kNSLDecals, 1, -1 do
+			if kNSLDecals[i] and (kNSLDecals[i].origin == message.origin or message.origin == kOriginVec) then
+				//kNSLDecals[i]
+				local rd = kNSLDecals[i].decal
+				table.removevalue(Client.decalList, rd)
+				kNSLDecals[i] = nil
+				Client.DestroyRenderDecal(rd)
+			end
+		end
+	end
+end
+
+Client.HookNetworkMessage("NSLClearDecals", OnClearNSLDecal)
+
+/*local function OnCommandSetYaw(yaw)
+	if yaw then
+		local rd = kNSLDecals[1]
+		local coords = Angles(0, yaw, 0):GetCoords(kNSLDecals[1].origin)
+		rd.decal:SetCoords(coords)
+		Print("Yaw set to " .. tostring(yaw))
+	else
+		Print("Yaw is " ..  tostring(kNSLDecals[1].yaw))
+	end
+end
+
+Event.Hook("Console_setyaw", OnCommandSetYaw)
+
+local function OnCommandSetXZ(x, z)
+	if x and z then
+		local rd = kNSLDecals[1]
+		local origin = kNSLDecals[1].origin
+		origin.x = x
+		origin.z = z
+		local coords = Angles(0, kNSLDecals[1].yaw, 0):GetCoords(origin)
+		rd.decal:SetCoords(coords)
+		Print("XZ set to " .. tostring(x) .. " " .. tostring(z))
+	else
+		Print("XZ is " ..  tostring(kNSLDecals[1].origin.x) .. " " .. tostring(kNSLDecals[1].origin.z))
+	end
+end
+
+Event.Hook("Console_setxz", OnCommandSetXZ)*/

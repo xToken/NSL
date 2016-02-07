@@ -9,6 +9,9 @@ local tscores = { }
 local tqueue = { }
 local overridenames = false
 local hookedPlayers = { }
+local kMinPlayersToName = 3
+local kOriginVec = Vector(0, 0, 0)
+local kDefaultDecal = "materials/logos/test.material"
 
 Script.Load("lua/nsl_class.lua")
 
@@ -19,6 +22,82 @@ local function UpdateCachedTeamScores()
 end
 
 UpdateCachedTeamScores()
+
+local function LookupDecalLocations()
+	local mapName = string.lower(Shared.GetMapName())
+	local locations = GetNSLConfigValue("LogoLocations")
+	if locations and locations[mapName] then
+		return locations[mapName]
+	end
+	return nil
+end
+
+local function GetNSLDecalLocations()
+	local locations = { }
+	local maplocations = LookupDecalLocations()
+	local techPoints = Shared.GetEntitiesWithClassname("TechPoint")
+	local tpDecals = { }
+	local team1decalname = string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name))
+	local team2decalname = string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name))
+	//Build transfer table of TP Locations to current Decal
+	for _, techPoint in ientitylist(techPoints) do
+		if techPoint:GetAttached() then
+			tpDecals[string.lower(techPoint:GetLocationName())] = techPoint.occupiedTeam == 1 and team1decalname or team2decalname
+		end
+	end
+	//Build full list of all decals.
+	for loc, data in pairs(maplocations) do
+		local decal = tpDecals[loc] or data.decal or kDefaultDecal
+		//Sanity File Check
+		if decal and not GetFileExists(decal) then
+			decal = kDefaultDecal
+		end
+		table.insert(locations, {data = data, decal = decal})
+	end
+	return locations
+end
+
+local function ConvertTabletoOrigin(t)
+	if t and type(t) == "table" and #t == 3 then
+		return Vector(t[1], t[2], t[3])
+	end
+	return nil
+end
+
+local function SyncLogos(spec)
+	if GetNSLMode() == "PCW" or GetNSLMode() == "OFFICIAL" then
+		local locations = GetNSLDecalLocations()
+		for i, loc in ipairs(locations) do
+			if loc and loc.data then
+				local origin = ConvertTabletoOrigin(loc.data.origin)
+				if origin then
+					Server.SendNetworkMessage(spec, "NSLDecal", { decalMaterial = loc.decal, origin = origin, pitch = loc.data.pitch, yaw = loc.data.yaw, roll = loc.data.roll }, true)
+				end
+			end
+		end
+	end
+end
+
+local function SyncNSLDecalsToPlayer(player, teamNumber)
+	//Clear all decals
+	Server.SendNetworkMessage(player, "NSLClearDecals", { origin = kOriginVec }, true)
+	if teamNumber == kSpectatorIndex then
+		SyncLogos(player)
+	end
+end
+
+table.insert(gTeamJoinedFunctions, SyncNSLDecalsToPlayer)
+
+local function UpdateAllNSLDecals()
+	//Clear all decals for everyone.
+	Server.SendNetworkMessage("NSLClearDecals", { origin = kOriginVec }, true)
+	//Get All Specs
+	for _, spec in ipairs(GetEntitiesForTeam("Spectator", kSpectatorIndex)) do
+		SyncNSLDecalsToPlayer(spec, kSpectatorIndex)
+	end	
+end
+
+table.insert(gTeamNamesUpdatedFunctions, UpdateAllNSLDecals)
 
 local function SyncTeamInfotoClients(client)
 	if client then
@@ -67,7 +146,7 @@ local function GetPrimaryTeam(teamnum, teamdata)
 	local count = 0
 	if teamdata ~= nil then
 		for t, c in pairs(teamdata) do
-			if c > count and t ~= "No Team" and c >= 3 then
+			if c > count and t ~= "No Team" and c >= kMinPlayersToName then
 				team = t
 				count = c
 			end	
@@ -100,6 +179,33 @@ local function CheckMercTeamJoin(player, teamNumber)
 	return true
 end
 
+local function UpdateCallbacksWithNewTeamNames(team1name, team2name)
+	SyncTeamInfotoClients()
+	for i = 1, #gTeamNamesUpdatedFunctions do
+		gTeamNamesUpdatedFunctions[i](team1name, team2name)
+	end
+end
+
+function ResetNSLTeamNames()
+	t1name = "Frontiersmen"
+	t2name = "Kharaa"
+	UpdateCallbacksWithNewTeamNames(t2name, t1name)
+end
+
+local function UpdatePlayerDataOnActivation(newState)
+	if newState == "GATHER" or newState == "DISABLED" then
+		ResetNSLTeamNames()
+	end
+end
+
+table.insert(gPluginStateChange, UpdatePlayerDataOnActivation)
+
+local function UpdateOnSuccessfulTeamJoin(player, newTeamNumber)
+	for i = 1, #gTeamJoinedFunctions do
+		gTeamJoinedFunctions[i](player, newTeamNumber)
+	end
+end
+
 //Detect team changes
 local originalNS2GRJoinTeam
 originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam", 
@@ -108,16 +214,19 @@ originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam",
 			return false, player
 		end
 		local success, player = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
-		if success and not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
-			//Joined team, update
-			local ntname = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
-			if newTeamNumber == 1 and ntname ~= t1name then
-				t1name = ntname
-				SyncTeamInfotoClients()
-			elseif newTeamNumber == 2 and ntname ~= t2name then
-				t2name = ntname
-				SyncTeamInfotoClients()
+		if success then
+			if not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
+				//Joined team, update
+				local ntname = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
+				if newTeamNumber == 1 and ntname ~= t1name then
+					t1name = ntname
+					UpdateCallbacksWithNewTeamNames(t1name, t2name)
+				elseif newTeamNumber == 2 and ntname ~= t2name then
+					t2name = ntname
+					UpdateCallbacksWithNewTeamNames(t1name, t2name)
+				end
 			end
+			UpdateOnSuccessfulTeamJoin(player, newTeamNumber)
 		end
 		return success, player
 	end
@@ -156,7 +265,7 @@ local function OnCommandOverrideTeamnames(client, team1name, team2name)
 			overridenames = true
 			t1name = team1name
 			t2name = team2name
-			SyncTeamInfotoClients()
+			UpdateCallbacksWithNewTeamNames(t1name, t2name)
 		end
 	end
 end
@@ -171,7 +280,7 @@ local function OnCommandSwitchTeamNames(client)
 			local team1name = t1name
 			t1name = t2name
 			t2name = team1name
-			SyncTeamInfotoClients()
+			UpdateCallbacksWithNewTeamNames(t1name, t2name)
 		end
 	end
 end
