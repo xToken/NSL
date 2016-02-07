@@ -11,6 +11,7 @@ Script.Load("lua/nsl_playerinfo_shared.lua")
 local kMaxTeamNameLength = 50
 local kMaxAdminChatLength = 250
 local kMaxFunctionMessageLength = 80
+local kMaxDecalPathLength = 120
 
 local kTeamNameUpdateMessage =
 {
@@ -24,10 +25,11 @@ Shared.RegisterNetworkMessage("TeamNames", kTeamNameUpdateMessage)
 
 local kAdminChatMessage =
 {
-    message = string.format("string (%d)", kMaxAdminChatLength + 1)
+    message = string.format("string (%d)", kMaxAdminChatLength + 1),
+	color = "vector"
 }
 
-Shared.RegisterNetworkMessage("AdminMessage", kAdminChatMessage)
+Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
 
 local kNSLPluginConfig =
 {
@@ -96,6 +98,24 @@ local kFunctionMessage =
 }
 
 Shared.RegisterNetworkMessage("ClientFunctionUpdate", kFunctionMessage)
+
+local kNSLDecalUpdateMessage =
+{
+    decalMaterial = string.format("string (%d)", kMaxDecalPathLength + 1),
+    origin = "vector",
+    yaw = "float",
+    pitch = "float",
+    roll = "float"
+}
+
+Shared.RegisterNetworkMessage("NSLDecal", kNSLDecalUpdateMessage)
+
+local kNSLClearDecalMessage =
+{
+	origin = "vector"
+}
+
+Shared.RegisterNetworkMessage("NSLClearDecals", kNSLClearDecalMessage)
 
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 
