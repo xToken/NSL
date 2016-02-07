@@ -17,6 +17,10 @@ gGameEndFunctions = { }
 gConfigLoadedFunctions = { }
 //PlayerData Updated Functions
 gPlayerDataUpdatedFunctions = { }
+//TeamNames Updated Functions
+gTeamNamesUpdatedFunctions = { }
+//TeamJoin Functions
+gTeamJoinedFunctions = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
