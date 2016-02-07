@@ -149,6 +149,13 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 //Set friendly fire percentage
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
+local function ConvertTabletoOrigin(t)
+	if #t == 3 then
+		return Vector(t[1], t[2], t[3])
+	end
+	return nil
+end
+
 //Simple functions to make sending messages easier.
 local function BuildAdminMessage(message, teamname, client)
 	local t = { }
@@ -168,12 +175,13 @@ local function BuildAdminMessage(message, teamname, client)
 	else
 		t.message = string.sub(string.format("(%s) %s", GetNSLConfigValue("LeagueName"), message), 1, 250)
 	end
+	t.color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor"))
 	return t
 end
 
 function SendAllClientsMessage(message)
 	if kNSLAltChatMode then
-		Server.SendNetworkMessage("AdminMessage", BuildAdminMessage(message), true)
+		Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message), true)
 	else
 		Server.SendNetworkMessage("Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
 	end
@@ -182,7 +190,7 @@ end
 function SendClientMessage(client, message)
 	if client then
 		if kNSLAltChatMode then
-			Server.SendNetworkMessage(client, "AdminMessage", BuildAdminMessage(message, nil, client), true)
+			Server.SendNetworkMessage(client, "NSLSystemMessage", BuildAdminMessage(message, nil, client), true)
 		else
 			Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
 		end
@@ -203,7 +211,7 @@ function SendTeamMessage(teamnum, message)
 			local client = Server.GetOwner(player)
 			if client then
 				if kNSLAltChatMode then
-					Server.SendNetworkMessage(client, "AdminMessage", chatmessage, true)
+					Server.SendNetworkMessage(client, "NSLSystemMessage", chatmessage, true)
 				else
 					Server.SendNetworkMessage(client, "Chat", chatmessage, true)
 				end
