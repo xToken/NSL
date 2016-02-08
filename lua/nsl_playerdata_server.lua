@@ -154,11 +154,23 @@ local function UpdateClientBadge(ns2id)
 	end
 end
 
+local function RemovePlayerFromRetryTable(player)
+	local client = Server.GetOwner(player)
+	if client and client:GetUserId() then
+		for i = #NSL_PlayerDataRetries, 1, -1 do
+			if NSL_PlayerDataRetries[i] and NSL_PlayerDataRetries[i].id == client:GetUserId() then
+				NSL_PlayerDataRetries[i] = nil
+			end
+		end
+	end
+end
+
 local function UpdateCallbacksWithNSLData(player, nslData)
 	if player then
 		for i = 1, #gPlayerDataUpdatedFunctions do
 			gPlayerDataUpdatedFunctions[i](player, nslData)
 		end
+		RemovePlayerFromRetryTable(player)
 		ServerAdminPrint(Server.GetOwner(player), string.format("%s Username verified as %s", GetActiveLeague(), nslData.NICK))
 	end
 end
@@ -244,39 +256,37 @@ local function OnClientConnectAUSNS2Response(response)
 	end
 end
 
-function UpdateNSLPlayerData(NS2ID)
-	if not GetNSLUserData(NS2ID) then
+function UpdateNSLPlayerData(RefTable)
+	if not GetNSLUserData(RefTable.id) then
 		//Check for retry
-		if not NSL_PlayerDataRetries[NS2ID] then
-			NSL_PlayerDataRetries[NS2ID] = {attemps = 0, time = 0}
-		end
-		if NSL_PlayerDataRetries[NS2ID].attemps < NSL_PlayerDataMaxRetries then
+		if RefTable.attemps < NSL_PlayerDataMaxRetries then
 			//Doesnt have data, query
 			local QueryURL = GetNSLConfigValue("PlayerDataURL")
 			if QueryURL then
 				//PlayerDataFormat
-				local steamId = "0:" .. (NS2ID % 2) .. ":" .. math.floor(NS2ID / 2)
-				NSL_NS2IDLookup[steamId] = NS2ID
-				NSL_PlayerDataRetries[NS2ID].attemps = NSL_PlayerDataRetries[NS2ID].attemps + 1
-				NSL_PlayerDataRetries[NS2ID].time = NSL_PlayerDataTimeout
+				local steamId = "0:" .. (RefTable.id % 2) .. ":" .. math.floor(RefTable.id / 2)
+				NSL_NS2IDLookup[steamId] = RefTable.id
+				RefTable.attemps = RefTable.attemps + 1
+				RefTable.time = NSL_PlayerDataTimeout
 				if GetNSLConfigValue("PlayerDataFormat") == "ENSL" then
-					Shared.SendHTTPRequest(string.format("%s%s.steamid", QueryURL, NS2ID), "GET", OnClientConnectENSLResponse)
+					Shared.SendHTTPRequest(string.format("%s%s.steamid", QueryURL, RefTable.id), "GET", OnClientConnectENSLResponse)
 				end
 				if GetNSLConfigValue("PlayerDataFormat") == "AUSNS" then
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
 				end
 			end
 		else
-			//Shared.Message(string.format("Failed to get valid response from %s site for ns2id %s.", GetActiveLeague(), tostring(NS2ID)))
-			NSL_PlayerDataRetries[NS2ID].time = NSL_PlayerDataTimeout * 10
+			Shared.Message(string.format("NSL - Failed to get valid response from %s site for ns2id %s.", 
+														GetActiveLeague(), tostring(RefTable.id)))
+			RefTable = nil
 		end
 	end
 end
 
-local function OnClientConnected(client)
+local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
 	if GetNSLModEnabled() then
-		UpdateNSLPlayerData(NS2ID)
+		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 0})
 		//Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
 			//Sync user all badge data
@@ -290,15 +300,15 @@ local function OnClientConnected(client)
 	end
 end
 
-table.insert(gConnectFunctions, OnClientConnected)
+table.insert(gConnectFunctions, OnNSLClientConnected)
 
 local function OnServerUpdated(deltaTime)
 	if GetNSLModEnabled() then
-		for k, v in pairs(NSL_PlayerDataRetries) do
-			if v and v.time > 0 then
-				v.time = math.max(0, v.time - deltaTime)
-				if v.time == 0 then
-					UpdateNSLPlayerData(k)
+		for i = #NSL_PlayerDataRetries, 1, -1 do
+			if NSL_PlayerDataRetries[i] and NSL_PlayerDataRetries[i].time > 0 then
+				NSL_PlayerDataRetries[i].time = math.max(0, NSL_PlayerDataRetries[i].time - deltaTime)
+				if NSL_PlayerDataRetries[i].time == 0 then
+					UpdateNSLPlayerData(NSL_PlayerDataRetries[i])
 				end
 			end
 		end
@@ -313,7 +323,7 @@ local function UpdatePlayerDataOnActivation(newState)
 		for p = 1, #playerList do
 			local playerClient = Server.GetOwner(playerList[p])
 			if playerClient then
-				OnClientConnected(playerClient)
+				OnNSLClientConnected(playerClient)
 			end
 		end
 	end
