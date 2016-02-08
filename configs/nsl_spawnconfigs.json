@@ -1,0 +1,58 @@
+{
+	"Version": 1.0,
+	"Configs": [
+		{
+		"LeagueName": 	"NSL",
+		"CustomSpawns":		{
+							"ns2_tram":		[
+												{
+													"effectiveDate":		2014.0910,
+													"expiryDate":			2014.1017,
+													"spawnData":			[
+																				{
+																					"name":				"Shipping",
+																					"team":				"aliens",
+																					"enemyspawns":    	["Warehouse", "Server Room"]
+																				},
+																				{
+																					"name":				"Warehouse",
+																					"team":				"marines",
+																					"enemyspawns":    	["Shipping"]
+																				},
+																				{
+																					"name":				"Server Room",
+																					"team":				"marines",
+																					"enemyspawns":    	["Shipping"]
+																				}
+																			]											
+												},
+												{
+													"effectiveDate":		2014.1018,
+													"expiryDate":			2014.1028,
+													"spawnData":			[
+																				{
+																					"name":				"Shipping",
+																					"team":				"marines",
+																					"enemyspawns":    	["Warehouse", "Server Room"]
+																				},
+																				{
+																					"name":				"Warehouse",
+																					"team":				"aliens",
+																					"enemyspawns":    	["Shipping"]
+																				},
+																				{
+																					"name":				"Server Room",
+																					"team":				"aliens",
+																					"enemyspawns":    	["Shipping"]
+																				}														
+																			]											
+												}
+											]															
+							}
+		},
+		{
+		"LeagueName": 							"AusNS2",
+		},
+	],
+	"EndOfTable": true
+}

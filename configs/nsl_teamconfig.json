@@ -1,0 +1,67 @@
+{
+	"Version": 1.0,
+	"Configs": [
+		{
+		"LeagueName": 		"NSL",
+		"TeamNames":		{
+								"all-in":				[ "all-in" ],
+								"calamity_gaming":		[ "calamitygaming" ],
+								"dark_legion":			[ "darklegion" ],
+								"godar":				[ "godar" ],
+								"legendary_snails":		[ "legendarysnails" ],
+								"lucky_fkers":			[ "luckyfkers" ],
+								"mimic":				[ "mimic" ],
+								"saunamen":				[ "saunamen" ],
+								"scurvy":				[ "scurvy" ],
+								"singularity":			[ "singularity" ],
+								"titus":				[ "titusgaming" ]
+							},
+		"LogoLocations":	{
+								"ns2_veil":
+									{
+										"control": {"origin": [55.65, 0, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0}
+									},
+								"ns2_summit":
+									{
+									
+									
+									
+									},
+								"ns2_tram":
+									{
+									
+									
+									
+									},
+								"ns2_biodome":
+									{
+									
+									
+									
+									},
+								"ns2_derelict":
+									{
+									
+									
+									
+									},
+								"ns2_descent":
+									{
+									
+									
+									
+									},
+								"ns2_jambi":
+									{
+									
+									
+									
+									}		
+							}
+		},
+		{
+		"LeagueName": 							"AusNS2",
+		}
+	],
+	"EndOfTable": true
+}
