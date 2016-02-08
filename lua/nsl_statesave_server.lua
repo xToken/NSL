@@ -238,7 +238,7 @@ local function OnCheckConnectionAllowed(userId)
                 Shared.Message(string.format("Rejected connection to banned client %s", userId))
                 return false
             else
-				//Send Cvar (sv_unban)
+				Shared.ConsoleCommand("sv_unban " .. tostring(userId))
 				break
             end
         end
