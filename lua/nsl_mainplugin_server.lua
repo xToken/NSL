@@ -40,40 +40,42 @@ local function SetupNSLTag()
 	end
 end
 
-local function SetupRates()
+local function SetupRates(configLoaded)
 	
-	if GetNSLPerfValue("TickRate") > kCachedTickRate then
-		//Tickrate going up, increase it first.
-		Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-		kCachedTickRate = GetNSLPerfValue("TickRate")
-		if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
-			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-			kCachedSendRate = GetNSLPerfValue("ClientRate")
-		end
-	elseif GetNSLPerfValue("TickRate") <= kCachedTickRate then
-		//Tickrate going down, set updaterate first.
-		if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
-			Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-			kCachedSendRate = GetNSLPerfValue("ClientRate")
-		end
-		if GetNSLPerfValue("TickRate") ~= kCachedTickRate then
+	if configLoaded == "perf" or configLoaded == "all" then
+		if GetNSLPerfValue("TickRate") > kCachedTickRate then
+			//Tickrate going up, increase it first.
 			Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
 			kCachedTickRate = GetNSLPerfValue("TickRate")
+			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
+				Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+				kCachedSendRate = GetNSLPerfValue("ClientRate")
+			end
+		elseif GetNSLPerfValue("TickRate") <= kCachedTickRate then
+			//Tickrate going down, set updaterate first.
+			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
+				Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
+				kCachedSendRate = GetNSLPerfValue("ClientRate")
+			end
+			if GetNSLPerfValue("TickRate") ~= kCachedTickRate then
+				Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
+				kCachedTickRate = GetNSLPerfValue("TickRate")
+			end
 		end
+		if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
+			Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
+			kCachedDataRate = GetNSLPerfValue("MaxDataRate")
+		end
+		if GetNSLPerfValue("Interp") ~= kCachedInterp then
+			Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
+			kCachedInterp = GetNSLPerfValue("Interp")
+		end
+		if GetNSLPerfValue("MoveRate") ~= kCachedMoveRate then
+			Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
+			kCachedMoveRate = GetNSLPerfValue("MoveRate")
+		end
+		SetupNSLTag()
 	end
-	if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
-		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
-		kCachedDataRate = GetNSLPerfValue("MaxDataRate")
-	end
-	if GetNSLPerfValue("Interp") ~= kCachedInterp then
-		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
-		kCachedInterp = GetNSLPerfValue("Interp")
-	end
-	if GetNSLPerfValue("MoveRate") ~= kCachedMoveRate then
-		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
-		kCachedMoveRate = GetNSLPerfValue("MoveRate")
-	end
-	SetupNSLTag()
 end
 
 table.insert(gConnectFunctions, SetupClientRatesandConfig)
