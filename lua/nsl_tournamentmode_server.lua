@@ -51,14 +51,25 @@ originalNS2GRGetPregameLength = Class_ReplaceMethod("NS2Gamerules", "GetPregameL
 	end
 )
 
+local function GetRealPlayerCountPerTeam(teamNumber)
+	local c = 0
+	for _, player in ipairs(GetEntitiesForTeam("Player", teamNumber)) do
+        local client = Server.GetOwner(player)
+		if client and not client:GetIsVirtual() then
+			c = c + 1
+		end
+    end
+	return c
+end
+
 //Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
 local originalNS2GameRulesGetCanJoinTeamNumber
 originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
 	function(self, teamNumber)
 		if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
 			if self:GetGameState() == kGameState.Started then
-				local team1Players = self.team1:GetNumPlayers()
-				local team2Players = self.team2:GetNumPlayers()
+				local team1Players = GetRealPlayerCountPerTeam(1)
+				local team2Players = GetRealPlayerCountPerTeam(2)
 				if (teamNumber == 1 and team1Players >= 6) or (teamNumber == 2 and team2Players >= 6) then
 					return false
 				end
