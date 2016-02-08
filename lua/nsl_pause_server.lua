@@ -427,10 +427,8 @@ local function UpdateMoveState(deltatime)
 					gamestate.serverpauseloopenabled = true
 					SendAllClientsMessage(GetNSLMessage("PausePausedMessage"))
 					gamestate.gamepausedtime = Shared.GetTime()
-					//Shared.Message("Game Paused.")
 				else
 					//Since other event already running, just let the final trigger run there (will be next frame).
-					//Shared.Message("Game Resumed.")
 				end
 				gamestate.serverprepauseloopenabled = false
 				gamestate.gamepaused = not GetIsGamePaused()
