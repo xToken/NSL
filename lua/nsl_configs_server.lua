@@ -11,7 +11,7 @@ local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/maste
 local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
 local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 1.8,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.0,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0,
 								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0,
 								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.0,
