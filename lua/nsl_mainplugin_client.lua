@@ -148,7 +148,7 @@ function RegisterNSLModeSensitiveFunction(method)
 	if type(method) == "function" then
 		table.insert(kNSLConfigUpdateFunctions, method)
 	else
-		Shared.Message("Attempted to register non-function argument for NSL Config callback")
+		Shared.Message("NSL - Attempted to register non-function argument for NSL Config callback")
 		Shared.Message(Script.CallStack())
 	end
 end
