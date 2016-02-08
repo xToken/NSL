@@ -60,8 +60,8 @@ function ProcessSayCommand(player, command)
 
 end
 
-function EstablishConfigDependantSettings()
+function EstablishConfigDependantSettings(configLoaded)
 	for i = 1, #gConfigLoadedFunctions do
-		gConfigLoadedFunctions[i]()
+		gConfigLoadedFunctions[i](configLoaded)
 	end
 end
