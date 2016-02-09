@@ -1,5 +1,5 @@
 {
-	"Version": 1.8,
+	"Version": 2.0,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -23,14 +23,8 @@
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						true,
-		"MessageColor":							[0.5, 0, 0.5],
 		"PausedMaxDuration": 					300,
-		"Badges":				 				{
-													"1":									"ensl_mod",
-													"2":									"ensl_caster",
-													"3":									"ensl_ref",
-													"4":									"ensl_admin"
-												},
+		"MessageColor":							[0.5, 0, 0.5],
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
 												},
@@ -48,66 +42,17 @@
 													"MercsRequireApproval": 				true,
 													"OverrideTeamNames": 					true
 												},
+		"Badges":				 				{
+													"1":									"ensl_mod",
+													"2":									"ensl_caster",
+													"3":									"ensl_ref",
+													"4":									"ensl_admin"
+												},
 		"REFS":									[
 													344054,
 													3490104,
 													5176141
 												],
-		"TeamNames":							{
-													"all-in":				[ "all-in" ],
-													"calamity_gaming":		[ "calamitygaming" ],
-													"dark_legion":			[ "darklegion" ],
-													"godar":				[ "godar" ],
-													"legendary_snails":		[ "legendarysnails" ],
-													"lucky_fkers":			[ "luckyfkers" ],
-													"mimic":				[ "mimic" ],
-													"saunamen":				[ "saunamen" ],
-													"scurvy":				[ "scurvy" ],
-													"singularity":			[ "singularity" ],
-													"titus":				[ "titusgaming" ]
-												},
-		"LogoLocations":						{
-													"ns2_veil":
-														{
-															"control": {"origin": [55.65, 0, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0}
-														},
-													"ns2_summit":
-														{
-														
-														
-														
-														},
-													"ns2_tram":
-														{
-														
-														
-														
-														},
-													"ns2_biodome":
-														{
-														
-														
-														
-														},
-													"ns2_derelict":
-														{
-														
-														
-														
-														},
-													"ns2_descent":
-														{
-														
-														
-														
-														},
-													"ns2_jambi":
-														{
-														
-														
-														
-														}		
-												},
 		"AdminGroups":							{
 													"2":{
 														"commands": 
@@ -142,90 +87,6 @@
 														],
 														"type": "disallowed"
 													}		
-												},
-		"ConsistencyConfig":					{
-												"restrict": [ 
-															"lua/entry/*.entry"
-															],
-												"check": 	[ 	
-															"game_setup.xml", 
-															"*.lua", 
-															"*.hlsl", 
-															"*.shader", 
-															"*.screenfx", 
-															"*.surface_shader", 
-															"*.fxh",
-															"*.fx", 
-															"*.render_setup", 
-															"*.shader_template",
-															"*.soundinfo",
-															"*.level", 
-															"*.dds", 
-															"*.jpg", 
-															"*.png", 
-															"*.hmp",
-															"*.cinematic", 
-															"*.material", 
-															"*.model", 
-															"*.animation_graph", 
-															"*.polygons", 
-															"*.fev", 
-															"*.fsb", 
-															"*.entry"
-															],
-												"ignore": 	[ 	
-															"ui/*.dds", 
-															"sound/hitsounds_client.fev",
-															"sound/hitsounds_client.fsb",
-															"sound/hitsounds_client.soundinfo",
-															"shaders/DarkVision.hlsl"
-															]
-												},
-		"CustomSpawns":							{
-												"ns2_tram":		[
-																	{
-																		"effectiveDate":		2014.0910,
-																		"expiryDate":			2014.1017,
-																		"spawnData":			[
-																									{
-																										"name":				"Shipping",
-																										"team":				"aliens",
-																										"enemyspawns":    	["Warehouse", "Server Room"]
-																									},
-																									{
-																										"name":				"Warehouse",
-																										"team":				"marines",
-																										"enemyspawns":    	["Shipping"]
-																									},
-																									{
-																										"name":				"Server Room",
-																										"team":				"marines",
-																										"enemyspawns":    	["Shipping"]
-																									}
-																								]											
-																	},
-																	{
-																		"effectiveDate":		2014.1018,
-																		"expiryDate":			2014.1028,
-																		"spawnData":			[
-																									{
-																										"name":				"Shipping",
-																										"team":				"marines",
-																										"enemyspawns":    	["Warehouse", "Server Room"]
-																									},
-																									{
-																										"name":				"Warehouse",
-																										"team":				"aliens",
-																										"enemyspawns":    	["Shipping"]
-																									},
-																									{
-																										"name":				"Server Room",
-																										"team":				"aliens",
-																										"enemyspawns":    	["Shipping"]
-																									}														
-																								]											
-																	}
-																]															
 												}
 		},
 		{
@@ -250,114 +111,26 @@
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						false,
+		"MessageColor":							[1, 0, 1],
+		"GATHER": 								{
+													"OverrideTeamNames": 					false
+												},
 		"PCW": 									{
 													"PausedMaxDuration": 					120,
 													"TournamentModeForfeitClock":			0,
 													"TournamentModeRestartDuration": 		90,
 													"Limit6PlayerPerTeam": 					false,
-													"MercsRequireApproval": 				false
+													"MercsRequireApproval": 				false,
+													"OverrideTeamNames": 					true
 												},
 		"OFFICIAL":								{
 													"PausedMaxDuration": 					90,
 													"TournamentModeForfeitClock":			1200,
 													"TournamentModeRestartDuration": 		30,
 													"Limit6PlayerPerTeam": 					true,
-													"MercsRequireApproval": 				true
-												},
-		"ConsistencyConfig":					{
-												"restrict": [ 
-															"lua/entry/*.entry"
-															],
-												"check": 	[ 	
-															"game_setup.xml", 
-															"*.lua", 
-															"*.hlsl", 
-															"*.shader", 
-															"*.screenfx", 
-															"*.surface_shader", 
-															"*.fxh",
-															"*.fx", 
-															"*.render_setup", 
-															"*.shader_template",
-															"*.soundinfo",
-															"*.level", 
-															"*.dds", 
-															"*.jpg", 
-															"*.png", 
-															"*.hmp",
-															"*.cinematic", 
-															"*.material", 
-															"*.model", 
-															"*.animation_graph", 
-															"*.polygons", 
-															"*.fev", 
-															"*.fsb", 
-															"*.entry"
-															],
-												"ignore": 	[ 	
-															"ui/*.dds", 
-															"sound/hitsounds_client.fev",
-															"sound/hitsounds_client.fsb",
-															"sound/hitsounds_client.soundinfo",
-															"shaders/DarkVision.hlsl"
-															]
+													"MercsRequireApproval": 				true,
+													"OverrideTeamNames": 					true
 												}
-		},
-		{
-		"PerfLevel":							"Default",
-		"Interp": 								100,
-		"MoveRate": 							30,
-		"ClientRate": 							20,
-		"TickRate":								30,
-		"MaxDataRate": 							50
-		},
-		{
-		"PerfLevel":							"Low",
-		"Interp": 								80,
-		"MoveRate": 							33,
-		"ClientRate": 							33,
-		"TickRate":								33,
-		"MaxDataRate": 							65
-		},
-		{
-		"PerfLevel":							"Medium",
-		"Interp": 								50,
-		"MoveRate": 							40,
-		"ClientRate": 							40,
-		"TickRate":								40,
-		"MaxDataRate": 							65
-		},
-		{
-		"PerfLevel":							"High",
-		"Interp": 								40,
-		"MoveRate": 							50,
-		"ClientRate": 							50,
-		"TickRate":								50,
-		"MaxDataRate": 							80
-		},
-		{
-		"PerfLevel":							"Extreme",
-		"Interp": 								30,
-		"MoveRate": 							65,
-		"ClientRate": 							65,
-		"TickRate":								65,
-		"MaxDataRate": 							100
-		},
-		{
-		"PerfLevel":							"Experimental",
-		"Interp": 								70,
-		"MoveRate": 							50,
-		"ClientRate": 							20,
-		"TickRate":								30,
-		"MaxDataRate": 							50
-		},
-		{
-		"PerfLevel":							"Experimental2",
-		"Interp": 								15,
-		"MoveRate": 							100,
-		"ClientRate": 							100,
-		"TickRate":								100,
-		"MaxDataRate": 							100
 		}
 	],
 	"EndOfTable": true
