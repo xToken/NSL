@@ -10,7 +10,7 @@ local RefBadges = { }
 local NSL_FunctionData = { }
 local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
-local NSL_PlayerDataTimeout = 5
+local NSL_PlayerDataTimeout = 10
 
 //These are the only mandatory fields
 //S_ID 		- Steam ID
@@ -219,7 +219,6 @@ local function OnClientConnectENSLResponse(response)
 				NSL_ClientData[ns2id] = clientData
 				UpdateCallbacksWithNSLData(player, clientData)
 				UpdateClientBadge(ns2id)
-				NSL_PlayerDataRetries[ns2id] = nil
 			end
 		end
 	end
@@ -249,7 +248,6 @@ local function OnClientConnectAUSNS2Response(response)
 					
 					UpdateCallbacksWithNSLData(player, NSL_ClientData[ns2id])
 					UpdateClientBadge(ns2id)
-					NSL_PlayerDataRetries[ns2id] = nil
 				end				
 			end
 		end
@@ -274,6 +272,9 @@ function UpdateNSLPlayerData(RefTable)
 				if GetNSLConfigValue("PlayerDataFormat") == "AUSNS" then
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
 				end
+			else
+				//Configs might not be loaded yet - push out time
+				RefTable.time = NSL_PlayerDataTimeout
 			end
 		else
 			Shared.Message(string.format("NSL - Failed to get valid response from %s site for ns2id %s.", 
@@ -286,7 +287,7 @@ end
 local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
 	if GetNSLModEnabled() then
-		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 0})
+		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
 		//Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
 			//Sync user all badge data
