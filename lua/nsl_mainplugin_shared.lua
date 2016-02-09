@@ -34,6 +34,7 @@ Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
 local kNSLPluginConfig =
 {
     config = "enum kNSLPluginConfigs",
+	league = string.format("string (%d)", 20)
 }
 
 Shared.RegisterNetworkMessage("NSLPluginConfig", kNSLPluginConfig)
