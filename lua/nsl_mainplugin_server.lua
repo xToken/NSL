@@ -30,7 +30,7 @@ local function SetupClientRatesandConfig(client)
 	if GetNSLPerfValue("MoveRate") ~= 30 then
 		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
 	end
-	Server.SendNetworkMessage(client, "NSLPluginConfig", {config = kNSLPluginConfigs[GetNSLMode()]}, true)
+	Server.SendNetworkMessage(client, "NSLPluginConfig", {config = kNSLPluginConfigs[GetNSLMode()], league = GetActiveLeague()}, true)
 end
 
 local function SetupNSLTag()
@@ -86,7 +86,7 @@ local function SendClientUpdatedMode(newState)
 	for p = 1, #playerList do
 		local playerClient = Server.GetOwner(playerList[p])
 		if playerClient then
-			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState]}, true)
+			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState], league = GetActiveLeague()}, true)
 		end
 	end
 	SetupNSLTag()
