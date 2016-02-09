@@ -17,6 +17,10 @@ local kInsightTeamnameHack = false
 local kNSLDecals = { }
 local kNSLMode
 local kNSLConfigUpdateFunctions = { }
+local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
+local teamConfigLocalFile = "configs/nsl_teamconfig.json"
+local kNSLTeamConfig = { }
+local kTeamWinScreensEnabled = false
 
 local function GetUpValue(origfunc, name)
 
@@ -131,6 +135,47 @@ end
 
 Client.HookNetworkMessage("NSLSystemMessage", AdminMessageRecieved)
 
+function GetNSLTeamName(teamName)
+	if teamName and teamName ~= "" then
+		teamName = string.lower(teamName)
+		if kNSLTeamConfig and kNSLTeamConfig.TeamNames then
+			for nslname, names in pairs(kNSLTeamConfig.TeamNames) do
+				if table.contains(names, teamName) then
+					return nslname
+				end
+			end
+		end
+	end
+	return teamName
+end
+
+local function OnLoadLocalConfig(configFile)
+	local config = { }
+	local file = io.open(configFile, "r")
+	if file then
+		config = json.decode(file:read("*all"))
+		file:close()
+	end
+	return config
+end
+
+local function OnConfigResponse(response, league)
+	local responseTable
+	if response then
+		responseTable = json.decode(response)
+		if not responseTable or not responseTable.Version or not responseTable.EndOfTable then
+			Shared.Message("NSL - Failed getting team config from GitHub, using local copy.")
+			responseTable = OnLoadLocalConfig(teamConfigLocalFile)
+		end
+		for i, config in ipairs(responseTable.Configs) do
+			if config.LeagueName and config.LeagueName == league then
+				kNSLTeamConfig = config
+			end
+		end
+	end
+	return responseTable
+end
+
 function OnNSLConfigRecieved(message)
 	if message then
 		kNSLMode = EnumToString(kNSLPluginConfigs, message.config)
@@ -138,6 +183,9 @@ function OnNSLConfigRecieved(message)
 			kNSLConfigUpdateFunctions[i](kNSLMode)
 		end
 		Shared.Message("NSL Plugin currently running " .. kNSLMode .. " configuration.")
+		if kNSLMode ~= "DISABLED" then
+			Shared.SendHTTPRequest(teamConfigUpdateURL, "GET", function(response) OnConfigResponse(response, message.league) end)
+		end
 	end
 end
 
@@ -277,6 +325,49 @@ local function ChatUICreation(scriptName, script)
 		
 	end
 	
+	if scriptName == "GUIGameEnd" then
+		//LAZY
+		local kEndStates = enum({ 'AlienPlayerWin', 'MarinePlayerWin', 'AlienPlayerLose', 'MarinePlayerLose', 'AlienPlayerDraw', 'MarinePlayerDraw' })
+		local kMessageText = { [kEndStates.AlienPlayerWin] = "ALIEN_VICTORY",
+							   [kEndStates.MarinePlayerWin] = "MARINE_VICTORY",
+							   [kEndStates.AlienPlayerLose] = "ALIEN_DEFEAT",
+							   [kEndStates.MarinePlayerLose] = "MARINE_DEFEAT",
+							   [kEndStates.AlienPlayerDraw] = "DRAW_GAME",
+							   [kEndStates.MarinePlayerDraw] = "DRAW_GAME" }
+		
+		local oldGUIGameEndSetGameEnded = GUIGameEnd.SetGameEnded
+		function GUIGameEnd:SetGameEnded(playerWon, playerDraw, playerTeamType)
+			oldGUIGameEndSetGameEnded(self, playerWon, playerDraw, playerTeamType)
+			if kTeamWinScreensEnabled then
+				local playerIsMarine = playerTeamType == kMarineTeamType
+				local endState
+				if playerWon then
+					endState = playerIsMarine and kEndStates.MarinePlayerWin or kEndStates.AlienPlayerWin
+				elseif playerDraw then
+					endState = playerIsMarine and kEndStates.MarinePlayerDraw or kEndStates.AlienPlayerDraw
+				else
+					endState = playerIsMarine and kEndStates.MarinePlayerLose or kEndStates.AlienPlayerLose
+				end
+				local messageString = Locale.ResolveString(kMessageText[endState])
+				local winningTeamName = nil
+				if endState == kEndStates.MarinePlayerWin then
+					winningTeamName = InsightUI_GetTeam1Name()
+				elseif endState == kEndStates.AlienPlayerWin then
+					winningTeamName = InsightUI_GetTeam2Name()     
+				end
+				if winningTeamName then
+					messageString = string.format("%s Wins!", winningTeamName)
+				end
+				local teamDDS = string.format("materials/logos/%s.dds", GetNSLTeamName(winningTeamName))
+				if GetFileExists(teamDDS) then
+					self.endIcon:SetTexture(teamDDS)
+					self.messageText:SetPosition(Vector(0, 0, 0) * GUIScale(1))
+					self.messageText:SetText(messageString)
+				end
+			end
+		end
+	end
+	
 end
 
 ClientUI.AddScriptCreationEventListener(ChatUICreation)
@@ -396,32 +487,3 @@ local function OnClearNSLDecal(message)
 end
 
 Client.HookNetworkMessage("NSLClearDecals", OnClearNSLDecal)
-
-/*local function OnCommandSetYaw(yaw)
-	if yaw then
-		local rd = kNSLDecals[1]
-		local coords = Angles(0, yaw, 0):GetCoords(kNSLDecals[1].origin)
-		rd.decal:SetCoords(coords)
-		Print("Yaw set to " .. tostring(yaw))
-	else
-		Print("Yaw is " ..  tostring(kNSLDecals[1].yaw))
-	end
-end
-
-Event.Hook("Console_setyaw", OnCommandSetYaw)
-
-local function OnCommandSetXZ(x, z)
-	if x and z then
-		local rd = kNSLDecals[1]
-		local origin = kNSLDecals[1].origin
-		origin.x = x
-		origin.z = z
-		local coords = Angles(0, kNSLDecals[1].yaw, 0):GetCoords(origin)
-		rd.decal:SetCoords(coords)
-		Print("XZ set to " .. tostring(x) .. " " .. tostring(z))
-	else
-		Print("XZ is " ..  tostring(kNSLDecals[1].origin.x) .. " " .. tostring(kNSLDecals[1].origin.z))
-	end
-end
-
-Event.Hook("Console_setxz", OnCommandSetXZ)*/
