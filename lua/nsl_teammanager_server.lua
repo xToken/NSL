@@ -11,7 +11,7 @@ local overridenames = false
 local hookedPlayers = { }
 local kMinPlayersToName = 3
 local kOriginVec = Vector(0, 0, 0)
-local kDefaultDecal = "materials/logos/test.material"
+local kDefaultDecal = "materials/logos/globe.material"
 
 Script.Load("lua/nsl_class.lua")
 
@@ -111,9 +111,14 @@ table.insert(gConnectFunctions, SyncTeamInfotoClients)
 
 function GetActualTeamName(teamnum)
 	//Check players on team to get an idea of their 'team'
-	local teamname = ConditionalValue(teamnum == 1, t1name, t2name)
-	if not teamname then
-		teamname = ConditionalValue(teamnum == 1, "Frontiersmen", "Kharaa")
+	if teamnum == 1 then
+		teamname = t1name or "Frontiersmen"
+	elseif teamnum == 2 then
+		teamname = t2name or "Kharaa"
+	elseif teamnum == 3 then
+		teamname = "Spectators"
+	else
+		teamname = "Others"	
 	end
 	return teamname
 end
