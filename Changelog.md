@@ -1,5 +1,13 @@
 # Changelog
 
+* 2-8-17
+
+Updated config system to have multiple individual configs so things are more clear.
+TeamBadgeNames is loaded by clients now, can be used to show team decals on endgame vis.
+State save defaults to on.
+NSL decal system added.
+League can select colors for messages.
+
 * 1-24-16
 
 Updated state saving to account for NS2 not counting bot clients as players in the server browser, but counting them in the reserve-slot system.  This would cause anyone rejoining after a d/c on a full server to be kicked.
