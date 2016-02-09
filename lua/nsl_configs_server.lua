@@ -11,11 +11,11 @@ local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/maste
 local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
 local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.0,
-								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0,
-								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0,
-								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.0,
-								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.0, leagueConfigComplete = false,
+								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0, perfConfigComplete = false,
+								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
+								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0, spawnConfigComplete = false,
+								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.0, teamConfigComplete = false
 								}
 local NSL_Mode = "PCW"
 local NSL_League = "NSL"
@@ -145,6 +145,7 @@ function UpdateNSLScores(team1name, team1score, team2name, team2score)
 end
 
 local DefaultConfig = {
+LeagueName							= "Default",
 AutomaticMapCycleDelay				= 180 * 60,
 PauseEndDelay 						= 5,
 PauseStartDelay 					= 1,
@@ -181,9 +182,9 @@ MaxDataRate 						= 50,
 local Configs = { }
 local PerfConfigs = { }
 
-local function OnLoadLocalConfig(config)
+local function OnLoadLocalConfig(configFile)
 	local config = { }
-	local file = io.open(leagueConfiglocalFile, "r")
+	local file = io.open(configFile, "r")
 	if file then
 		config = json.decode(file:read("*all"))
 		file:close()
@@ -192,35 +193,62 @@ local function OnLoadLocalConfig(config)
 end
 
 local function ValidateResponse(response, request)
+	local responseTable
 	if response then
-		local responsetable = json.decode(response)
-		if not responsetable or not responsetable.Version or not responsetable.EndOfTable then
+		responseTable = json.decode(response)
+		if not responseTable or not responseTable.Version or not responseTable.EndOfTable then
 			if configRequestTracking[request .. "ConfigRetries"] < 3 then
 				configRequestTracking[request .. "ConfigRequest"] = false
 				configRequestTracking[request .. "ConfigRetries"] = configRequestTracking[request .. "ConfigRetries"] + 1
+				responseTable = nil
 			else
 				Shared.Message(string.format("NSL - Failed getting %s config from GitHub, using local copy.", request))
-				responsetable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
+				responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
 			end
-		elseif responsetable.Version < configRequestTracking[request .. "ExpectedVersion"] then
+		elseif responseTable.Version < configRequestTracking[request .. "ExpectedVersion"] then
 			//Old version still on github, use local cache
-			responsetable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
+			Shared.Message(string.format("NSL - Old copy of %s config on GitHub, using local copy.", request))
+			responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
+		end
+		if responseTable then
+			//GOOD DATA ITS AMAZING
+			configRequestTracking[request .. "ConfigComplete"] = true
 		end
 	end
-	return response
+	return responseTable
+end
+
+local function CheckForExistingConfig(leagueName)
+	if not Configs[leagueName] then
+		Configs[leagueName] = { }
+		Shared.Message("NSL - Adding league " .. leagueName .. ".")
+	end
+end
+
+local function tablemerge(tab1, tab2)
+	if tab1 and tab2 then
+		for k, v in pairs(tab2) do
+			if type(v) == "table" and type(tab1[k]) == "table" then
+				tablemerge(tab1[k], tab2[k])
+			else
+				tab1[k] = v
+			end
+		end
+	end
 end
 
 local function OnConfigResponse(response, request)
 	response = ValidateResponse(response, request)
-	if response then
-		for i, config in ipairs(responsetable.Configs) do
+	if response and response.Configs then
+		for i, config in ipairs(response.Configs) do
 			if config.LeagueName then
 				//assume valid, update Configs table, always uppercase
-				Shared.Message("NSL - Loading config " .. config.LeagueName .. " part " .. request .. ".")
-				Configs[string.upper(config.LeagueName)] = table.copy(Configs[string.upper(config.LeagueName)] or { }, config, true)
+				CheckForExistingConfig(string.upper(config.LeagueName))
+				//Shared.Message("NSL - Loading config " .. request .. " for " .. config.LeagueName .. ".")
+				tablemerge(Configs[string.upper(config.LeagueName)], config)
 			elseif config.PerfLevel then
 				//Performance configs
-				Shared.Message("NSL - Loading perf config " .. config.PerfLevel .. ".")
+				//Shared.Message("NSL - Loading perf config " .. config.PerfLevel .. ".")
 				PerfConfigs[string.upper(config.PerfLevel)] = config
 			end
 		end
@@ -235,21 +263,21 @@ local function OnServerUpdated()
 		Shared.SendHTTPRequest(leagueConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "league") end)
 		configRequestTracking["leagueConfigRequest"] = true
 	end
-	if not configRequestTracking["perfConfigRequest"] then
+	if not configRequestTracking["perfConfigRequest"] and configRequestTracking["leagueConfigComplete"] then
 		Shared.SendHTTPRequest(perfConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "perf") end)
 		configRequestTracking["perfConfigRequest"] = true
 	end
-	if not configRequestTracking["spawnConfigRequest"] then
+	if not configRequestTracking["consistencyConfigRequest"] and configRequestTracking["perfConfigComplete"] then
+		Shared.SendHTTPRequest(consistencyConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "consistency") end)
+		configRequestTracking["consistencyConfigRequest"] = true
+	end
+	if not configRequestTracking["spawnConfigRequest"] and configRequestTracking["consistencyConfigComplete"] then
 		Shared.SendHTTPRequest(spawnConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "spawn") end)
 		configRequestTracking["spawnConfigRequest"] = true
 	end
-	if not configRequestTracking["teamConfigRequest"] then
+	if not configRequestTracking["teamConfigRequest"] and configRequestTracking["spawnConfigComplete"] then
 		Shared.SendHTTPRequest(teamConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "team") end)
 		configRequestTracking["teamConfigRequest"] = true
-	end
-	if not configRequestTracking["consistencyConfigRequest"] then
-		Shared.SendHTTPRequest(consistencyConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "consistency") end)
-		configRequestTracking["consistencyConfigRequest"] = true
 	end
 end
 
