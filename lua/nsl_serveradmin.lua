@@ -65,21 +65,18 @@ function ReplaceLocals(originalFunction, replacedLocals)
     
 end
 
-local GetClientCanRunCommand = GetUpValue(CreateServerAdminCommand, "GetClientCanRunCommand")
+local oldGetClientCanRunCommand = GetClientCanRunCommand
+function GetClientCanRunCommand(client, commandName, printWarning)
 
-local function NSLGetClientCanRunCommand(client, commandName, printWarning)
-
-		if not client then return end
-		local NS2ID = client:GetUserId()
-		local canRun = false
-		if GetIsNSLRef(NS2ID) then
-			canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
-		end
-        if not canRun then
-			return GetClientCanRunCommand(client, commandName, printWarning)
-		end
-        return canRun
-        
-    end
-
-ReplaceLocals(CreateServerAdminCommand, { GetClientCanRunCommand = NSLGetClientCanRunCommand })
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	local canRun = false
+	if GetNSLLeagueAdminsAccess() and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
+		canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
+	end
+	if not canRun then
+		return oldGetClientCanRunCommand(client, commandName, printWarning)
+	end
+	return canRun
+	
+end
