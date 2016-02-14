@@ -76,6 +76,10 @@ local function SetupRates(configLoaded)
 		end
 		SetupNSLTag()
 	end
+	if configLoaded == "league" or configLoaded == "all" then
+		Server.SetNetworkFieldTruncationControl(GetNSLConfigValue("NetworkTruncation"))
+		Shared.Message(string.format("Network Truncation set to %s.", GetNSLConfigValue("NetworkTruncation")))
+	end
 end
 
 table.insert(gConnectFunctions, SetupClientRatesandConfig)

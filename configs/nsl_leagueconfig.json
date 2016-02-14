@@ -25,6 +25,7 @@
 		"SavePlayerStates":						true,
 		"PausedMaxDuration": 					300,
 		"MessageColor":							[0.10, 0.65, 0.89],
+		"NetworkTruncation":					0,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
 												},
@@ -112,6 +113,7 @@
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						false,
 		"MessageColor":							[1, 0, 1],
+		"NetworkTruncation":					0,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
 												},

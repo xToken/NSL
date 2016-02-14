@@ -168,7 +168,8 @@ UseDefaultSkins						= false,
 PauseOnDisconnect					= false,
 SavePlayerStates					= false,
 OverrideTeamNames					= false,
-MessageColor						= {0.5, 0, 0.5}
+MessageColor						= {0.10, 0.65, 0.89},
+NetworkTruncation					= 0
 }
 
 local DefaultPerfConfig = {
