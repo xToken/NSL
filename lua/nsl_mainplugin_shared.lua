@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_mainplugin_shared.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_mainplugin_shared.lua
+-- - Dragon
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_pause_shared.lua")
@@ -117,6 +117,8 @@ local kNSLClearDecalMessage =
 }
 
 Shared.RegisterNetworkMessage("NSLClearDecals", kNSLClearDecalMessage)
+
+Shared.RegisterNetworkMessage("NSLReplacePlayer")
 
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 
