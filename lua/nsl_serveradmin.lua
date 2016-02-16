@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_serveradmin.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_serveradmin.lua
+-- - Dragon
 
-//NSL Server Admin Hooks
+--NSL Server Admin Hooks
 
 local function GetUpValue(origfunc, name)
 

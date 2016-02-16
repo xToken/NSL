@@ -1,10 +1,10 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_mainplugin_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_mainplugin_server.lua
+-- - Dragon
 
-//NSL Main Plugin
-//Reworked to function more as a 'league' plugin, not just a ENSL plugin.
+--NSL Main Plugin
+--Reworked to function more as a 'league' plugin, not just a ENSL plugin.
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
@@ -21,9 +21,9 @@ local kCachedTickRate = 30
 local kNSLTag = "nsl"
 local kNSLAltChatMode = false
 
-//Supposedly this still not syncronized.
+--Supposedly this still not syncronized.
 local function SetupClientRatesandConfig(client)
-	//If non-default rates, send to clients.
+	--If non-default rates, send to clients.
 	if GetNSLPerfValue("Interp") ~= 100 then
 		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
 	end
@@ -44,7 +44,7 @@ local function SetupRates(configLoaded)
 	
 	if configLoaded == "perf" or configLoaded == "all" then
 		if GetNSLPerfValue("TickRate") > kCachedTickRate then
-			//Tickrate going up, increase it first.
+			--Tickrate going up, increase it first.
 			Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
 			kCachedTickRate = GetNSLPerfValue("TickRate")
 			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
@@ -52,7 +52,7 @@ local function SetupRates(configLoaded)
 				kCachedSendRate = GetNSLPerfValue("ClientRate")
 			end
 		elseif GetNSLPerfValue("TickRate") <= kCachedTickRate then
-			//Tickrate going down, set updaterate first.
+			--Tickrate going down, set updaterate first.
 			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
 				Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
 				kCachedSendRate = GetNSLPerfValue("ClientRate")
@@ -99,14 +99,14 @@ end
 table.insert(gPluginStateChange, SendClientUpdatedMode)
 
 local originalPlayerOnJoinTeam
-//Maintain original PlayerOnJoinTeam
+--Maintain original PlayerOnJoinTeam
 originalPlayerOnJoinTeam = Class_ReplaceMethod("Player", "OnJoinTeam", 
 	function(self)
 		originalPlayerOnJoinTeam(self)
-		//This is new, to prevent players joining midgame and getting pRes.
+		--This is new, to prevent players joining midgame and getting pRes.
 		local gamerules = GetGamerules()
 		if gamerules and gamerules:GetGameStarted() then
-			//Set pres to 0.
+			--Set pres to 0.
 			local team = self:GetTeam()
 			local startingpres = kPlayerInitialIndivRes
 			if kAlienInitialIndivRes and kMarineInitialIndivRes and team then
@@ -120,21 +120,21 @@ originalPlayerOnJoinTeam = Class_ReplaceMethod("Player", "OnJoinTeam",
 )
 
 local originalNS2GRGetFriendlyFire
-//Override friendly fire function checks
+--Override friendly fire function checks
 originalNS2GRGetFriendlyFire = Class_ReplaceMethod("NS2Gamerules", "GetFriendlyFire", 
 	function(self)
 		return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 	end
 )
 
-//Override friendly fire function checks
+--Override friendly fire function checks
 function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
 local oldMapCycle_CycleMap = MapCycle_CycleMap
 function MapCycle_CycleMap()
-	//Override to prevent automatic mapcycle from lazy server admins
+	--Override to prevent automatic mapcycle from lazy server admins
 end
 
 local function NewServerAgeCheck(self)
@@ -149,10 +149,10 @@ local function NewServerAgeCheck(self)
 	end
 end
 
-//Setup Periodic MapCycle to prevent some animation craziness.
+--Setup Periodic MapCycle to prevent some animation craziness.
 ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 
-//Set friendly fire percentage
+--Set friendly fire percentage
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
 local function ConvertTabletoOrigin(t)
@@ -162,7 +162,7 @@ local function ConvertTabletoOrigin(t)
 	return nil
 end
 
-//Simple functions to make sending messages easier.
+--Simple functions to make sending messages easier.
 local function BuildAdminMessage(message, teamname, client)
 	local t = { }
 	if client then
@@ -373,7 +373,7 @@ end
 CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetPerfConfigAccess, "Toggles league staff having access set performance configs.")
 
 local function SetupServerConfig()
-	//Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
+	--Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
 	Server.SetConfigSetting("rookie_friendly", false)
 	Server.SetConfigSetting("force_even_teams_on_join", false)
 	Server.SetConfigSetting("auto_team_balance", {enabled_after_seconds = 0, enabled = false, enabled_on_unbalance_amount = 2})

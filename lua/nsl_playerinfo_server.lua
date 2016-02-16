@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_playerinfo_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_playerinfo_server.lua
+-- - Dragon
 
 local function UpdateFromNSLPlayerData(player, nsldata)
 	if player then

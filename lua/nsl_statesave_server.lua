@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_statesave_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_statesave_server.lua
+-- - Dragon
 
 Script.Load("lua/nsl_class.lua")
 
@@ -14,33 +14,34 @@ local NSLDontGenPlayerOnConnect = false
 local function StoreDisconnectedTeamPlayer(self, client)
 	if client then
 		local player = client:GetControllingPlayer()
-		//If we kicked already cached player, just assume something might have gone wrong, and dont save again.
+		--If we kicked already cached player, just assume something might have gone wrong, and dont save again.
 		if player and not player.isCached and GetNSLConfigValue("SavePlayerStates") then
 			local teamNumber = player:GetTeamNumber()
 			if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
-				//Valid team, player, config opt.  Check gamestate.
+				--Valid team, player, config opt.  Check gamestate.
 				if self:GetGameStarted() then
-					//Do things
-					//Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
+					--Do things
+					--Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
 					local id = client:GetUserId()
 					local name = player:GetName()
 					local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
 					NSLDontGenPlayerOnConnect = true
-					local newclient = Server.AddVirtualClient() //Fake client to prevent death of retarded amount of NS2 codebase that is reliant on valid clients without ANY checks if not.
+					local newclient = Server.AddVirtualClient() 
+					--Fake client to prevent death of retarded amount of NS2 codebase that is reliant on valid clients without ANY checks if not.
 					NSLDontGenPlayerOnConnect = false
 					player:RemoveSpectators(tempplayer)
 					player:SetControllerClient(newclient)
 					tempplayer:SetControllerClient(client)
-					//Block things
+					--Block things
 					player.isCached = true
 					player:SetName("[D/C]" .. name)
-					//Player ENT should be disjoined, cache to table.
+					--Player ENT should be disjoined, cache to table.
 					NSL_VirtualClients[id] = newclient
 					NSL_DisconnectedIDs[name] = id
 					NSL_VirtualClientCount = NSL_VirtualClientCount + 1
-					//Force Pause
-					//Will consume a pause for the team, but will always pause even if out.
-					//During crash, team may pause before, so check.
+					--Force Pause
+					--Will consume a pause for the team, but will always pause even if out.
+					--During crash, team may pause before, so check.
 					if not GetIsGamePaused() and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
 						TriggerDisconnectNSLPause(name, teamNumber, 1, true)
 					end
@@ -53,7 +54,7 @@ end
 local originalGamerulesOnClientConnect
 originalGamerulesOnClientConnect = Class_ReplaceMethod("Gamerules", "OnClientConnect", 
 	function(self, client)
-		//Already exists, and is cached so maybeh?  Atleast basic safety to ensure only bot clients.
+		--Already exists, and is cached so maybeh?  Atleast basic safety to ensure only bot clients.
 		if NSLDontGenPlayerOnConnect and client:GetIsVirtual() then
 			return
 		end
@@ -68,17 +69,17 @@ function NS2Gamerules:OnClientDisconnect(client)
 end
 
 function CleanupCachedPlayers()
-	//Delete ents if still valid
+	--Delete ents if still valid
 	for k, v in pairs(NSL_VirtualClients) do
 		if NSL_VirtualClients[k] then
 			Server.DisconnectClient(NSL_VirtualClients[k])
 		end
 	end
-	//Clear ref table
+	--Clear ref table
 	NSL_DisconnectedIDs = { }
-	//Clear this too
+	--Clear this too
 	NSL_VirtualClients = { }
-	//No virtual clients here dawg
+	--No virtual clients here dawg
 	NSL_VirtualClientCount = 0
 end
 
@@ -88,7 +89,7 @@ function NS2Gamerules:ResetGame()
 	CleanupCachedPlayers()
 end
 
-//Hook into this shiz
+--Hook into this shiz
 local oldRagdollMixinOnTag = RagdollMixin.OnTag
 function RagdollMixin:OnTag(tagName)
 	if not (self.isCached and tagName == "destroy") then
@@ -114,11 +115,11 @@ local function RemoveCachedFlag(self)
 end
 
 function MoveClientToStoredPlayer(client, ns2ID)
-	//So we found a stored player, and we are still paused
+	--So we found a stored player
 	local player = client:GetControllingPlayer()
 	local success = false
 	local virtualClient = NSL_VirtualClients[ns2ID]
-	//Dont want to stick them back into a ragdoll, as funny as it would be :D - anddddd thats now what we do cause its fun :D:D
+	--Dont want to stick them back into a ragdoll, as funny as it would be :D - anddddd thats now what we do cause its fun :D:D
 	if virtualClient and player then
 		local name = player:GetName()
 		local oldplayer = virtualClient:GetControllingPlayer()
@@ -128,7 +129,7 @@ function MoveClientToStoredPlayer(client, ns2ID)
 			Server.DisconnectClient(virtualClient)
 		end
 		oldplayer:SetName(name)
-		//Need to send tech tree to player
+		--Need to send tech tree to player
 		oldplayer.sendTechTreeBase = true
 		oldplayer:AddTimedCallback(RemoveCachedFlag, 0.1)
 		success = true
@@ -143,7 +144,7 @@ local function OnClientConnected(client)
 	if client and GetNSLConfigValue("SavePlayerStates") then
 		local NS2ID = client:GetUserId()
 		if NSL_VirtualClients[NS2ID] then
-			//So we found a stored player
+			--So we found a stored player
 			MoveClientToStoredPlayer(client, NS2ID)
 		end
 	end
@@ -170,14 +171,14 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 			local replacePlayer = GetPlayerMatching(newPlayer)
 			if replacePlayer then
 				local replaceClient = Server.GetOwner(replacePlayer)
-				//Found new replacement, find cached player
+				--Found new replacement, find cached player
 				local id = tonumber(oldPlayer)
 				if NSL_DisconnectedIDs[oldPlayer] then
-					//Name
+					--Name
 					id = tonumber(NSL_DisconnectedIDs[oldPlayer])
 				end
 				if replaceClient and id and NSL_VirtualClients[id] then
-					//it worked, holy shit
+					--it worked, holy shit
 					if MoveClientToStoredPlayer(replaceClient, id) then
 						ServerAdminPrint(client, "Set " .. tostring(newPlayer) .. " as replacement for " .. tostring(oldPlayer) .. ".")
 					else
@@ -225,7 +226,7 @@ end
 
 Event.Hook("VirtualClientMove", OnVirtualClientMove)
 
-//This is seriously retarded...
+--This is seriously retarded...
 local function OnCheckConnectionAllowed(userId)
 
     --check if the user is banned
@@ -257,7 +258,7 @@ local function OnCheckConnectionAllowed(userId)
         end
     end
 
-	//Dont count NSLVirtualClients in MaxPlayers
+	--Dont count NSLVirtualClients in MaxPlayers
     local numPlayers = Server.GetNumPlayers() - NSL_VirtualClientCount
     local maxPlayers = Server.GetMaxPlayers()
     if (numPlayers < (maxPlayers - reservedSlots.amount)) or (newPlayerIsReserved and (numPlayers < maxPlayers)) then
@@ -269,7 +270,7 @@ local function OnCheckConnectionAllowed(userId)
 
 end
 
-//Find old reserveslot hook
+--Find old reserveslot hook
 local HookTable = debug.getregistry()["Event.HookTable"]
 if HookTable then
 	for k, v in pairs(HookTable) do

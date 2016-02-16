@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_firstpersonblock_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_firstpersonblock_server.lua
+-- - Dragon
 
-//First Person Spectator Block
+--First Person Spectator Block
 local kDeltatimeBetweenAction = 0.3
 	
 local function IsTeamSpectator(self)
@@ -26,7 +26,7 @@ local function NextSpectatorMode(self, mode)
 	end
 
 	local nextMode = (mode % numModes) + 1
-	// FirstPerson is only used directly through SetSpectatorMode(), never in this function.
+	-- FirstPerson is only used directly through SetSpectatorMode(), never in this function.
 	if nextMode == kSpectatorMode.FirstPerson and not GetNSLConfigValue("FirstPersonSpectate") and GetNSLModEnabled() then
 		if IsTeamSpectator(self) then
 			return kSpectatorMode.Following
@@ -102,7 +102,7 @@ oldNS2SpectatorOnInitialized = Class_ReplaceMethod("Spectator", "OnInitialized",
 			self.timeFromLastAction = 0
 			self:SetIsVisible(false)
 			self:SetIsAlive(false)
-			// Start us off by looking for a target to follow.
+			-- Start us off by looking for a target to follow.
 			if not GetNSLConfigValue("FirstPersonSpectate") and GetNSLModEnabled() then
 				self:SetSpectatorMode(kSpectatorMode.Following)
 			else
@@ -117,10 +117,10 @@ oldNS2SpectatorOnInitialized = Class_ReplaceMethod("Spectator", "OnInitialized",
 			
 		end
 		
-		// Remove physics
+		-- Remove physics
 		self:DestroyController()
 		
-		// Other players never see a spectator.
+		-- Other players never see a spectator.
 		self:SetPropagate(Entity.Propagate_Never)
 	end
 )

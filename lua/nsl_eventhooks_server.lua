@@ -1,25 +1,25 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_eventhooks_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_eventhooks_server.lua
+-- - Dragon
 
-//Functions for chat commands
+--Functions for chat commands
 gChatCommands = { }
-//Chat functions which could use additional arguments
+--Chat functions which could use additional arguments
 gArgumentedChatCommands = { }
-//Functions on connect
+--Functions on connect
 gConnectFunctions = { }
-//Plugin Activation Functions
+--Plugin Activation Functions
 gPluginStateChange = { }
-//Game End Functions
+--Game End Functions
 gGameEndFunctions = { }
-//Config Loaded Functions
+--Config Loaded Functions
 gConfigLoadedFunctions = { }
-//PlayerData Updated Functions
+--PlayerData Updated Functions
 gPlayerDataUpdatedFunctions = { }
-//TeamNames Updated Functions
+--TeamNames Updated Functions
 gTeamNamesUpdatedFunctions = { }
-//TeamJoin Functions
+--TeamJoin Functions
 gTeamJoinedFunctions = { }
 
 local function OnClientConnected(client)

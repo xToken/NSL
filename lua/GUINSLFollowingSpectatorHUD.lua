@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\GUINSLFollowingSpectatorHUD.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\GUINSLFollowingSpectatorHUD.lua
+-- - Dragon
 
 class 'GUINSLFollowingSpectatorHUD' (GUIScript)
 

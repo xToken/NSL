@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_configs_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_configs_server.lua
+-- - Dragon
 
-//NSL Configs
+--NSL Configs
 local configFileName = "NSLConfig.json"
 local leagueConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_leagueconfig.json"
 local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_perfconfig.json"
@@ -207,12 +207,12 @@ local function ValidateResponse(response, request)
 				responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
 			end
 		elseif responseTable.Version < configRequestTracking[request .. "ExpectedVersion"] then
-			//Old version still on github, use local cache
+			--Old version still on github, use local cache
 			Shared.Message(string.format("NSL - Old copy of %s config on GitHub, using local copy.", request))
 			responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
 		end
 		if responseTable then
-			//GOOD DATA ITS AMAZING
+			--GOOD DATA ITS AMAZING
 			configRequestTracking[request .. "ConfigComplete"] = true
 		end
 	end
@@ -243,13 +243,13 @@ local function OnConfigResponse(response, request)
 	if response and response.Configs then
 		for i, config in ipairs(response.Configs) do
 			if config.LeagueName then
-				//assume valid, update Configs table, always uppercase
+				--assume valid, update Configs table, always uppercase
 				CheckForExistingConfig(string.upper(config.LeagueName))
-				//Shared.Message("NSL - Loading config " .. request .. " for " .. config.LeagueName .. ".")
+				--Shared.Message("NSL - Loading config " .. request .. " for " .. config.LeagueName .. ".")
 				tablemerge(Configs[string.upper(config.LeagueName)], config)
 			elseif config.PerfLevel then
-				//Performance configs
-				//Shared.Message("NSL - Loading perf config " .. config.PerfLevel .. ".")
+				--Performance configs
+				--Shared.Message("NSL - Loading perf config " .. config.PerfLevel .. ".")
 				PerfConfigs[string.upper(config.PerfLevel)] = config
 			end
 		end
@@ -285,18 +285,18 @@ end
 Event.Hook("UpdateServer", OnServerUpdated)
 
 function GetNSLConfigValue(value)
-	//Check League config
+	--Check League config
 	if Configs[NSL_League] then
-		//Check League/Mode Specific config
+		--Check League/Mode Specific config
 		if Configs[NSL_League][NSL_Mode] and Configs[NSL_League][NSL_Mode][value] then
 			return Configs[NSL_League][NSL_Mode][value]
 		end
-		//Check League Specific config
+		--Check League Specific config
 		if Configs[NSL_League][value] then
 			return Configs[NSL_League][value]
 		end
 	end
-	//Base Config
+	--Base Config
 	if DefaultConfig[value] then
 		return DefaultConfig[value]
 	end
@@ -304,7 +304,7 @@ function GetNSLConfigValue(value)
 end
 
 function GetNSLPerfValue(value)
-	//Check base config
+	--Check base config
 	if PerfConfigs[NSL_PerfLevel] and PerfConfigs[NSL_PerfLevel][value] then
 		return PerfConfigs[NSL_PerfLevel][value]
 	end
@@ -367,7 +367,7 @@ local function GetGroupCanRunCommand(groupData, commandName)
 	elseif groupData.type == "disallowed" then
 		return not existsInList
 	else
-		//Invalid structure
+		--Invalid structure
 		return false
 	end
 	

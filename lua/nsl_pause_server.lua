@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_pause_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_pause_server.lua
+-- - Dragon
 
-//Pause
+--Pause
 
 Script.Load("lua/nsl_class.lua")
 
@@ -182,7 +182,7 @@ local function UpdatePausesOnGameEnd(self, winningteam)
 	if GetNSLModEnabled() then
 		gamestate.team1resume = false
 		gamestate.team2resume = false
-		//Check pause and copy?
+		--Check pause and copy?
 		local alienpauses = 0
 		local marinepauses = 0
 		if gamestate.teampauses["Aliens"] and gamestate.teampauses["Aliens"] > 0 then
@@ -253,7 +253,7 @@ end
 local lastTimeAdjustmentUpdate = 0
 local kTimeAdjustmentUpdateRate = 1
 
-//This runs every tick to procedurally update any timerelevant fields of any relevant ents to insure they remain in the appropriate state.
+--This runs every tick to procedurally update any timerelevant fields of any relevant ents to insure they remain in the appropriate state.
 local function UpdateEntStates(deltatime)
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	local updateTime = false
@@ -283,7 +283,7 @@ local function UpdateEntStates(deltatime)
 	end
 end
 
-//This runs when game resumes, should restore any ents whos states were saved initially.
+--This runs when game resumes, should restore any ents whos states were saved initially.
 local function ResumeEntStates()
 	
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
@@ -294,7 +294,7 @@ local function ResumeEntStates()
 			player.timepaused = gamestate.gamepausedtime
 		end
 	end
-	//Resume the annoying noise
+	--Resume the annoying noise
 	local Obs = Shared.GetEntitiesWithClassname("Observatory")
 	for _, Ob in ientitylist(Obs) do
 		if Ob.distressBeaconTime ~= nil and Ob.distressBeaconSound ~= nil then
@@ -313,31 +313,28 @@ local function ResumeEntStates()
 			end
 		end
 	end
-	
-	//Clean any cachedplayers
-	CleanupCachedPlayers()
 
 end
 
-// This runs when the pause enables, saves the times/states of any ents that cannot be procedurally correctly.
+--This runs when the pause enables, saves the times/states of any ents that cannot be procedurally correctly.
 local function SaveEntStates()
 
-	//Stopppp the duck turrets
+	--Stopppp the duck turrets
 	local Sentries = Shared.GetEntitiesWithClassname("Sentry")
 	for _, Sentry in ientitylist(Sentries) do
 		Sentry.attacking = false
 	end
 
-	//Stop the bacon from spammmming.
+	--Stop the bacon from spammmming.
 	local Obs = Shared.GetEntitiesWithClassname("Observatory")
 	for _, Ob in ientitylist(Obs) do
 		if Ob.distressBeaconTime ~= nil and Ob.distressBeaconSound ~= nil then
 			Ob.distressBeaconSound:Stop()
-			//Dont wanna listen to that noise over and over and over and over and over ..
+			--Dont wanna listen to that noise over and over and over and over and over ..
 		end
 	end
 	
-	//Cancel out whip attacks
+	--Cancel out whip attacks
 	local Whips = Shared.GetEntitiesWithClassname("Whip")
 	for _, Whip in ientitylist(Whips) do
 		Whip.attacking = false
@@ -348,7 +345,7 @@ local function SaveEntStates()
 		Whip.waitingForEndAttack = false
 	end
 	
-	//Block movement instantly so that its not updated each frame needlessly
+	--Block movement instantly so that its not updated each frame needlessly
 	local playerRecords = Shared.GetEntitiesWithClassname("Player")
 	for _, player in ientitylist(playerRecords) do
 		if player ~= nil then
@@ -381,7 +378,7 @@ local function UpdateMoveState(deltatime)
 	if gamestate.serverpauseloopenabled then
 		gamestate.gamepauseddelta = gamestate.gamepauseddelta + deltatime
 		if GetIsGamePaused() then
-			//Going to check and reblock player movement every second or so - trying every frame, might as well.
+			--Going to check and reblock player movement every second or so - trying every frame, might as well.
 			gSharedGetTimeAdjustments = gSharedGetTimeAdjustments + deltatime
 			gamestate.gamepausedmessagetime = (gamestate.gamepausedmessagetime + deltatime)
 			if gamestate.gamepausedmessagetime > GetNSLConfigValue("PausedReadyNotificationDelay") and gamestate.gamepausedcountdown == 0 then
@@ -402,7 +399,7 @@ local function UpdateMoveState(deltatime)
 				gamestate.serverprepauseloopenabled = true
 				gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 			end
-			//No more scoreboard updates, uses PlayerInfo ent.
+			--No more scoreboard updates, uses PlayerInfo ent.
 		else
 			ResumeEntStates()
 			gamestate.serverpauseloopenabled = false
@@ -428,7 +425,7 @@ local function UpdateMoveState(deltatime)
 					SendAllClientsMessage(GetNSLMessage("PausePausedMessage"))
 					gamestate.gamepausedtime = Shared.GetTime()
 				else
-					//Since other event already running, just let the final trigger run there (will be next frame).
+					--Since other event already running, just let the final trigger run there (will be next frame).
 				end
 				gamestate.serverprepauseloopenabled = false
 				gamestate.gamepaused = not GetIsGamePaused()
@@ -470,7 +467,7 @@ local function OnCommandPause(client)
 	
 end
 
-//Trigger pause from somewhere else
+--Trigger pause from somewhere else
 function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 	
 	if GetGamerules():GetGameStarted() and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") then

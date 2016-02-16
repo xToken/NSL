@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_teammanager_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_teammanager_server.lua
+-- - Dragon
 
 local t1name = "Frontiersmen"
 local t2name = "Kharaa"
@@ -39,16 +39,16 @@ local function GetNSLDecalLocations()
 	local tpDecals = { }
 	local team1decalname = string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name))
 	local team2decalname = string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name))
-	//Build transfer table of TP Locations to current Decal
+	--Build transfer table of TP Locations to current Decal
 	for _, techPoint in ientitylist(techPoints) do
 		if techPoint:GetAttached() then
 			tpDecals[string.lower(techPoint:GetLocationName())] = techPoint.occupiedTeam == 1 and team1decalname or team2decalname
 		end
 	end
-	//Build full list of all decals.
+	--Build full list of all decals.
 	for loc, data in pairs(maplocations) do
 		local decal = tpDecals[loc] or data.decal or kDefaultDecal
-		//Sanity File Check
+		--Sanity File Check
 		if decal and not GetFileExists(decal) then
 			decal = kDefaultDecal
 		end
@@ -79,7 +79,7 @@ local function SyncLogos(spec)
 end
 
 local function SyncNSLDecalsToPlayer(player, teamNumber)
-	//Clear all decals
+	--Clear all decals
 	Server.SendNetworkMessage(player, "NSLClearDecals", { origin = kOriginVec }, true)
 	if teamNumber == kSpectatorIndex then
 		SyncLogos(player)
@@ -89,9 +89,9 @@ end
 table.insert(gTeamJoinedFunctions, SyncNSLDecalsToPlayer)
 
 local function UpdateAllNSLDecals()
-	//Clear all decals for everyone.
+	--Clear all decals for everyone.
 	Server.SendNetworkMessage("NSLClearDecals", { origin = kOriginVec }, true)
-	//Get All Specs
+	--Get All Specs
 	for _, spec in ipairs(GetEntitiesForTeam("Spectator", kSpectatorIndex)) do
 		SyncNSLDecalsToPlayer(spec, kSpectatorIndex)
 	end	
@@ -110,7 +110,7 @@ end
 table.insert(gConnectFunctions, SyncTeamInfotoClients)
 
 function GetActualTeamName(teamnum)
-	//Check players on team to get an idea of their 'team'
+	--Check players on team to get an idea of their 'team'
 	if teamnum == 1 then
 		teamname = t1name or "Frontiersmen"
 	elseif teamnum == 2 then
@@ -170,7 +170,8 @@ local function CheckMercTeamJoin(player, teamNumber)
 			if (teamNumber == 1 or teamNumber == 2) and teamname ~= nsldata.NSL_Team then
 				if tqueue[teamNumber] == nil then
 					tqueue[teamNumber] = { }
-					tqueue[teamNumber][ns2id] = false //This is set to true when mercs approved.
+					tqueue[teamNumber][ns2id] = false 
+					--This is set to true when mercs approved.
 					SendClientMessage(client, GetNSLMessage("MercApprovalNeeded"))
 					return false
 				elseif tqueue[teamNumber][ns2id] ~= true then
@@ -211,7 +212,7 @@ local function UpdateOnSuccessfulTeamJoin(player, newTeamNumber)
 	end
 end
 
-//Detect team changes
+--Detect team changes
 local originalNS2GRJoinTeam
 originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam", 
 	function(self, player, newTeamNumber, force)
@@ -221,7 +222,7 @@ originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam",
 		local success, player = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
 		if success then
 			if not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
-				//Joined team, update
+				--Joined team, update
 				local ntname = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
 				if newTeamNumber == 1 and ntname ~= t1name then
 					t1name = ntname
@@ -254,7 +255,7 @@ local function UpdateTeamDataOnGameEnd(self, winningteam)
 				end
 			end
 		end
-		//Clear merc queue
+		--Clear merc queue
 		tqueue = { }
 		UpdateNSLScores(t1name, tscores[t1name] or 0, t2name, tscores[t2name] or 0)
 		SyncTeamInfotoClients()
@@ -414,7 +415,7 @@ local function OnClientCommandMercHelp(client)
 	if client then
 		local NS2ID = client:GetUserId()
 		if GetIsNSLRef(NS2ID) then
-			//Print Ref only merc commands
+			--Print Ref only merc commands
 			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
 			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
 		end
@@ -434,11 +435,11 @@ Event.Hook("Console_sv_nslmerchelp",               OnClientCommandMercHelp)
 local function OnNetMsgRequestTeamTechTree(client, message)
     local player = client:GetControllingPlayer()
 	local teamNum = message.teamNumber
-	//Send stuff now, add them to table to recieve updates for that team.
-	//Safty third ladies
+	--Send stuff now, add them to table to recieve updates for that team.
+	--Safty third ladies
 	if player and player:isa("Spectator") then
 		if teamNum ~= 1 and teamNum ~= 2 then
-			//Geeeeeeet outta here
+			--Geeeeeeet outta here
 			player.hookedTechTree = 0
 			table.remove(hookedPlayers, player:GetId())
 			Server.SendNetworkMessage(player, "ClearTechTree", {}, true)
@@ -464,7 +465,7 @@ table.insert(gGameEndFunctions, OnGameEndClearTechHooks)
 local originalTeamGetPlayers
 originalTeamGetPlayers = Class_ReplaceMethod("Team", "GetPlayers",
 	function(self)
-		//KEKEKEKEKEKEKE
+		--KEKEKEKEKEKEKE
 		local players = originalTeamGetPlayers(self)
 		if self.IsUpdatingTechTree and hookedPlayers then
 			local HP = { }
@@ -473,9 +474,9 @@ originalTeamGetPlayers = Class_ReplaceMethod("Team", "GetPlayers",
 			for index, pId in ipairs(HP) do
 				if pId then
 					local player = Shared.GetEntity(pId)
-					//This creates a bit of a mess, but no good way to make sure EntIDs stay relevant without some kind of global OnEntityIDChanged thingie... it works :/
+					--This creates a bit of a mess, but no good way to make sure EntIDs stay relevant without some kind of global OnEntityIDChanged thingie... it works :/
 					if player and player:isa("Spectator") then
-						//Always readd if still a spec and has a valid hook.
+						--Always readd if still a spec and has a valid hook.
 						if player.hookedTechTree == 1 or player.hookedTechTree == 2 then
 							table.insert(hookedPlayers, player:GetId())
 							if player.hookedTechTree == self:GetTeamNumber() then

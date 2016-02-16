@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_mainplugin_client.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_mainplugin_client.lua
+-- - Dragon
 
-//NSL Main Plugin
+--NSL Main Plugin
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")
@@ -77,7 +77,7 @@ end
 
 Client.HookNetworkMessage("TeamNames", OnNewTeamNames)
 
-//Fix for low damage to techpoints causing infinite flashing warnings
+--Fix for low damage to techpoints causing infinite flashing warnings
 local originalNS2InsightUI_GetTechPointData = InsightUI_GetTechPointData
 function InsightUI_GetTechPointData()
 	local techPointData = originalNS2InsightUI_GetTechPointData()
@@ -94,7 +94,7 @@ local NSLMessages = { }
 local kNSLDefaultMessageColor = Color(1, 0, 0, 1)
 local kNSLMessageHexColor = 0x800080
 
-//Meh
+--Meh
 local function BuildColorFromVector(v)
 	if v and type(v) == "cdata" and v.isa and v:isa("Vector") then
 		return Color(v.x, v.y, v.z, 1)
@@ -121,7 +121,7 @@ local function AdminMessageRecieved(message)
 		table.insert(NSLMessages, BuildColorFromVector(message.color))
         table.insert(NSLMessages, message.message)
 		
-		//No idea what this crap is for...
+		--No idea what this crap is for...
         table.insert(NSLMessages, false)
         table.insert(NSLMessages, false)
         table.insert(NSLMessages, 0)
@@ -191,7 +191,7 @@ end
 
 Client.HookNetworkMessage("NSLPluginConfig", OnNSLConfigRecieved)
 
-//Call this with a function if it needs to be updated when/if mode changes.
+--Call this with a function if it needs to be updated when/if mode changes.
 function RegisterNSLModeSensitiveFunction(method)
 	if type(method) == "function" then
 		table.insert(kNSLConfigUpdateFunctions, method)
@@ -207,9 +207,9 @@ end
 
 AddClientUIScriptForClass("Spectator", "GUINSLFollowingSpectatorHUD")
 
-//Materials that reference time dont call back into lua, which causes issues.
-//This sucks, but should hopefully fix those issues.
-//This might be the most epic hack in all of ns2 :<
+--Materials that reference time dont call back into lua, which causes issues.
+--This sucks, but should hopefully fix those issues.
+--This might be the most epic hack in all of ns2 :< 
 
 local tablebuilt = false
 local TimeBypassFunctions = { }
@@ -254,7 +254,7 @@ end
 
 Event.Hook("LoadComplete", OnLoadComplete)
 
-//FFFFFFFFFFFFFFFF
+--FFFFFFFFFFFFFFFF
 local startedChatTime = 0
 
 function ChatUI_GetStartedChatTime()
@@ -326,7 +326,7 @@ local function ChatUICreation(scriptName, script)
 	end
 	
 	if scriptName == "GUIGameEnd" then
-		//LAZY
+		--LAZY
 		local kEndStates = enum({ 'AlienPlayerWin', 'MarinePlayerWin', 'AlienPlayerLose', 'MarinePlayerLose', 'AlienPlayerDraw', 'MarinePlayerDraw' })
 		local kMessageText = { [kEndStates.AlienPlayerWin] = "ALIEN_VICTORY",
 							   [kEndStates.MarinePlayerWin] = "MARINE_VICTORY",
@@ -405,7 +405,7 @@ originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update",
 local RefBadges = { }
 
 local function RefBadgeRecieved(msg)
-	//Print("received RefBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
+	--Print("received RefBadges msg for client id = "..msg.clientId.." msg = "..ToString(msg) )
 	RefBadges[ msg.clientId ] = msg
 end
 
@@ -417,14 +417,14 @@ function Badges_GetBadgeTextures( clientId, usecase )
 	local badges = RefBadges[ clientId ]
 	textures, badgeNames = oldBadges_GetBadgeTextures(clientId, usecase)
     if badges then
-		//These seem to get cached somewhere now, so check the table to be sure....
+		--These seem to get cached somewhere now, so check the table to be sure....
 		local textureKey = (usecase == "scoreboard" and "scoreboardTexture" or "unitStatusTexture")
 		for _, info in ipairs(gRefBadges) do
 			if not table.contains(badgeNames, info.name) and badges[ "has_" .. info.name .. "_badge" ] == true then
 				table.insert( textures, info[textureKey] )
 				table.insert( badgeNames, info.name )
 				break
-				//Can only have 1 nsl badge, sorry dudes
+				--Can only have 1 nsl badge, sorry dudes
 			end
 		end
 	end
@@ -444,7 +444,7 @@ function GetBadgeFormalName(name)
 	return fname
 end
 
-//Leeeets see how much this breaks :D
+--Leeeets see how much this breaks :D
 AddClientUIScriptForTeam(kSpectatorIndex, "GUINSLSpectatorTechMap")
 
 local function InitNSLDecal(decal, origin, yaw, pitch, roll)
@@ -476,7 +476,6 @@ local function OnClearNSLDecal(message)
 	if message then
 		for i = #kNSLDecals, 1, -1 do
 			if kNSLDecals[i] and (kNSLDecals[i].origin == message.origin or message.origin == kOriginVec) then
-				//kNSLDecals[i]
 				local rd = kNSLDecals[i].decal
 				table.removevalue(Client.decalList, rd)
 				kNSLDecals[i] = nil
@@ -487,3 +486,10 @@ local function OnClearNSLDecal(message)
 end
 
 Client.HookNetworkMessage("NSLClearDecals", OnClearNSLDecal)
+
+local function OnReplacedPlayer()
+	--AWWWW YEA LETS GO HORRIBLE CODE TIME
+	
+end
+
+Client.HookNetworkMessage("NSLReplacePlayer", OnReplacedPlayer)

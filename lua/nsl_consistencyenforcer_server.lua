@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_consistencyenforcer_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_consistencyenforcer_server.lua
+-- - Dragon
 
-//Hmm lets see what kind of craziness THIS can cause...
+--Hmm lets see what kind of craziness THIS can cause...
 local ConsistencyApplied = false
 local consistencyBackupFile = "configs/nsl_consistencybackupconfig.json"
 
@@ -13,7 +13,7 @@ local function ApplyNSLConsistencyConfig(configLoaded)
 	
 		local consistencyConfig = GetNSLConfigValue("ConsistencyConfig")
 		if not consistencyConfig then
-			//This *should* be impossible.
+			--This *should* be impossible.
 			local file = io.open(consistencyBackupFile, "r")
 			if file then
 				consistencyConfig = json.decode(file:read("*all"))
@@ -25,7 +25,7 @@ local function ApplyNSLConsistencyConfig(configLoaded)
 		if consistencyConfig and not ConsistencyApplied then
 
 			local startTime = Shared.GetSystemTime()
-			//First, remove ANY established config
+			--First, remove ANY established config
 			Server.RemoveFileHashes("*.*")
 			
 			if type(consistencyConfig.check) == "table" then

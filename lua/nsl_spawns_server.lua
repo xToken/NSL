@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_spawns_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_spawns_server.lua
+-- - Dragon
 
 local kSelectedMarineSpawn
 local kSelectedAlienSpawn
@@ -32,7 +32,7 @@ local function GetMapSpecificSpawns()
 	end
 end
 
-//Need this to re-apply team values.
+--Need this to re-apply team values.
 local function UpdateTechPointTeamsAfterReset(techPoints)
 	for index, currentTechPoint in pairs(techPoints) do
 		for k, v in pairs(kCustomTechPointTeams) do
@@ -44,7 +44,7 @@ local function UpdateTechPointTeamsAfterReset(techPoints)
 end
 
 local originalNS2GRGetChooseTechPoint
-//Override default tech point choosing function to something that supports using the caches	
+--Override default tech point choosing function to something that supports using the caches	
 originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTechPoint", 
 	function(self, techPoints, teamNumber)
 		
@@ -62,9 +62,9 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 				if teamNumber == kTeam1Index then
 					UpdateTechPointTeamsAfterReset(kCustomTechPointData)
 					techPoint = originalNS2GRGetChooseTechPoint(self, kCustomTechPointData, teamNumber)
-					//Add back in this TP cause yea
+					--Add back in this TP cause yea
 					table.insert(kCustomTechPointData, techPoint)
-					//If getting team1 spawn location, build alien spawns for next check
+					--If getting team1 spawn location, build alien spawns for next check
 					local ValidAlienSpawns = { }
 					for index, currentTechPoint in pairs(kCustomTechPointData) do
 						local teamNum = kCustomTechPointTeams[currentTechPoint:GetLocationName()]
@@ -83,7 +83,7 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 					techPoint = kSelectedAlienSpawn
 				end
 			else
-				//Blehhhhh
+				--Blehhhhh
 				techPoint = originalNS2GRGetChooseTechPoint(self, techPoints, teamNumber)
 			end
 		end
@@ -101,24 +101,24 @@ local function LoadCustomTechPointData(configLoaded)
 			for index, currentTechPoint in pairs(techPoints) do
 				for _, v in pairs(customSpawnData) do
 					if (string.lower(v.name) == string.lower(currentTechPoint:GetLocationName())) then						
-						// Modify the teams allowed to spawn here
+						--Modify the teams allowed to spawn here
 						if (string.lower(v.team) == "marines") then
 							currentTechPoint.allowedTeamNumber = 1
 						elseif (string.lower(v.team) == "aliens") then
 							currentTechPoint.allowedTeamNumber = 2
 						elseif (string.lower(v.team) == "both") then
 							currentTechPoint.allowedTeamNumber = 0
-						// If we don't understand the team, no teams can spawn here
+						--If we don't understand the team, no teams can spawn here
 						else
 							currentTechPoint.allowedTeamNumber = 3
 						end
 						
-						// Assign the valid enemy spawns to the tech point
+						--Assign the valid enemy spawns to the tech point
 						if (v.enemyspawns ~= nil) then
 							currentTechPoint.enemyspawns = v.enemyspawns
 						end
 						
-						// Reset the weight parameter (will be customizable in the file later)
+						--Reset the weight parameter (will be customizable in the file later)
 						currentTechPoint.chooseWeight = 1
 						
 						kValidCustomSpawnData = true
@@ -130,19 +130,19 @@ local function LoadCustomTechPointData(configLoaded)
 		end
 		
 		if #kCustomTechPointData < 2 and kValidCustomSpawnData then
-			//NOT valid data
+			--NOT valid data
 			kValidCustomSpawnData = false
 			Shared.Message("NSl - Error configuring custom spawns, invalid response or incorrectly configured weekly config!")
 			kCustomTechPointData = nil
 		end
 		
 		if kValidCustomSpawnData then
-			//Prevent Map Specific spawn overrides from being used
+			--Prevent Map Specific spawn overrides from being used
 			Server.spawnSelectionOverrides = nil
 		end
 		
 		if GetNSLConfigValue("UseFixedSpawnsWhenLoaded") then
-			//Setup spawns now, reset game
+			--Setup spawns now, reset game
 			local gamerules = GetGamerules()
 			
 			if not kValidCustomSpawnData then
@@ -153,9 +153,9 @@ local function LoadCustomTechPointData(configLoaded)
 			else
 				kSelectedMarineSpawn = originalNS2GRGetChooseTechPoint(gamerules, kCustomTechPointData, 1)
 				assert(kSelectedMarineSpawn ~= nil)
-				//Add back in this TP cause yea
+				--Add back in this TP cause yea
 				table.insert(kCustomTechPointData, kSelectedMarineSpawn)
-				//If getting team1 spawn location, build alien spawns for next check
+				--If getting team1 spawn location, build alien spawns for next check
 				local ValidAlienSpawns = { }
 				for index, currentTechPoint in pairs(kCustomTechPointData) do
 					local teamNum = kCustomTechPointTeams[currentTechPoint:GetLocationName()]
@@ -172,7 +172,7 @@ local function LoadCustomTechPointData(configLoaded)
 				assert(kSelectedAlienSpawn ~= nil)
 			end
 			
-			//Prevent Map Specific spawn overrides from being used
+			--Prevent Map Specific spawn overrides from being used
 			Server.spawnSelectionOverrides = nil
 			
 			gamerules:ResetGame()

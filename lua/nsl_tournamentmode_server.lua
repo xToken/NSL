@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_tournamentmode_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_tournamentmode_server.lua
+-- - Dragon
 
-//NS2 Tournament Mod Server side script
+--NS2 Tournament Mod Server side script
 
 Script.Load("lua/nsl_class.lua")
 
@@ -39,8 +39,8 @@ originalNS2GRSetGameState = Class_ReplaceMethod("NS2Gamerules", "SetGameState",
 	end
 )
 
-//Derrrrrrrp
-//Seems wierd, but makes game start the same frame as final counter expires.
+--Derrrrrrrp
+--Seems wierd, but makes game start the same frame as final counter expires.
 local originalNS2GRGetPregameLength
 originalNS2GRGetPregameLength = Class_ReplaceMethod("NS2Gamerules", "GetPregameLength", 
 	function(self)
@@ -62,7 +62,7 @@ local function GetRealPlayerCountPerTeam(teamNumber)
 	return c
 end
 
-//Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
+--Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
 local originalNS2GameRulesGetCanJoinTeamNumber
 originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
 	function(self, teamNumber)

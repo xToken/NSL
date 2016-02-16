@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_playerinfo_shared.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_playerinfo_shared.lua
+-- - Dragon
 
 Script.Load("lua/nsl_class.lua")
 

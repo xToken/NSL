@@ -1,9 +1,9 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_server.lua
+-- - Dragon
 
-//NSL Server references
+--NSL Server references
 
 Script.Load("lua/nsl_configs_server.lua")
 Script.Load("lua/nsl_mainplugin_server.lua")

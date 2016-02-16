@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_handicap_shared.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_handicap_shared.lua
+-- - Dragon
 
 local originalNS2PlayerOnCreate
 originalNS2PlayerOnCreate = Class_ReplaceMethod("Player", "OnCreate", 
@@ -55,7 +55,7 @@ function DamageMixin:DoDamage( damage, ... )
 
     end
 	
-	//Attacker might be nil... duhhhhhh
+	--Attacker might be nil... duhhhhhh
 	if attacker and attacker:isa("Player") then
 		damage = damage * attacker:GetHandicap()
 	end

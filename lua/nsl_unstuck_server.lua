@@ -1,13 +1,13 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_unstuck_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_unstuck_server.lua
+-- - Dragon
 
-//NS2 Unstuck Plugin
+--NS2 Unstuck Plugin
 
-local UnstuckOriginTracker = { }  	//Tracks origin of clients in unstuck Queue.
-local LastUnstuckTracker = { }		//Tracks time of clients last successful unstuck.
-local UnstuckRetryTracker = { }		//Tracks retries of unstuck up to kMaxUnstuckAttemps.
+local UnstuckOriginTracker = { }  	--Tracks origin of clients in unstuck Queue.
+local LastUnstuckTracker = { }		--Tracks time of clients last successful unstuck.
+local UnstuckRetryTracker = { }		--Tracks retries of unstuck up to kMaxUnstuckAttemps.
 local kUnstuckRate = 30
 local kMinUnstuckTime = 2.5
 local kMaxUnstuckTime = 5
@@ -45,7 +45,7 @@ local function UnstuckCallback(self)
 		if UnstuckRetryTracker[ns2id] < kMaxUnstuckAttemps then
 			UnstuckRetryTracker[ns2id] = UnstuckRetryTracker[ns2id] + 1
 			LastUnstuckTracker[ns2id] = Shared.GetTime()
-			//Keep that donkey moving.
+			--Keep that donkey moving.
 			return true
 		else
 			UnstuckOriginTracker[ns2id] = nil
@@ -68,7 +68,7 @@ local function RegisterClientStuck(client)
 		local ns2id = client:GetUserId()
 		if LastUnstuckTracker[ns2id] == nil or LastUnstuckTracker[ns2id] + kUnstuckRate < Shared.GetTime() then
 			if GetIsGamePaused() then
-				//fucking sploiters
+				--fucking sploiters
 				SendClientMessage(client, "Cannot unstuck during pause!")
 				return
 			end

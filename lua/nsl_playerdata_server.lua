@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_playerdata_server.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_playerdata_server.lua
+-- - Dragon
 
 local NSL_ClientData = { }
 local NSL_NS2IDLookup = { }
@@ -12,25 +12,25 @@ local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
 local NSL_PlayerDataTimeout = 10
 
-//These are the only mandatory fields
-//S_ID 		- Steam ID
-//NICK 		- Nickname on Site
-//NSL_Team	- Current Team
+--These are the only mandatory fields
+--S_ID 		- Steam ID
+--NICK 		- Nickname on Site
+--NSL_Team	- Current Team
 
-//These are optional, and should be checked as such by the mod
-//NSL_IP 	- IP Info from site
-//NSL_ID	- Users ID on Site
-//NSL_TID	- Teams ID on Site
-//NSL_Level - Access Level
-//NSL_Rank	- Rank
-//NSL_Icon 	- Assigned Icon
-//Would like to USE these icons :S
+--These are optional, and should be checked as such by the mod
+--NSL_IP 	- IP Info from site
+--NSL_ID	- Users ID on Site
+--NSL_TID	- Teams ID on Site
+--NSL_Level - Access Level
+--NSL_Rank	- Rank
+--NSL_Icon 	- Assigned Icon
+--Would like to USE these icons :S
 
 Script.Load("lua/nsl_class.lua")
 
 function GetNSLUserData(ns2id)
 	if NSL_ClientData[ns2id] == nil then
-		//Check manually specified player data table from configs
+		--Check manually specified player data table from configs
 		local cPlayerData = GetNSLConfigValue("PLAYERDATA")
 		local sns2id = tostring(ns2id)
 		if cPlayerData and sns2id then
@@ -118,8 +118,8 @@ local function UpdateClientBadge(ns2id)
 	local refBadge = GetRefBadgeforID(ns2id)
 	local teamBadge = GetNSLBadgeNameFromTeamName(NSL_ClientData[ns2id].NSL_Team)
 	if GiveBadge then
-		//Yay for badges+ mod.
-		//Give badge if ref and ref badge configured.
+		--Yay for badges+ mod.
+		--Give badge if ref and ref badge configured.
 		local succes, row
 		row = 1
 		if refBadge then
@@ -130,24 +130,24 @@ local function UpdateClientBadge(ns2id)
 			success = success and GiveBadge(ns2id, teamBadge, row)
 		end
 	else
-		//Assume legacy badge process :S
+		--Assume legacy badge process :S
 		local player = GetPlayerMatchingNS2Id(ns2id)
 		if player and refBadge then
 			local client = Server.GetOwner(player)
 			if client then
 				local newmsg = { clientId = client:GetId() }
 				
-				//Set all badges to false first.
+				--Set all badges to false first.
 				for _, badge in ipairs(gRefBadges) do
 					newmsg[ "has_" .. badge.name .. "_badge" ] = false
 				end
-				//Set current NSL badge to true.
+				--Set current NSL badge to true.
 				newmsg["has_" .. refBadge .. "_badge"] = true
 				
-				//Sends new badge info to all connected users.
+				--Sends new badge info to all connected users.
 				Server.SendNetworkMessage("RefBadges", newmsg, true)
 				
-				// Store it ourselves as well for future clients
+				--Store it ourselves as well for future clients
 				RefBadges[ newmsg.clientId ] = newmsg
 			end
 		end
@@ -179,8 +179,8 @@ local function OnClientConnectENSLResponse(response)
 	if response then
 		local responsetable = json.decode(response)
 		if responsetable == nil or responsetable.steam == nil or responsetable.steam.id == nil then
-			//Message to user to register on ENSL site?
-			//Possible DB issue?
+			--Message to user to register on ENSL site?
+			--Possible DB issue?
 		else
 			local ns2id = NSL_NS2IDLookup[responsetable.steam.id]
 			if ns2id ~= nil then
@@ -209,10 +209,10 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Rank = nil
 				end
 
-				//Check config refs here
+				--Check config refs here
 				local cRefs = GetNSLConfigValue("REFS")
 				if cRefs and table.contains(cRefs, ns2id) then
-					//A manually configured 'Ref' - give them ref level
+					--A manually configured 'Ref' - give them ref level
 					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				end
@@ -228,8 +228,8 @@ local function OnClientConnectAUSNS2Response(response)
 	if response then
 		local responsetable = json.decode(response)
 		if responsetable == nil or responsetable.UserID == nil then
-			//Message to user to register on AUSNS2 site?
-			//Possible DB issue?
+			--Message to user to register on AUSNS2 site?
+			--Possible DB issue?
 		else
 			local steamId = string.gsub(responsetable.SteamID, "STEAM_", "")
 			if steamId ~= nil then
@@ -256,12 +256,12 @@ end
 
 function UpdateNSLPlayerData(RefTable)
 	if not GetNSLUserData(RefTable.id) then
-		//Check for retry
+		--Check for retry
 		if RefTable.attemps < NSL_PlayerDataMaxRetries then
-			//Doesnt have data, query
+			--Doesnt have data, query
 			local QueryURL = GetNSLConfigValue("PlayerDataURL")
 			if QueryURL then
-				//PlayerDataFormat
+				--PlayerDataFormat
 				local steamId = "0:" .. (RefTable.id % 2) .. ":" .. math.floor(RefTable.id / 2)
 				NSL_NS2IDLookup[steamId] = RefTable.id
 				RefTable.attemps = RefTable.attemps + 1
@@ -273,7 +273,7 @@ function UpdateNSLPlayerData(RefTable)
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
 				end
 			else
-				//Configs might not be loaded yet - push out time
+				--Configs might not be loaded yet - push out time
 				RefTable.time = NSL_PlayerDataTimeout
 			end
 		else
@@ -288,9 +288,9 @@ local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
 	if GetNSLModEnabled() then
 		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
-		//Dont think badges+ needs this..
+		--Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
-			//Sync user all badge data
+			--Sync user all badge data
 			for clientId, msg in pairs(RefBadges) do
 				Server.SendNetworkMessage( client, "RefBadges", msg, true )
 			end
@@ -466,7 +466,7 @@ local function OnRecievedFunction(client, message)
 			NSL_FunctionData[NS2ID] = { }
 		end
 		if not table.contains(NSL_FunctionData[NS2ID], message.detectionType) then
-			//Reconnects could re-add duplicate stuff.
+			--Reconnects could re-add duplicate stuff.
 			table.insert(NSL_FunctionData[NS2ID], message.detectionType)
 		end
 	end
@@ -524,8 +524,8 @@ end
 
 Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
 
-//Disabled for now.
-/*local function OnClientCommandSetFunctionData(client, target, functionName, newValue)
+--Disabled for now.
+--[[local function OnClientCommandSetFunctionData(client, target, functionName, newValue)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local player = GetPlayerMatching(target)
@@ -541,4 +541,4 @@ Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
 	end
 end
 
-Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)*/
+Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)--]]

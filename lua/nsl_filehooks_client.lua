@@ -1,16 +1,16 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_filehooks_client.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_filehooks_client.lua
+-- - Dragon
 
-//NSL Client File Hooks
+--NSL Client File Hooks
 local runDetectionAt = math.random() * 10
 local C = { }
 local recursiveLimit = 3
 local sleepDetections = 0
 local funcNameMin = 2
 
-//Waaaay to much is whitelisted here, really this would only pick up lazy hooks at this point, value probably doesnt justify the complexity.
+--Waaaay to much is whitelisted here, really this would only pick up lazy hooks at this point, value probably doesnt justify the complexity.
 local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient", "GetGameStarted", "GetIsPlaying", "kMinTimeBeforeConcede", "PlayerUI_GetWeaponLevel",
 						"gCHUDHiddenViewModel", "PlayerUI_GetCanDisplayRequestMenu", "kWorldDamageNumberAnimationSpeed", "ChatUI_EnterChatMessage", "PlayerUI_GetPlayerResources",
 						"PlayerUI_GetArmorLevel", "CommanderUI_Logout", "upgradeLevelThree" , "upgradeLevelTwo", "nearestLocationName", "gPreviousPausedTime", "sortById",
@@ -180,7 +180,7 @@ local l
 function Script.Load(fileName, reload)
 	if not l then l = string.lower(fileName) end
 	if string.find(fileName, "PostLoadMod.lua") then
-		//Stuff
+		--Stuff
 		local Q = { }
 		CopyGTable(_G, Q, 1)
 		oldScriptLoad(fileName, reload)
@@ -200,7 +200,7 @@ local function HTTPResponseRecieved(data)
 end
 
 local kTextureUploadURL
-//Sadly this costs me about 80fps, probably not viable at this time.
+--Sadly this costs me about 80fps, probably not viable at this time.
 local function TakeTextureRenderCameraSnapshot()
 	
     local player = Client.GetLocalPlayer()
@@ -224,7 +224,7 @@ local function TakeTextureRenderCameraSnapshot()
         rCamera:SetFarPlane(farPlane)
         rCamera:SetCullingMode(cullingMode)
 		rCamera:SetTargetTexture("asdf", true, Client.GetScreenWidth() , Client.GetScreenHeight())
-		//Shared.SendHTTPRequest(kTextureUploadURL, "POST", { GetMaterialParameter("asdf") }, HTTPResponseRecieved)
+		--Shared.SendHTTPRequest(kTextureUploadURL, "POST", { GetMaterialParameter("asdf") }, HTTPResponseRecieved)
 		Client.DestroyRenderCamera(rCamera)
 		rCamera = nil
 	end
@@ -237,7 +237,7 @@ local function OnUpdateClientTimers(deltaTime)
 	runDetectionAt = math.max(runDetectionAt - deltaTime, 0)
 	if runDetectionAt == 0 then
 		CheckGlobalFunctionTable(_G, C, 1)
-		//TakeTextureRenderCameraSnapshot()
+		--TakeTextureRenderCameraSnapshot()
 		runDetectionAt = math.random() * 10 + 30
 	end
 

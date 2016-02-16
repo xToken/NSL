@@ -1,7 +1,7 @@
-// Natural Selection League Plugin
-// Source located at - https://github.com/xToken/NSL
-// lua\nsl_pause_shared.lua
-// - Dragon
+-- Natural Selection League Plugin
+-- Source located at - https://github.com/xToken/NSL
+-- lua\nsl_pause_shared.lua
+-- - Dragon
 
 Script.Load("lua/nsl_class.lua")
 
@@ -63,14 +63,14 @@ local function RestoreClientViewAngles()
 	end
 end
 
-//Blocks input.
+--Blocks input.
 local originalNS2PlayerOnProcessIntermediate
 originalNS2PlayerOnProcessIntermediate = Class_ReplaceMethod("Player", "OnProcessIntermediate", 
 	function(self, input)
 
 		if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
 			if SaveClientViewAngles(self) then
-				//Run this if this returns true, to update the view angles one last time.
+				--Run this if this returns true, to update the view angles one last time.
 				originalNS2PlayerOnProcessIntermediate(self, input)
 			end
 			return
@@ -82,7 +82,7 @@ originalNS2PlayerOnProcessIntermediate = Class_ReplaceMethod("Player", "OnProces
 	end
 )
 
-//FJDKOSFHJDKSHFKJDSHFKJSDHFKJSDHFKJSDLFHDSIJRFYU*W#$IHATENS2
+--FJDKOSFHJDKSHFKJDSHFKJSDHFKJSDHFKJSDLFHDSIJRFYU*W#$IHATENS2
 local oldFollowMoveMixinUpdateMove = FollowMoveMixin.UpdateMove
 function FollowMoveMixin:UpdateMove(input)
 	if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
@@ -92,7 +92,7 @@ function FollowMoveMixin:UpdateMove(input)
 	end
 end
 
-//Blocks input.
+--Blocks input.
 local originalNS2PlayerOnProcessMove
 originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove", 
 	function(self, input)
@@ -114,7 +114,7 @@ function CameraHolderMixin:SetDesiredCamera(transitionDuration, mode, position, 
 	oldCameraHolderMixinSetDesiredCamera(self, transitionDuration, mode, position, angles, distance, yOffset, callback)
 end
 
-//Blocks buying things.
+--Blocks buying things.
 local originalNS2PlayerProcessBuyAction
 originalNS2PlayerProcessBuyAction = Class_ReplaceMethod("Player", "ProcessBuyAction", 
 	function(self, upgrades)
@@ -128,7 +128,7 @@ originalNS2PlayerProcessBuyAction = Class_ReplaceMethod("Player", "ProcessBuyAct
 	end
 )
 
-//Blocks input.
+--Blocks input.
 local originalNS2PlayerGetCanControl
 originalNS2PlayerGetCanControl = Class_ReplaceMethod("Player", "GetCanControl", 
 	function(self)
@@ -142,7 +142,7 @@ originalNS2PlayerGetCanControl = Class_ReplaceMethod("Player", "GetCanControl",
 	end
 )
 
-//Maybe time rounding issues?
+--Maybe time rounding issues?
 local originalNS2JetpackMarineGetCanJump
 originalNS2JetpackMarineGetCanJump = Class_ReplaceMethod("JetpackMarine", "GetCanJump", 
 	function(self)
@@ -151,7 +151,7 @@ originalNS2JetpackMarineGetCanJump = Class_ReplaceMethod("JetpackMarine", "GetCa
 	end
 )
 
-//Eliminates gravity to prevent stutter if midair.
+--Eliminates gravity to prevent stutter if midair.
 local originalNS2PlayerModifyGravityForce
 originalNS2PlayerModifyGravityForce = Class_ReplaceMethod("Player", "ModifyGravityForce", 
 	function(self, gravityTable)
@@ -165,7 +165,7 @@ originalNS2PlayerModifyGravityForce = Class_ReplaceMethod("Player", "ModifyGravi
 	end
 )
 
-//Fix for healing effects not working after pause.
+--Fix for healing effects not working after pause.
 local oldLiveMixinAddHealth = LiveMixin.AddHealth
 function LiveMixin:AddHealth(...)
 	gTimeBypass = true
@@ -181,7 +181,7 @@ function LiveMixin:SetArmor(...)
 	gTimeBypass = false
 end
 
-//Pause Projectiles (some/most)
+--Pause Projectiles (some/most)
 if Server then
     local originalNS2PredictedProjectileShooterMixinOnProcessMove = PredictedProjectileShooterMixin.OnProcessMove
 	function PredictedProjectileShooterMixin.OnProcessMove(self, input)
@@ -278,7 +278,7 @@ originalNS2SharedGetTime = Class_ReplaceMethod("Shared", "GetTime",
 	end
 )
 
-//Fix for chat messages being rate limited during pause.
+--Fix for chat messages being rate limited during pause.
 local function AddTokens(self)
 
     local now = Shared.GetTime(true)
@@ -293,9 +293,9 @@ local function AddTokens(self)
 end
 
 local function RemoveTokens(self, numberToRemove)
-    // Add tokens to bucket first.
+    --Add tokens to bucket first.
     AddTokens(self)
-    // Check if we are able to remove the requested number of tokens from the bucket.
+    --Check if we are able to remove the requested number of tokens from the bucket.
     local tokensRemoved = self.tokens >= numberToRemove
     if tokensRemoved then
         self.tokens = self.tokens - numberToRemove
@@ -315,16 +315,16 @@ local UpdateAnimationState = GetUpValue(BaseModelMixin.ProcessMoveOnModel, "Upda
 ReplaceLocals(UpdateAnimationState, { Shared_GetTime = Shared.GetTime })
 ReplaceLocals(UpdateAnimationState, { Shared_GetPreviousTime = Shared.GetPreviousTime })
 
-//Sample of 'time' accuracy
-//Server  : 19.716058198363
-//Predict : 19.71484375
-//Client  : 19.71484375
-//Sample of 'float' accuracy
-//Server  : 21.63121445477
-//Predict : 21.631214141846
-//Client  : 21.631214141846
-//Time paused set on pause, used for smooth prediction on the client during pause.
-//Time adjustment set on resume, used for adjusting all time based on the delta.
-//Ideally I could network these at different precisions to save bw, but I dont know the efficiency of time vs float so....
-//Considering how important these are for EVERYTHING, a little extra bandwidth on ent creation seems to be plenty acceptable.
+--Sample of 'time' accuracy
+--Server  : 19.716058198363
+--Predict : 19.71484375
+--Client  : 19.71484375
+--Sample of 'float' accuracy
+--Server  : 21.63121445477
+--Predict : 21.631214141846
+--Client  : 21.631214141846
+--Time paused set on pause, used for smooth prediction on the client during pause.
+--Time adjustment set on resume, used for adjusting all time based on the delta.
+--Ideally I could network these at different precisions to save bw, but I dont know the efficiency of time vs float so....
+--Considering how important these are for EVERYTHING, a little extra bandwidth on ent creation seems to be plenty acceptable.
 Class_Reload( "Player", {timeadjustment = "float", timepaused = "float", gamepaused = "boolean"} )
