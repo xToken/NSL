@@ -222,7 +222,7 @@ end
 local function CheckForExistingConfig(leagueName)
 	if not Configs[leagueName] then
 		Configs[leagueName] = { }
-		Shared.Message("NSL - Adding league " .. leagueName .. ".")
+		--Shared.Message("NSL - Adding league " .. leagueName .. ".")
 	end
 end
 
