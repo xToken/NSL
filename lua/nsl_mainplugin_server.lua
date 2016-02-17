@@ -19,7 +19,6 @@ local kCachedInterp = 100
 local kCachedSendRate = 20
 local kCachedTickRate = 30
 local kNSLTag = "nsl"
-local kNSLAltChatMode = false
 
 --Supposedly this still not syncronized.
 local function SetupClientRatesandConfig(client)
@@ -155,7 +154,7 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 --Set friendly fire percentage
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
-local function ConvertTabletoOrigin(t)
+function ConvertTabletoOrigin(t)
 	if #t == 3 then
 		return Vector(t[1], t[2], t[3])
 	end
@@ -186,43 +185,24 @@ local function BuildAdminMessage(message, teamname, client)
 end
 
 function SendAllClientsMessage(message)
-	if kNSLAltChatMode then
-		Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message), true)
-	else
-		Server.SendNetworkMessage("Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
-	end
+	Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message), true)
 end
 
 function SendClientMessage(client, message)
 	if client then
-		if kNSLAltChatMode then
-			Server.SendNetworkMessage(client, "NSLSystemMessage", BuildAdminMessage(message, nil, client), true)
-		else
-			Server.SendNetworkMessage(client, "Chat", BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message), true)
-		end
+		Server.SendNetworkMessage(client, "NSLSystemMessage", BuildAdminMessage(message, nil, client), true)
 	end
 end
 
 function SendTeamMessage(teamnum, message)
-	local chatmessage
-	if kNSLAltChatMode then
-		chatmessage = BuildAdminMessage(message, GetActualTeamName(teamnum))
-	else
-		chatmessage = BuildChatMessage(false, GetNSLConfigValue("LeagueName"), -1, kTeamReadyRoom, kNeutralTeamType, message)
-	end
+	local chatmessage = BuildAdminMessage(message, GetActualTeamName(teamnum))
 	if tonumber(teamnum) then
 		local playerRecords = GetEntitiesForTeam("Player", teamnum)
 		for _, player in ipairs(playerRecords) do
-			
 			local client = Server.GetOwner(player)
 			if client then
-				if kNSLAltChatMode then
-					Server.SendNetworkMessage(client, "NSLSystemMessage", chatmessage, true)
-				else
-					Server.SendNetworkMessage(client, "Chat", chatmessage, true)
-				end
+				Server.SendNetworkMessage(client, "NSLSystemMessage", chatmessage, true)
 			end
-		
 		end
 	end
 end
@@ -420,14 +400,3 @@ local function OnCommandNSLPassword(client, password)
 end
 
 Event.Hook("Console_sv_nslpassword", OnCommandNSLPassword)
-
-local function OnCommandNSLAltChat(client)
-	if not client then return end
-	local NS2ID = client:GetUserId()
-	if GetIsNSLRef(NS2ID) then
-		kNSLAltChatMode = not kNSLAltChatMode
-		ServerAdminPrint(client, string.format("Setting alternate chat mode to %s.", ToString(kNSLAltChatMode)))
-	end
-end
-
-Event.Hook("Console_sv_nslaltchat", OnCommandNSLAltChat)
