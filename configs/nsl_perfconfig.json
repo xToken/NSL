@@ -35,9 +35,9 @@
 		},
 		{
 		"PerfLevel":							"Extreme",
-		"Interp": 								30,
-		"MoveRate": 							65,
-		"ClientRate": 							65,
+		"Interp": 								33,
+		"MoveRate": 							60,
+		"ClientRate": 							60,
 		"TickRate":								65,
 		"MaxDataRate": 							100
 		},
