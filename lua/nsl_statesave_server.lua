@@ -10,6 +10,7 @@ local NSL_DisconnectedIDs = { }
 local NSL_VirtualClientCount = 0
 local NSLPauseDisconnectOverride = false
 local NSLDontGenPlayerOnConnect = false
+local kDisconnectTag = "[D/C]"
 
 local function StoreDisconnectedTeamPlayer(self, client)
 	if client then
@@ -34,7 +35,7 @@ local function StoreDisconnectedTeamPlayer(self, client)
 					tempplayer:SetControllerClient(client)
 					--Block things
 					player.isCached = true
-					player:SetName("[D/C]" .. name)
+					player:SetName(kDisconnectTag .. name)
 					--Player ENT should be disjoined, cache to table.
 					NSL_VirtualClients[id] = newclient
 					NSL_DisconnectedIDs[name] = id
@@ -117,22 +118,33 @@ end
 function MoveClientToStoredPlayer(client, ns2ID)
 	--So we found a stored player
 	local player = client:GetControllingPlayer()
+	local gamerules = GetGamerules()
 	local success = false
 	local virtualClient = NSL_VirtualClients[ns2ID]
 	--Dont want to stick them back into a ragdoll, as funny as it would be :D - anddddd thats now what we do cause its fun :D:D
-	if virtualClient and player then
+	if virtualClient and player and gamerules then
 		local name = player:GetName()
 		local oldplayer = virtualClient:GetControllingPlayer()
-		oldplayer:SetControllerClient(client)
-		player:SetControllerClient(virtualClient)
-		if virtualClient then
-			Server.DisconnectClient(virtualClient)
+		if oldplayer then
+			local oldname = string.gsub(oldplayer:GetName(), kDisconnectTag, "")
+			-- Make the client ACTUALLY JOIN the team... cause.. lol
+			success, player = gamerules:JoinTeam(player, oldplayer:GetTeamNumber(), true)
+			if success then
+				oldplayer:SetControllerClient(client)
+				player:SetControllerClient(virtualClient)
+				--Set this flag so they get removed as expected
+				player.isCached = true
+				if virtualClient then
+					Server.DisconnectClient(virtualClient)
+				end
+				oldplayer:SetName(name)
+				--Need to send tech tree to player
+				oldplayer.sendTechTreeBase = true
+				oldplayer:AddTimedCallback(RemoveCachedFlag, 0.1)
+				--oldplayer is actually the 'newplayer' lol.. but its the OLDPlayer entity that was disconnected.. so that.
+				Server.SendNetworkMessage(oldplayer, "NSLReplacePlayer", {color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor")), name = oldname}, true )
+			end
 		end
-		oldplayer:SetName(name)
-		--Need to send tech tree to player
-		oldplayer.sendTechTreeBase = true
-		oldplayer:AddTimedCallback(RemoveCachedFlag, 0.1)
-		success = true
 	end
 	NSL_VirtualClients[ns2ID] = nil
 	NSL_VirtualClientCount = math.max(NSL_VirtualClientCount - 1, 0)

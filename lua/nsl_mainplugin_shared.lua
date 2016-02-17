@@ -118,7 +118,13 @@ local kNSLClearDecalMessage =
 
 Shared.RegisterNetworkMessage("NSLClearDecals", kNSLClearDecalMessage)
 
-Shared.RegisterNetworkMessage("NSLReplacePlayer")
+local kReplacePlayerMessage = 
+{
+	color = "vector",
+	name = string.format("string (%d)", kMaxTeamNameLength + 1)
+}
+
+Shared.RegisterNetworkMessage("NSLReplacePlayer", kReplacePlayerMessage)
 
 local originalNS2SpectatorOnCreate
 originalNS2SpectatorOnCreate = Class_ReplaceMethod("Spectator", "OnCreate", 

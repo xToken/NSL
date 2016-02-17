@@ -487,9 +487,13 @@ end
 
 Client.HookNetworkMessage("NSLClearDecals", OnClearNSLDecal)
 
-local function OnReplacedPlayer()
+local function OnReplacedPlayer(message)
 	--AWWWW YEA LETS GO HORRIBLE CODE TIME
-	
+	local player = Client.GetLocalPlayer()
+	if player and message then
+		message.message = string.format("(NSL)(%s) Player Restored.", message.name)
+		AdminMessageRecieved(message)
+	end
 end
 
 Client.HookNetworkMessage("NSLReplacePlayer", OnReplacedPlayer)
