@@ -541,4 +541,4 @@ Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
 	end
 end
 
-Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)--]]
+Event.Hook("Console_sv_nslsetfunctiondata", OnClientCommandSetFunctionData)]]
