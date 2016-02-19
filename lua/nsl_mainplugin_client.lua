@@ -117,7 +117,7 @@ local function AdminMessageRecieved(message)
 	local player = Client.GetLocalPlayer()    
 	if message and player then
 	
-        table.insert(chatMessages, "0x" .. message.color)
+        table.insert(chatMessages, HexStringToNumber(message.color))
         table.insert(chatMessages, message.header)
 		table.insert(chatMessages, kNSLDefaultMessageColor)
         table.insert(chatMessages, message.message)
