@@ -10,7 +10,7 @@ local RefBadges = { }
 local NSL_FunctionData = { }
 local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
-local NSL_PlayerDataTimeout = 10
+local NSL_PlayerDataTimeout = 30
 
 --These are the only mandatory fields
 --S_ID 		- Steam ID
@@ -286,7 +286,7 @@ end
 
 local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
-	if GetNSLModEnabled() then
+	if GetNSLModEnabled() and NS2ID > 0 then
 		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
 		--Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
@@ -379,34 +379,28 @@ end
 
 Event.Hook("Console_sv_nslinfo",               OnClientCommandViewNSLInfo)
 
-local function ConvertTabletoOrigin(t)
-	if t and type(t) == "table" and #t == 3 then
-		return Vector(t[1], t[2], t[3])
-	end
-	return nil
-end
-
-local function MakeNSLMessage(message)
+local function MakeNSLMessage(message, header)
 	local m = { }
 	m.message = string.sub(message, 1, 250)
-	m.color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor"))
+	m.header = header
+	m.color = GetNSLConfigValue("MessageColor")
 	return m
 end
 
-local function OnCommandChat(client, target, message)
+local function OnCommandChat(client, target, message, header)
 	if target == nil then
-		Server.SendNetworkMessage("NSLSystemMessage", MakeNSLMessage(message), true)
+		Server.SendNetworkMessage("NSLSystemMessage", MakeNSLMessage(message, header), true)
 	else
 		if type(target) == "number" then
 			local playerRecords = GetEntitiesForTeam("Player", target)
 			for _, player in ipairs(playerRecords) do
 				local pclient = Server.GetOwner(player)
 				if pclient ~= nil then
-					Server.SendNetworkMessage(pclient, "NSLSystemMessage", MakeNSLMessage(message), true)
+					Server.SendNetworkMessage(pclient, "NSLSystemMessage", MakeNSLMessage(message, header), true)
 				end
 			end
 		elseif type(target) == "userdata" and target:isa("Player") then
-			Server.SendNetworkMessage(target, "NSLSystemMessage", MakeNSLMessage(message), true)
+			Server.SendNetworkMessage(target, "NSLSystemMessage", MakeNSLMessage(message, header), true)
 		end
 	end
 end
@@ -416,11 +410,12 @@ local function OnClientCommandChat(client, ...)
 	local NS2ID = client:GetUserId()
 	if GetIsNSLRef(NS2ID) then
 		local ns2data = GetNSLUserData(NS2ID)
-		local message = string.format("(All)(%s) %s:", ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local message = ""
+		local header = string.format("(All)(%s):", ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
-		OnCommandChat(client, nil, message)
+		OnCommandChat(client, nil, message, header)
 	end
 end
 
@@ -432,11 +427,12 @@ local function OnClientCommandTeamChat(client, team, ...)
 	team = tonumber(team)
 	if GetIsNSLRef(NS2ID) and team then
 		local ns2data = GetNSLUserData(NS2ID)
-		local message = string.format("(%s)(%s) %s:", GetActualTeamName(team), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local message = ""
+		local header = string.format("(%s)(%s):", GetActualTeamName(team), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
-		OnCommandChat(client, team, message)
+		OnCommandChat(client, team, message, header)
 	end
 end
 
@@ -448,11 +444,12 @@ local function OnClientCommandPlayerChat(client, target, ...)
 	local player = GetPlayerMatching(target)
 	if GetIsNSLRef(NS2ID) and player then
 		local ns2data = GetNSLUserData(NS2ID)
-		local message = string.format("(%s)(%s) %s:", player:GetName(), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local message = ""
+		local header = string.format("(%s)(%s):", player:GetName(), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
-		OnCommandChat(client, player, message)
+		OnCommandChat(client, player, message, header)
 	end
 end
 
