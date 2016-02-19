@@ -90,8 +90,9 @@ function InsightUI_GetTechPointData()
 	return techPointData
 end
 
-local NSLMessages = { }
-local kNSLDefaultMessageColor = Color(1, 0, 0, 1)
+--if I name this chatMessages, it matches vanilla.  Anything that then joins upvalues to the chatMessages in vanilla wont get broken by my hook then.
+local chatMessages = { }
+local kNSLDefaultMessageColor = Color(1, 1, 1, 1)
 local kNSLMessageHexColor = 0x800080
 
 --Meh
@@ -105,9 +106,9 @@ end
 local oldChatUI_GetMessages = ChatUI_GetMessages
 function ChatUI_GetMessages()
 	local cM = oldChatUI_GetMessages()
-	if table.maxn(NSLMessages) > 0 then
-        table.copy(NSLMessages, cM, true)
-        NSLMessages = { }
+	if table.maxn(chatMessages) > 0 then
+        table.copy(chatMessages, cM, true)
+        chatMessages = { }
     end
 	return cM
 end
@@ -116,19 +117,19 @@ local function AdminMessageRecieved(message)
 	local player = Client.GetLocalPlayer()    
 	if message and player then
 	
-        table.insert(NSLMessages, kNSLMessageHexColor)
-        table.insert(NSLMessages, "")
-		table.insert(NSLMessages, BuildColorFromVector(message.color))
-        table.insert(NSLMessages, message.message)
+        table.insert(chatMessages, "0x" .. message.color)
+        table.insert(chatMessages, message.header)
+		table.insert(chatMessages, kNSLDefaultMessageColor)
+        table.insert(chatMessages, message.message)
 		
 		--No idea what this crap is for...
-        table.insert(NSLMessages, false)
-        table.insert(NSLMessages, false)
-        table.insert(NSLMessages, 0)
-        table.insert(NSLMessages, 0)
+        table.insert(chatMessages, false)
+        table.insert(chatMessages, false)
+        table.insert(chatMessages, 0)
+        table.insert(chatMessages, 0)
 
         StartSoundEffect(player:GetChatSound())
-		Shared.Message(message.message)
+		Shared.Message(message.header .. " " .. message.message)
         
 	end
 end
@@ -490,9 +491,7 @@ Client.HookNetworkMessage("NSLClearDecals", OnClearNSLDecal)
 local function OnReplacedPlayer(message)
 	--AWWWW YEA LETS GO HORRIBLE CODE TIME
 	local player = Client.GetLocalPlayer()
-	if player and message then
-		message.message = string.format("(NSL)(%s) Player Restored.", message.name)
-		AdminMessageRecieved(message)
+	if player then
 	end
 end
 
