@@ -168,7 +168,7 @@ UseDefaultSkins						= false,
 PauseOnDisconnect					= false,
 SavePlayerStates					= false,
 OverrideTeamNames					= false,
-MessageColor						= 800080,
+MessageColor						= "00BFFF",
 NetworkTruncation					= 0
 }
 
