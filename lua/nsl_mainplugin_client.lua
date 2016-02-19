@@ -95,14 +95,6 @@ local chatMessages = { }
 local kNSLDefaultMessageColor = Color(1, 1, 1, 1)
 local kNSLMessageHexColor = 0x800080
 
---Meh
-local function BuildColorFromVector(v)
-	if v and type(v) == "cdata" and v.isa and v:isa("Vector") then
-		return Color(v.x, v.y, v.z, 1)
-	end
-	return kNSLDefaultMessageColor
-end
-
 local oldChatUI_GetMessages = ChatUI_GetMessages
 function ChatUI_GetMessages()
 	local cM = oldChatUI_GetMessages()
