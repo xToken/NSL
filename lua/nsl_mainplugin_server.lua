@@ -154,33 +154,21 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 --Set friendly fire percentage
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
-function ConvertTabletoOrigin(t)
-	if #t == 3 then
-		return Vector(t[1], t[2], t[3])
-	end
-	return nil
-end
-
 --Simple functions to make sending messages easier.
 local function BuildAdminMessage(message, teamname, client)
 	local t = { }
+	local mod
+	t.message = string.sub(message, 1, 250)
 	if client then
-		local name
 		local player = client:GetControllingPlayer()
         if player then
-			name = player:GetName()
+			mod = player:GetName()
 		end
-		if name then
-			t.message = string.sub(string.format("(%s)(%s) %s", GetNSLConfigValue("LeagueName"), name, message), 1, 250)
-		else
-			t.message = string.sub(string.format("(%s) %s", GetNSLConfigValue("LeagueName"), message), 1, 250)
-		end
-	elseif teamname then
-		t.message = string.sub(string.format("(%s)(%s) %s", GetNSLConfigValue("LeagueName"), teamname, message), 1, 250)
 	else
-		t.message = string.sub(string.format("(%s) %s", GetNSLConfigValue("LeagueName"), message), 1, 250)
+		mod = teamname
 	end
-	t.color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor"))
+	t.header = string.format(mod and "(%s)(%s):" or "(%s):", GetNSLConfigValue("LeagueName"), mod)
+	t.color = GetNSLConfigValue("MessageColor")
 	return t
 end
 
