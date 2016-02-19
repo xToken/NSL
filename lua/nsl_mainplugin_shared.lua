@@ -27,7 +27,7 @@ local kAdminChatMessage =
 {
 	header = string.format("string (%d)", kMaxAdminChatLength + 1),
     message = string.format("string (%d)", kMaxAdminChatLength + 1),
-	color = string.format("string (%d)", 5),
+	color = string.format("string (%d)", 7),
 }
 
 Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
