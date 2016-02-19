@@ -45,14 +45,16 @@ local function GetNSLDecalLocations()
 			tpDecals[string.lower(techPoint:GetLocationName())] = techPoint.occupiedTeam == 1 and team1decalname or team2decalname
 		end
 	end
-	--Build full list of all decals.
-	for loc, data in pairs(maplocations) do
-		local decal = tpDecals[loc] or data.decal or kDefaultDecal
-		--Sanity File Check
-		if decal and not GetFileExists(decal) then
-			decal = kDefaultDecal
+	--Build full list of all decals, if we have them
+	if maplocations then
+		for loc, data in pairs(maplocations) do
+			local decal = tpDecals[loc] or data.decal or kDefaultDecal
+			--Sanity File Check
+			if decal and not GetFileExists(decal) then
+				decal = kDefaultDecal
+			end
+			table.insert(locations, {data = data, decal = decal})
 		end
-		table.insert(locations, {data = data, decal = decal})
 	end
 	return locations
 end
@@ -67,11 +69,13 @@ end
 local function SyncLogos(spec)
 	if GetNSLMode() == "PCW" or GetNSLMode() == "OFFICIAL" then
 		local locations = GetNSLDecalLocations()
-		for i, loc in ipairs(locations) do
-			if loc and loc.data then
-				local origin = ConvertTabletoOrigin(loc.data.origin)
-				if origin then
-					Server.SendNetworkMessage(spec, "NSLDecal", { decalMaterial = loc.decal, origin = origin, pitch = loc.data.pitch, yaw = loc.data.yaw, roll = loc.data.roll }, true)
+		if locations then
+			for i, loc in ipairs(locations) do
+				if loc and loc.data then
+					local origin = ConvertTabletoOrigin(loc.data.origin)
+					if origin then
+						Server.SendNetworkMessage(spec, "NSLDecal", { decalMaterial = loc.decal, origin = origin, pitch = loc.data.pitch, yaw = loc.data.yaw, roll = loc.data.roll }, true)
+					end
 				end
 			end
 		end
