@@ -142,7 +142,7 @@ function MoveClientToStoredPlayer(client, ns2ID)
 				oldplayer.sendTechTreeBase = true
 				oldplayer:AddTimedCallback(RemoveCachedFlag, 0.1)
 				--oldplayer is actually the 'newplayer' lol.. but its the OLDPlayer entity that was disconnected.. so that.
-				Server.SendNetworkMessage(oldplayer, "NSLReplacePlayer", {color = ConvertTabletoOrigin(GetNSLConfigValue("MessageColor")), name = oldname}, true )
+				Server.SendNetworkMessage(oldplayer, "NSLSystemMessage", {color = GetNSLConfigValue("MessageColor"), message = string.format(" %s Player Restored.", name), header = "NSL: "}, true )
 			end
 		end
 	end
