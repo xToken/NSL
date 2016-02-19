@@ -25,8 +25,9 @@ Shared.RegisterNetworkMessage("TeamNames", kTeamNameUpdateMessage)
 
 local kAdminChatMessage =
 {
+	header = string.format("string (%d)", kMaxAdminChatLength + 1),
     message = string.format("string (%d)", kMaxAdminChatLength + 1),
-	color = "vector"
+	color = string.format("string (%d)", 5),
 }
 
 Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
@@ -120,8 +121,6 @@ Shared.RegisterNetworkMessage("NSLClearDecals", kNSLClearDecalMessage)
 
 local kReplacePlayerMessage = 
 {
-	color = "vector",
-	name = string.format("string (%d)", kMaxTeamNameLength + 1)
 }
 
 Shared.RegisterNetworkMessage("NSLReplacePlayer", kReplacePlayerMessage)
