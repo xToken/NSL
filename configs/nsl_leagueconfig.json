@@ -1,5 +1,5 @@
 {
-	"Version": 2.0,
+	"Version": 2.1,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -24,7 +24,7 @@
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						true,
 		"PausedMaxDuration": 					300,
-		"MessageColor":							[0.10, 0.65, 0.89],
+		"MessageColor":							"CC2EFA",
 		"NetworkTruncation":					0,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
@@ -112,7 +112,7 @@
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						false,
-		"MessageColor":							[1, 0, 1],
+		"MessageColor":							"00BFFF",
 		"NetworkTruncation":					0,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
