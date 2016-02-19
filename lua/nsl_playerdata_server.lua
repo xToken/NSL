@@ -411,7 +411,7 @@ local function OnClientCommandChat(client, ...)
 	if GetIsNSLRef(NS2ID) then
 		local ns2data = GetNSLUserData(NS2ID)
 		local message = ""
-		local header = string.format("(All)(%s):", ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local header = string.format("(All)(%s) %s:", ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
@@ -428,7 +428,7 @@ local function OnClientCommandTeamChat(client, team, ...)
 	if GetIsNSLRef(NS2ID) and team then
 		local ns2data = GetNSLUserData(NS2ID)
 		local message = ""
-		local header = string.format("(%s)(%s):", GetActualTeamName(team), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local header = string.format("(%s)(%s) %s:", GetActualTeamName(team), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
@@ -445,7 +445,7 @@ local function OnClientCommandPlayerChat(client, target, ...)
 	if GetIsNSLRef(NS2ID) and player then
 		local ns2data = GetNSLUserData(NS2ID)
 		local message = ""
-		local header = string.format("(%s)(%s):", player:GetName(), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
+		local header = string.format("(%s)(%s) %s:", player:GetName(), ns2data.NSL_Rank or "Ref", ns2data.NICK or NS2ID)
         for i, p in ipairs({...}) do
             message = message .. " " .. p
         end
