@@ -89,17 +89,10 @@ Shared.RegisterNetworkMessage("RequestTeamTechTree", kTechTreeRequest)
 local kFunctionTrigger = 
 {
 	detectionType = string.format("string (%d)", kMaxFunctionMessageLength + 1),
+	detectionValue = string.format("string (%d)", kMaxFunctionMessageLength + 1),
 }
 
 Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
-
-local kFunctionMessage = 
-{
-	functionName = string.format("string (%d)", kMaxFunctionMessageLength + 1),
-	newValue = string.format("string (%d)", kMaxFunctionMessageLength + 1)
-}
-
-Shared.RegisterNetworkMessage("ClientFunctionUpdate", kFunctionMessage)
 
 local kNSLDecalUpdateMessage =
 {

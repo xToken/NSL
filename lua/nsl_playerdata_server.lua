@@ -463,9 +463,11 @@ local function OnRecievedFunction(client, message)
 			NSL_FunctionData[NS2ID] = { }
 		end
 		if not table.contains(NSL_FunctionData[NS2ID], message.detectionType) then
-			--Reconnects could re-add duplicate stuff.
+			--Reconnects or monitored fields could re-add duplicate stuff, only add if new.	
 			table.insert(NSL_FunctionData[NS2ID], message.detectionType)
 		end
+		--Set value
+		NSL_FunctionData[NS2ID][message.detectionType] = message.detectionValue
 	end
 	
 end
@@ -506,7 +508,12 @@ local function OnClientCommandShowFunctionData(client)
 						end
 						ServerAdminPrint(client, "Function Data For " .. GetFunctionString(playerList[p]))
 						for k, v in ipairs(NSL_FunctionData[pNS2ID]) do
-							ServerAdminPrint(client, v)
+							--Check for value updates if this is a detection type that updates.. itself?
+							if NSL_FunctionData[pNS2ID][v] then
+								ServerAdminPrint(client, v .. ":" .. NSL_FunctionData[pNS2ID][v])
+							else
+								ServerAdminPrint(client, v)
+							end
 						end
 						ServerAdminPrint(client, "End Function Data")
 					end
