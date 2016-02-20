@@ -1,5 +1,4 @@
 modEntry = {
-	Shared = "lua/nsl_shared.lua",
 	Client = "lua/nsl_client.lua",
 	Server = "lua/nsl_server.lua",
 	Predict = "lua/nsl_predict.lua",
