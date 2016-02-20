@@ -11,6 +11,30 @@ local kClientPaused
 local kClientView = { yaw = 0, pitch = 0 }
 local kJetpackJumpWindow = 0.001
 
+local function GetNSLUpValue(origfunc, name)
+
+	local index = 1
+	local foundValue = nil
+	while true do
+	
+		local n, v = debug.getupvalue(origfunc, index)
+		if not n then
+			break
+		end
+		
+		-- Find the highest index matching the name.
+		if n == name then
+			foundValue = v
+		end
+		
+		index = index + 1
+		
+	end
+	
+	return foundValue
+	
+end
+
 local function ValidateTeamNumber(teamnum)
 	return teamnum ~= 3
 end
@@ -19,8 +43,8 @@ local function SaveClientViewAngles(player)
 	if Client then
 		if not kClientPaused then
 			kClientPaused = true
-			kClientView.yaw = GetUpValue(Client.SetYaw, "_cameraYaw")
-			kClientView.pitch = GetUpValue(Client.SetPitch, "_cameraPitch")
+			kClientView.yaw = GetNSLUpValue(Client.SetYaw, "_cameraYaw")
+			kClientView.pitch = GetNSLUpValue(Client.SetPitch, "_cameraPitch")
 			return true
 		else
 			Client.SetYaw(kClientView.yaw)
@@ -287,7 +311,7 @@ end
 ReplaceLocals(CreateTokenBucket, { GetNumberOfTokens = GetNumberOfTokens })
 ReplaceLocals(CreateTokenBucket, { RemoveTokens = RemoveTokens })
 
-local UpdateAnimationState = GetUpValue(BaseModelMixin.ProcessMoveOnModel, "UpdateAnimationState")
+local UpdateAnimationState = GetNSLUpValue(BaseModelMixin.ProcessMoveOnModel, "UpdateAnimationState")
 ReplaceLocals(UpdateAnimationState, { Shared_GetTime = Shared.GetTime })
 ReplaceLocals(UpdateAnimationState, { Shared_GetPreviousTime = Shared.GetPreviousTime })
 
