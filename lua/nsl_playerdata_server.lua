@@ -148,7 +148,7 @@ local function UpdateClientBadge(ns2id)
 				Server.SendNetworkMessage("RefBadges", newmsg, true)
 				
 				--Store it ourselves as well for future clients
-				RefBadges[ newmsg.clientId ] = newmsg
+				table.insert(RefBadges, {msg = newmsg, ns2id = client:GetUserId()})
 			end
 		end
 	end
@@ -170,7 +170,6 @@ local function UpdateCallbacksWithNSLData(player, nslData)
 		for i = 1, #gPlayerDataUpdatedFunctions do
 			gPlayerDataUpdatedFunctions[i](player, nslData)
 		end
-		RemovePlayerFromRetryTable(player)
 		ServerAdminPrint(Server.GetOwner(player), string.format("%s Username verified as %s", GetActiveLeague(), nslData.NICK))
 	end
 end
@@ -218,6 +217,7 @@ local function OnClientConnectENSLResponse(response)
 				end
 				NSL_ClientData[ns2id] = clientData
 				UpdateCallbacksWithNSLData(player, clientData)
+				RemovePlayerFromRetryTable(player)
 				UpdateClientBadge(ns2id)
 			end
 		end
@@ -247,6 +247,7 @@ local function OnClientConnectAUSNS2Response(response)
 					NSL_Icon = nil}
 					
 					UpdateCallbacksWithNSLData(player, NSL_ClientData[ns2id])
+					RemovePlayerFromRetryTable(player)
 					UpdateClientBadge(ns2id)
 				end				
 			end
@@ -281,6 +282,13 @@ function UpdateNSLPlayerData(RefTable)
 														GetActiveLeague(), tostring(RefTable.id)))
 			RefTable = nil
 		end
+	else
+		--Already have data.
+		local player = GetPlayerMatchingNS2Id(RefTable.id)
+		if player then
+			UpdateCallbacksWithNSLData(player, GetNSLUserData(RefTable.id))
+		end
+		RefTable = nil
 	end
 end
 
@@ -291,8 +299,15 @@ local function OnNSLClientConnected(client)
 		--Dont think badges+ needs this..
 		if not GiveBadge and #RefBadges > 0 then
 			--Sync user all badge data
-			for clientId, msg in pairs(RefBadges) do
-				Server.SendNetworkMessage( client, "RefBadges", msg, true )
+			for _, badge in ipairs(RefBadges) do
+				--Check for updates first
+				if NS2ID == badge.ns2id then
+					--Update and send to everyone
+					badge.msg.clientId = client:GetId()
+					Server.SendNetworkMessage( "RefBadges", badge.msg, true )
+				else
+					Server.SendNetworkMessage( client, "RefBadges", badge.msg, true )
+				end
 			end
 		end
 	end
