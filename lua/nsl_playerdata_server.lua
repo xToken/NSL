@@ -505,18 +505,23 @@ local function GetFunctionString(player)
 	return ""
 end
 
-local function OnClientCommandShowFunctionData(client)
+local function OnClientCommandShowFunctionData(client, target)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local heading = false
 	if GetIsNSLAdmin(NS2ID) then
+		local targetPlayer = GetPlayerMatching(target)
+		local targetClient
+		if targetPlayer then
+			targetClient = Server.GetOwner(targetPlayer)
+		end
 		local playerList = GetPlayerList()
 		if playerList then
 			for p = 1, #playerList do
 				local playerClient = Server.GetOwner(playerList[p])
 				if playerClient then
 					local pNS2ID = playerClient:GetUserId()
-					if NSL_FunctionData[pNS2ID] then
+					if NSL_FunctionData[pNS2ID] and (not targetPlayer or (targetClient and pNS2ID == targetClient:GetUserId())) then
 						if not heading then
 							ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, LNick = League Nickname")
 							heading = true
