@@ -4,7 +4,7 @@
 -- - Dragon
 
 --NSL Server references
-
+Script.Load("lua/nsl_shared.lua")
 Script.Load("lua/nsl_configs_server.lua")
 Script.Load("lua/nsl_mainplugin_server.lua")
 Script.Load("lua/nsl_firstpersonblock_server.lua")

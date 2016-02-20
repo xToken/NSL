@@ -4,5 +4,5 @@
 -- - Dragon
 
 --NSL Client references
-
+Script.Load("lua/nsl_shared.lua")
 Script.Load("lua/nsl_mainplugin_client.lua")
