@@ -11,30 +11,6 @@ local kClientPaused
 local kClientView = { yaw = 0, pitch = 0 }
 local kJetpackJumpWindow = 0.001
 
-local function GetUpValue(origfunc, name)
-
-	local index = 1
-	local foundValue = nil
-	while true do
-	
-		local n, v = debug.getupvalue(origfunc, index)
-		if not n then
-			break
-		end
-		
-		-- Find the highest index matching the name.
-		if n == name then
-			foundValue = v
-		end
-		
-		index = index + 1
-		
-	end
-	
-	return foundValue
-	
-end
-
 local function ValidateTeamNumber(teamnum)
 	return teamnum ~= 3
 end
