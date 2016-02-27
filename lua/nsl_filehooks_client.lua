@@ -131,6 +131,7 @@ local function split(str, pat)
 end
 
 local function CheckGlobalFunctionTable(G, t, R, S)
+	--This sleeps additional detection intervals because iterating the entire global table probably isn't super speedy.... Even though it doesn't actually go through the ENTIRE table
 	if sleepDetections > 0 then
 		sleepDetections = sleepDetections - 1
 		return
@@ -141,6 +142,7 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 				CheckGlobalFunctionTable(v, t[k], R + 1, k)
 			end
 		else
+			--S comes from recursive calls to this function with the previous key.  This allows me to track functions of classes (S is the class)
 			if S then
 				if t[k] and t[k] ~= v and not table.contains(excludeClassFuncs, S .. ":" .. k) and not table.contains(excludeFuncs, k) then
 					modString = UpdateFuncString(modString, k, S)
@@ -166,13 +168,22 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 	if modString then
 		for k, v in ipairs(split(modString, ";")) do
 			if not table.contains(rTable, r) then
-				Client.SendNetworkMessage("ClientFunctionReport", {detectionType = v}, true)
+				local s = split(v, ":")
+				--Only split out numeric things.  Otherwise its a func/class func and we are just tracking its existence as being modified/latehooked.
+				if #s == 2 and tonumber(s[2]) then
+					Client.SendNetworkMessage("ClientFunctionReport", {detectionType = s[1], detectionValue = s[2]}, true)
+				else
+					Client.SendNetworkMessage("ClientFunctionReport", {detectionType = v, detectionValue = ""}, true)
+				end
 				table.insert(rTable, v)
 			end
 		end
 		modString = nil
 	end
 	sleepDetections = 10
+end
+
+local function UpdateNSLMonitoredFields()
 end
 
 local oldScriptLoad = Script.Load
@@ -195,41 +206,6 @@ function Script.Load(fileName, reload)
 	end
 end
 
-local function HTTPResponseRecieved(data)
-	Print(ToString(data))
-end
-
-local kTextureUploadURL
---Sadly this costs me about 80fps, probably not viable at this time.
-local function TakeTextureRenderCameraSnapshot()
-	
-    local player = Client.GetLocalPlayer()
-    if player then
-		local cullingMode = RenderCamera.CullingMode_Occlusion
-		local rCamera = Client.CreateRenderCamera()
-		rCamera:SetRenderSetup("renderer/Deferred.render_setup")
-		rCamera:SetNearPlane(0.03)		
-		local adjustValue = Clamp( Client.GetOptionFloat("graphics/display/fov-adjustment",0), 0, 1 )
-		local adjustRadians = math.rad((1 - adjustValue) * kMinFOVAdjustmentDegrees + adjustValue * kMaxFOVAdjustmentDegrees)
-		if player:isa("Commander") or player:isa("Spectator") then
-			adjustRadians = 0
-		end
-		if player:GetIsOverhead() or player:GetCameraFarPlane() then
-			cullingMode = RenderCamera.CullingMode_Frustum
-		else
-			farPlane = 1000.0
-		end
-		rCamera:SetCoords(player:GetCameraViewCoords())
-        rCamera:SetFov(GetScreenAdjustedFov( player:GetRenderFov() + adjustRadians, 4 / 3 ))
-        rCamera:SetFarPlane(farPlane)
-        rCamera:SetCullingMode(cullingMode)
-		rCamera:SetTargetTexture("asdf", true, Client.GetScreenWidth() , Client.GetScreenHeight())
-		--Shared.SendHTTPRequest(kTextureUploadURL, "POST", { GetMaterialParameter("asdf") }, HTTPResponseRecieved)
-		Client.DestroyRenderCamera(rCamera)
-		rCamera = nil
-	end
-end
-
 local function OnUpdateClientTimers(deltaTime)
 
 	PROFILE("OnUpdateClientTimers")
@@ -237,24 +213,10 @@ local function OnUpdateClientTimers(deltaTime)
 	runDetectionAt = math.max(runDetectionAt - deltaTime, 0)
 	if runDetectionAt == 0 then
 		CheckGlobalFunctionTable(_G, C, 1)
-		--TakeTextureRenderCameraSnapshot()
+		UpdateNSLMonitoredFields()
 		runDetectionAt = math.random() * 10 + 30
 	end
 
 end
 
 Event.Hook("UpdateClient", OnUpdateClientTimers)
-
-local function OnNSLFunctionDataReceived(message)
-	if message and message.functionName then
-		if _G[message.functionName] and message.newValue then
-			_G[message.functionName] = ConditionalValue(tonumber(message.newValue), tonumber(message.newValue), message.newValue)
-		end
-	end
-end
-
-local function OnLoadComplete()
-	Client.HookNetworkMessage("ClientFunctionUpdate", OnNSLFunctionDataReceived)
-end
-
-Event.Hook("LoadComplete", OnLoadComplete)
