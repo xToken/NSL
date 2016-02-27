@@ -96,7 +96,7 @@ Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
 
 local kNSLDecalUpdateMessage =
 {
-    decalMaterial = string.format("string (%d)", kMaxDecalPathLength + 1),
+    decalIndex = "integer (0 to 25)",
     origin = "vector",
     yaw = "float",
     pitch = "float",
