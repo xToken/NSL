@@ -1,0 +1,7 @@
+shader = "models/teamlogos/nsllogos.surface_shader"
+albedoMap = "models/teamlogos/logos.dds"
+emissiveMap = "models/teamlogos/logos_emissive.dds"
+opacityMap = "models/teamlogos/logos_opacity.dds"
+numRows = 4
+numColumns = 4
+surface = "metal"
