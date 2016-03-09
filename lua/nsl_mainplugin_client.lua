@@ -20,9 +20,10 @@ local kNSLConfigUpdateFunctions = { }
 local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
 local teamConfigLocalFile = "configs/nsl_teamconfig.json"
 local kNSLModel = PrecacheAsset("models/teamlogos/nsllogos.model")
+local kNSLMaterial = PrecacheAsset("materials/teamlogos/teamlogos.material")
 local kNSLTeamConfig = { }
 local kTeamWinScreensEnabled = false
-local kNSLDecalsEnabled = false
+local kNSLDecalsEnabled = true
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -422,12 +423,14 @@ local function InitNSLDecal(decal, origin, yaw, pitch, roll)
 	
 	local renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
     renderModel:SetModel(kNSLModel)
+	local renderMaterial = Client.CreateRenderMaterial()
+	renderMaterial:SetMaterial(kNSLMaterial)  
+    renderModel:AddMaterial(renderMaterial)
 	local coords = Angles(pitch, yaw, roll):GetCoords(origin)
 	coords:Scale(4)
 	renderModel:SetCoords(coords)
-	renderModel:SetIsInstanced(true)
-	renderModel:SetMaterialParameter("textureIndex", decal - 1)
-	table.insert(kNSLDecals, {model = renderModel, origin = origin, yaw = yaw, decal = decal})
+	renderMaterial:SetParameter("textureIndex", decal - 1)
+	table.insert(kNSLDecals, {model = renderModel, material = renderMaterial, origin = origin, yaw = yaw, decal = decal})
 	
 end
 
@@ -445,8 +448,11 @@ local function OnClearNSLDecal(message)
 		for i = #kNSLDecals, 1, -1 do
 			if kNSLDecals[i] and (kNSLDecals[i].origin == message.origin or message.origin == kOriginVec) then
 				local rm = kNSLDecals[i].model
-				kNSLDecals[i] = nil
+				local rmat = kNSLDecals[i].material
+				rm:RemoveMaterial(rmat)
+				Client.DestroyRenderMaterial(rmat)
 				Client.DestroyRenderModel(rm)
+				kNSLDecals[i] = nil
 			end
 		end
 	end
@@ -462,13 +468,3 @@ local function OnReplacedPlayer(message)
 end
 
 Client.HookNetworkMessage("NSLReplacePlayer", OnReplacedPlayer)
-
-local function NSLUpdateRenderer()
-	for i = #kNSLDecals, 1, -1 do
-		if kNSLDecals[i] and kNSLDecals[i].model then
-			kNSLDecals[i].model:SetMaterialParameter("textureIndex", kNSLDecals[i].decal - 1)
-		end
-	end
-end
-
-Event.Hook("UpdateRender", NSLUpdateRenderer)

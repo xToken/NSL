@@ -19,6 +19,8 @@ local function GetNSLDecalForTP(techPoints)
 	local tpDecals = { }
 	local logoNumbers = GetNSLConfigValue("TeamLogos")
 	if logoNumbers then
+		local t1name = GetActualTeamName(1)
+		local t2name = GetActualTeamName(2)
 		local team1decalnum = logoNumbers[string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name))] or kDefaultDecal
 		local team2decalnum = logoNumbers[string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name))] or kDefaultDecal
 		--Build transfer table of TP Locations to current Decal
