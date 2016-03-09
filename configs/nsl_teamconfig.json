@@ -1,5 +1,5 @@
 {
-	"Version": 1.1,
+	"Version": 1.2,
 	"Configs": [
 		{
 		"LeagueName": 		"NSL",
@@ -26,11 +26,11 @@
 		"LogoLocations":	{
 								"ns2_veil":
 									{
-										"control": {"origin": [55.65, -0.5, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0},
-										"sub-sector": {"origin": [-63, -3.23, -156.75], "yaw": 0, "pitch": 0, "roll": 0},
-										"cargo": {"origin": [-87.33, -4, -78.75], "yaw": 0, "pitch": 0, "roll": 0},
-										"pipeline": {"origin": [-54.05, -7.72, -8.94], "yaw": 0, "pitch": 0, "roll": 0},
-										"nanogrid": {"origin": [-1.71, -1, -94.3], "yaw": 0, "pitch": 0, "roll": 0, "decal": 2}
+										"control": {"origin": [55.65, -1.4, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0},
+										"sub-sector": {"origin": [-63, -2.6, -156.75], "yaw": 0, "pitch": 0, "roll": 0},
+										"cargo": {"origin": [-87.33, -3.8, -78.75], "yaw": 0, "pitch": 0, "roll": 0},
+										"pipeline": {"origin": [-54.05, -7.4, -8.94], "yaw": 0, "pitch": 0, "roll": 0},
+										"nanogrid": {"origin": [-1.71, -1.9, -94.3], "yaw": -89.538, "pitch": 0, "roll": 0, "decal": 2}
 									},
 								"ns2_summit":
 									{

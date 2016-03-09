@@ -15,7 +15,7 @@ local configRequestTracking = {
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0, perfConfigComplete = false,
 								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
 								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0, spawnConfigComplete = false,
-								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.1, teamConfigComplete = false
+								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.2, teamConfigComplete = false
 								}
 local NSL_Mode = "PCW"
 local NSL_League = "NSL"
@@ -380,7 +380,7 @@ local function GetGroupCanRunCommand(groupData, commandName)
 end
 
 function GetCanRunCommandviaNSL(ns2id, commandName)
-	if (NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
+	if NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
 			local level = tostring(pData.NSL_Level)
