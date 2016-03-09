@@ -237,7 +237,18 @@ local function ClientReady(client)
 		local gamerules = GetGamerules()
 		local team1Commander = gamerules.team1:GetCommander()
         local team2Commander = gamerules.team2:GetCommander()
-		if (not team1Commander and teamnum == 1) or (not team2Commander and teamnum == 2) then
+		local team1CommanderRequired = true
+		local team2CommanderRequired = true
+		if GetServerGameMode and kGameMode then
+			--Classic
+			if GetServerGameMode() == kGameMode.Classic then
+				team2CommanderRequired = false
+			elseif  GetServerGameMode() == kGameMode.Combat then
+				team1CommanderRequired = false
+				team2CommanderRequired = false
+			end
+		end
+		if (not team1Commander and teamnum == 1 and team1CommanderRequired) or (not team2Commander and teamnum == 2 and team2CommanderRequired) then
 			SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
 		elseif TournamentModeSettings[teamnum].lastready + 2 < Shared.GetTime() then
 			TournamentModeSettings[teamnum].ready = not TournamentModeSettings[teamnum].ready
