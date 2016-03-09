@@ -4,7 +4,6 @@
 -- - Dragon
 
 if Server then
-	ModLoader.SetupFileHook( "lua/ServerAdmin.lua", "lua/nsl_serveradmin.lua", "post" )
 	--This is odd, but hey.
 	ModLoader.SetupFileHook( "lua/ConsistencyConfig.lua", "lua/nsl_consistencybypass_server.lua", "replace" )
 elseif Client then

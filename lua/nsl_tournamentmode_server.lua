@@ -5,8 +5,6 @@
 
 --NS2 Tournament Mod Server side script
 
-Script.Load("lua/nsl_class.lua")
-
 local TournamentModeSettings = { 
 countdownstarted = false, 
 countdownstarttime = 0, 
@@ -40,7 +38,7 @@ originalNS2GRSetGameState = Class_ReplaceMethod("NS2Gamerules", "SetGameState",
 )
 
 --Derrrrrrrp
---Seems wierd, but makes game start the same frame as final counter expires.
+--Seems weird, but makes game start the same frame as final counter expires.
 local originalNS2GRGetPregameLength
 originalNS2GRGetPregameLength = Class_ReplaceMethod("NS2Gamerules", "GetPregameLength", 
 	function(self)

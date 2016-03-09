@@ -22,6 +22,7 @@ local NSL_League = "NSL"
 local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
+local NSL_ServerCommands = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
 local cachedScoresValidFor = 10 * 60
@@ -52,6 +53,11 @@ end
 
 function GetNSLPerfConfigsBlocked()
 	return NSL_PerfConfigsBlocked
+end
+
+function RegisterNSLServerCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed, nslAdminCommand)
+	NSL_ServerCommands[string.gsub(commandName, "Console_", "")] = nslAdminCommand or false
+	CreateServerAdminCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed)
 end
 
 local function LoadConfig()
@@ -374,7 +380,7 @@ local function GetGroupCanRunCommand(groupData, commandName)
 end
 
 function GetCanRunCommandviaNSL(ns2id, commandName)
-	if NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
+	if (NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
 			local level = tostring(pData.NSL_Level)
@@ -385,6 +391,27 @@ function GetCanRunCommandviaNSL(ns2id, commandName)
 		end		
 	end
 	return false
+end
+
+--NSL Server Admin Hooks
+local oldGetClientCanRunCommand = GetClientCanRunCommand
+function GetClientCanRunCommand(client, commandName, printWarning)
+
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	local canRun = false
+	if NSL_ServerCommands[commandName] ~=nil and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
+		--Check if cmd is an NSL command, check perms
+		return true
+	elseif NSL_LeagueAdminsAccess and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
+		--Check if cmd is vanilla and leagueadminaccess is enabled
+		canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
+	end
+	if not canRun then
+		return oldGetClientCanRunCommand(client, commandName, printWarning)
+	end
+	return canRun
+	
 end
 
 local Messages = {

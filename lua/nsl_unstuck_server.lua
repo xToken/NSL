@@ -4,7 +4,6 @@
 -- - Dragon
 
 --NS2 Unstuck Plugin
-
 local UnstuckOriginTracker = { }  	--Tracks origin of clients in unstuck Queue.
 local LastUnstuckTracker = { }		--Tracks time of clients last successful unstuck.
 local UnstuckRetryTracker = { }		--Tracks retries of unstuck up to kMaxUnstuckAttemps.

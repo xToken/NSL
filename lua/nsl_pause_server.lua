@@ -4,9 +4,6 @@
 -- - Dragon
 
 --Pause
-
-Script.Load("lua/nsl_class.lua")
-
 local gamestate = {
 serverpauseloopenabled = false,
 serverprepauseloopenabled = false,

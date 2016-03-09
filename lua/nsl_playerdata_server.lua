@@ -26,8 +26,6 @@ local NSL_PlayerDataTimeout = 30
 --NSL_Icon 	- Assigned Icon
 --Would like to USE these icons :S
 
-Script.Load("lua/nsl_class.lua")
-
 function GetNSLUserData(ns2id)
 	if NSL_ClientData[ns2id] == nil then
 		--Check manually specified player data table from configs
@@ -215,6 +213,7 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				end
+				
 				NSL_ClientData[ns2id] = clientData
 				UpdateCallbacksWithNSLData(player, clientData)
 				RemovePlayerFromRetryTable(player)
