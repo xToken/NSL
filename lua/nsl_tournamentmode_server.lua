@@ -243,7 +243,7 @@ local function ClientReady(client)
 			--Classic
 			if GetServerGameMode() == kGameMode.Classic then
 				team2CommanderRequired = false
-			elseif  GetServerGameMode() == kGameMode.Combat then
+			elseif GetServerGameMode() == kGameMode.Combat then
 				team1CommanderRequired = false
 				team2CommanderRequired = false
 			end
