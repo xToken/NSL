@@ -11,6 +11,9 @@ Script.Load("lua/nsl_mainplugin_shared.lua")
 local t1name = "Frontiersmen"
 local t2name = "Kharaa"
 local kChatMinWindow = 0.005
+local kNSLTeamDecalSize = 256
+local kNSLTeamDecalColumns = 8
+local kNSLTeamDecalRows = 8
 local kTeam1NameLocal
 local kTeam2NameLocal
 local kInsightTeamnameHack = false
@@ -21,9 +24,9 @@ local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local teamConfigLocalFile = "configs/nsl_teamconfig.json"
 local kNSLModel = PrecacheAsset("models/teamlogos/nsllogos.model")
 local kNSLMaterial = PrecacheAsset("materials/teamlogos/teamlogos.material")
+local kNSLTeamDecals = PrecacheAsset("materials/teamlogos/logos.dds")
 local kNSLTeamConfig = { }
 local kTeamWinScreensEnabled = false
-local kNSLDecalsEnabled = true
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -121,6 +124,12 @@ function GetNSLTeamName(teamName)
 	return teamName
 end
 
+local function GetNSLTeamDecalLocation(nslTeamName)
+	if kNSLTeamConfig and kNSLTeamConfig.TeamLogos and kNSLTeamConfig.TeamLogos[nslTeamName] then
+		return kNSLTeamConfig.TeamLogos[nslTeamName]
+	end
+end
+
 local function OnLoadLocalConfig(configFile)
 	local config = { }
 	local file = io.open(configFile, "r")
@@ -155,7 +164,7 @@ function OnNSLConfigRecieved(message)
 			kNSLConfigUpdateFunctions[i](kNSLMode)
 		end
 		Shared.Message("NSL Plugin currently running " .. kNSLMode .. " configuration.")
-		if kNSLMode ~= "DISABLED" then
+		if kNSLMode ~= "DISABLED" and (not kNSLTeamConfig or not kNSLTeamConfig.TeamNames) then
 			Shared.SendHTTPRequest(teamConfigUpdateURL, "GET", function(response) OnConfigResponse(response, message.league) end)
 		end
 	end
@@ -330,9 +339,12 @@ local function ChatUICreation(scriptName, script)
 				if winningTeamName then
 					messageString = string.format("%s Wins!", winningTeamName)
 				end
-				local teamDDS = string.format("materials/logos/%s.dds", GetNSLTeamName(winningTeamName))
-				if GetFileExists(teamDDS) then
+				local decalLocation = GetNSLTeamDecalLocation(GetNSLTeamName(winningTeamName))
+				if decalLocation then
+					local xOffset = ((decalLocation - 1) % kNSLTeamDecalColumns) * kNSLTeamDecalSize
+					local yOffset = math.floor((decalLocation - 1) / kNSLTeamDecalColumns) * kNSLTeamDecalSize
 					self.endIcon:SetTexture(teamDDS)
+					self.endIcon:SetTexturePixelCoordinates(xOffset, yOffset, xOffset + kNSLTeamDecalSize, yOffset + kNSLTeamDecalSize)
 					self.messageText:SetPosition(Vector(0, 0, 0) * GUIScale(1))
 					self.messageText:SetText(messageString)
 				end
@@ -421,21 +433,22 @@ AddClientUIScriptForTeam(kSpectatorIndex, "GUINSLSpectatorTechMap")
 
 local function InitNSLDecal(decal, origin, yaw, pitch, roll)
 	
-	local renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
-    renderModel:SetModel(kNSLModel)
-	local renderMaterial = Client.CreateRenderMaterial()
-	renderMaterial:SetMaterial(kNSLMaterial)  
-    renderModel:AddMaterial(renderMaterial)
-	local coords = Angles(pitch, yaw, roll):GetCoords(origin)
-	coords:Scale(4)
-	renderModel:SetCoords(coords)
-	renderMaterial:SetParameter("textureIndex", decal - 1)
-	table.insert(kNSLDecals, {model = renderModel, material = renderMaterial, origin = origin, yaw = yaw, decal = decal})
-	
+	if decal > 0 then
+		local renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
+		renderModel:SetModel(kNSLModel)
+		local renderMaterial = Client.CreateRenderMaterial()
+		renderMaterial:SetMaterial(kNSLMaterial)  
+		renderModel:AddMaterial(renderMaterial)
+		local coords = Angles(pitch, yaw, roll):GetCoords(origin)
+		coords:Scale(4)
+		renderModel:SetCoords(coords)
+		renderMaterial:SetParameter("textureIndex", decal - 1)
+		table.insert(kNSLDecals, {model = renderModel, material = renderMaterial, origin = origin, yaw = yaw, decal = decal})
+	end
 end
 
 local function OnNewNSLDecal(message)
-	if message and kNSLDecalsEnabled then
+	if message then
 		InitNSLDecal(message.decalIndex, message.origin, message.yaw, message.pitch, message.roll)
 	end
 end
