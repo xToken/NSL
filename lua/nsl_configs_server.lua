@@ -11,11 +11,11 @@ local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/maste
 local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
 local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.1, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.2, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0, perfConfigComplete = false,
 								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
 								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0, spawnConfigComplete = false,
-								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.2, teamConfigComplete = false
+								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.3, teamConfigComplete = false
 								}
 local NSL_Mode = "PCW"
 local NSL_League = "NSL"
@@ -175,7 +175,8 @@ PauseOnDisconnect					= false,
 SavePlayerStates					= false,
 OverrideTeamNames					= false,
 MessageColor						= "00BFFF",
-NetworkTruncation					= 0
+NetworkTruncation					= 0,
+LeagueDecal							= 1
 }
 
 local DefaultPerfConfig = {
