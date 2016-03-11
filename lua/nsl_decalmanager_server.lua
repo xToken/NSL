@@ -4,7 +4,6 @@
 -- - Dragon
 
 local kOriginVec = Vector(0, 0, 0)
-local kDefaultDecal = 1
 
 local function LookupDecalLocations()
 	local mapName = string.lower(Shared.GetMapName())
@@ -21,8 +20,8 @@ local function GetNSLDecalForTP(techPoints)
 	if logoNumbers then
 		local t1name = GetActualTeamName(1)
 		local t2name = GetActualTeamName(2)
-		local team1decalnum = logoNumbers[string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name))] or kDefaultDecal
-		local team2decalnum = logoNumbers[string.format("materials/logos/%s.material", GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name))] or kDefaultDecal
+		local team1decalnum = logoNumbers[GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name)] or GetNSLConfigValue("LeagueDecal")
+		local team2decalnum = logoNumbers[GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name)] or GetNSLConfigValue("LeagueDecal")
 		--Build transfer table of TP Locations to current Decal
 		for _, techPoint in ipairs(techPoints) do
 			if techPoint:GetAttached() then
