@@ -1,6 +1,0 @@
-shader = "shaders/Decal.surface_shader"
-albedoMap = "materials/logos/sauna.dds"
-specularMap = "materials/logos/logo_spec.dds"
-normalMap = "materials/logos/logo_normal.dds"
-opacityMap = "materials/logos/logo_opacity.dds"
-surface = "metal"
