@@ -22,10 +22,10 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
-		"SavePlayerStates":						true,
+		"SavePlayerStates":						false,
 		"PausedMaxDuration": 					300,
 		"MessageColor":							"CC2EFA",
-		"NetworkTruncation":					0,
+		"NetworkTruncation":					1,
 		"LeagueDecal":							1,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
@@ -114,7 +114,7 @@
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						false,
 		"MessageColor":							"00BFFF",
-		"NetworkTruncation":					0,
+		"NetworkTruncation":					1,
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
 												},
