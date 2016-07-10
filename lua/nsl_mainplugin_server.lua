@@ -118,6 +118,14 @@ originalNS2GRGetFriendlyFire = Class_ReplaceMethod("NS2Gamerules", "GetFriendlyF
 	end
 )
 
+local originalNS2GRGetWarmUpPlayerLimit
+--Override warmup mode
+originalNS2GRGetWarmUpPlayerLimit = Class_ReplaceMethod("NS2Gamerules", "GetWarmUpPlayerLimit", 
+	function(self)
+		return GetNSLModEnabled() and 0 or originalNS2GRGetWarmUpPlayerLimit(self)
+	end
+)
+
 --Override friendly fire function checks
 function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
