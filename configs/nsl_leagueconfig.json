@@ -22,7 +22,7 @@
 		"UseFixedSpawnsWhenLoaded":				false,
 		"UseDefaultSkins":						false,
 		"PauseOnDisconnect":					false,
-		"SavePlayerStates":						false,
+		"SavePlayerStates":						true,
 		"PausedMaxDuration": 					300,
 		"MessageColor":							"CC2EFA",
 		"NetworkTruncation":					1,
