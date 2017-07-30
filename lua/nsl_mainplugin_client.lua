@@ -27,6 +27,7 @@ local kNSLMaterial = PrecacheAsset("materials/teamlogos/teamlogos.material")
 local kNSLTeamDecals = PrecacheAsset("materials/teamlogos/logos.dds")
 local kNSLTeamConfig = { }
 local kTeamWinScreensEnabled = false
+local kNSLChatSoundWarning = PrecacheAsset("sound/NS2.fev/common/invalid")
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -102,7 +103,11 @@ local function AdminMessageRecieved(message)
         table.insert(chatMessages, 0)
         table.insert(chatMessages, 0)
 
-        StartSoundEffect(player:GetChatSound())
+        if message.changesound then 
+            StartSoundEffect(kNSLChatSoundWarning)
+        else
+            StartSoundEffect(player:GetChatSound())
+        end
 		Shared.Message(message.header .. " " .. message.message)
         
 	end

@@ -155,7 +155,7 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
 
 --Simple functions to make sending messages easier.
-local function BuildAdminMessage(message, teamname, client)
+local function BuildAdminMessage(message, teamname, client, changesound)
 	local t = { }
 	local mod
 	t.message = string.sub(message, 1, 250)
@@ -169,11 +169,12 @@ local function BuildAdminMessage(message, teamname, client)
 	end
 	t.header = string.format(mod and "(%s)(%s):" or "(%s):", GetNSLConfigValue("LeagueName"), mod)
 	t.color = GetNSLConfigValue("MessageColor")
+    t.changesound = changesound
 	return t
 end
 
-function SendAllClientsMessage(message)
-	Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message), true)
+function SendAllClientsMessage(message, changesound)
+	Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message, nil, nil, changesound), true)
 end
 
 function SendClientMessage(client, message)

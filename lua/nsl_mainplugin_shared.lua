@@ -28,6 +28,7 @@ local kAdminChatMessage =
 	header = string.format("string (%d)", kMaxAdminChatLength + 1),
     message = string.format("string (%d)", kMaxAdminChatLength + 1),
 	color = string.format("string (%d)", 7),
+	changesound = "boolean" -- bool for now. later maybe filenames, or ints and keep an index somewhere
 }
 
 Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
