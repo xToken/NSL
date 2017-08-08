@@ -136,6 +136,15 @@ function MapCycle_CycleMap()
 	--Override to prevent automatic mapcycle from lazy server admins
 end
 
+--Keep vanilla behavior when a map change fails
+local function OnMapChangeFailed(mapName)
+    Log("Failed to load map '%s', cycling...", mapName);
+    oldMapCycle_CycleMap(mapName)
+end
+
+Event.RemoveHook("MapChangeFailed")
+Event.Hook("MapChangeFailed", OnMapChangeFailed)
+
 local function NewServerAgeCheck(self)
 	if GetNSLModEnabled() then
 		if self.gameState ~= kGameState.Started and Shared.GetTime() > GetNSLConfigValue("AutomaticMapCycleDelay") and Server.GetNumPlayers() == 0 then
