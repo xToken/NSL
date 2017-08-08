@@ -415,6 +415,31 @@ function GetClientCanRunCommand(client, commandName, printWarning)
 	
 end
 
+local Shine = Shine
+
+if Shine then
+    -- Adds the graphical AdminMenu button to Shine's VoteMenu
+    -- for NSL admins who can use sh_adminmenu
+    local oldHasAccess = Shine.HasAccess
+    function Shine:HasAccess(client, commandName)
+        local ns2id = client:GetUserId()
+        local oldAccess = oldHasAccess(self, client, commandName)
+        local newAccess = GetCanRunCommandviaNSL(ns2id, commandName)
+
+        return oldAccess or newAccess
+    end
+
+    -- Gives NSL admins access to their group's Shine commands
+    local oldGetPermission = Shine.GetPermission
+    function Shine:GetPermission(client, commandName)
+        local ns2id = client:GetUserId()
+        local oldPerm = oldGetPermission(self, client, commandName)
+        local newPerm = GetCanRunCommandviaNSL(ns2id, commandName)
+
+        return oldPerm or newPerm
+    end
+end
+
 local Messages = {
 PauseResumeMessage 					= "Game Resumed.  %s have %s pauses remaining",
 PausePausedMessage					= "Game Paused.",
