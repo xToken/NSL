@@ -61,7 +61,11 @@
 														[
 															"sv_kick", 
 															"sv_say", 
-															"sv_changemap"
+															"sv_changemap",
+															"sh_adminmenu",
+															"sh_kick",
+															"sh_say",
+															"sh_changelevel"
 														],
 														"type": "allowed"
 													},
@@ -78,14 +82,25 @@
 															"sv_rrall", 
 															"sv_eject", 
 															"sv_tsay", 
-															"sv_psay"
+															"sv_psay",
+															"sh_adminmenu",
+															"sh_ban",
+															"sh_unban",
+															"sh_kick",
+															"sh_say",
+															"sh_changelevel",
+															"sh_reset",
+															"sh_setteam",
+															"sh_rr",
+															"sh_eject"
 														],
 														"type": "allowed"
 													},
 													"4":{
 														"commands": 
 														[
-															"sv_rcon"
+															"sv_rcon",
+															"sh_rcon"
 														],
 														"type": "disallowed"
 													}		
