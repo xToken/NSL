@@ -387,7 +387,7 @@ local function UpdateMoveState(deltatime)
 					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
 				end
 				if GetNSLConfigValue("PausedMaxDuration") ~= 0 then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeWarningMessage"), ((GetNSLConfigValue("PausedMaxDuration") - gamestate.gamepauseddelta))))
+					SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeWarningMessage"), ((GetNSLConfigValue("PausedMaxDuration") - gamestate.gamepauseddelta))), true)
 				end
 				gamestate.gamepausedmessagetime = 0
 			end
@@ -414,7 +414,7 @@ local function UpdateMoveState(deltatime)
 		if gamestate.gameprepausedelta >= 1 then
 			gamestate.gamepausedcountdown = (gamestate.gamepausedcountdown - 1)
 			if gamestate.gamepausedcountdown > 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("PauseWarningMessage"), ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)))
+				SendAllClientsMessage(string.format(GetNSLMessage("PauseWarningMessage"), ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)), true)
 			else
 				if not GetIsGamePaused() then
 					SaveEntStates()
@@ -454,7 +454,7 @@ local function OnCommandPause(client)
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseStartDelay")
 					gamestate.gamepausingteam = teamnumber
 					gamestate.serverprepauseloopenabled = true
-					SendAllClientsMessage(string.format(GetNSLMessage("PausePlayerMessage"), player:GetName()))
+					SendAllClientsMessage(string.format(GetNSLMessage("PausePlayerMessage"), player:GetName()), true)
 				else
 					SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
 				end
