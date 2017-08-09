@@ -1,5 +1,11 @@
 # Changelog
 
+* 8-8-17
+
+Added invalid sound for some NSL messages (pause/admin)
+Added shine command access for NSL admins (if enabled)
+Corrected automatic mapcycle on invalid mapchanges
+
 * 2-8-17
 
 Updated config system to have multiple individual configs so things are more clear.
@@ -8,10 +14,23 @@ State save defaults to on.
 NSL decal system added.
 League can select colors for messages.
 
+* 3-10-16
+
+Updated decal system to use models and a ton of other BS to mitigate infestation overlay issues.
+Split out files for some slightly better organization (its still terrible, NSL mod has become a mess).
+
+* 2-16-16
+
+Fixes for statesave not joining players to team as needed.
+Altchat mode now main chat mode.
+
+* 2-14-16
+
+Fix for league admin access not working after NS2 patch.
+
 * 1-24-16
 
 Updated state saving to account for NS2 not counting bot clients as players in the server browser, but counting them in the reserve-slot system.  This would cause anyone rejoining after a d/c on a full server to be kicked.
-
 State saving defaults to disabled now, can be toggled on with: sv_nslstatesave
 
 * 1-6-16
