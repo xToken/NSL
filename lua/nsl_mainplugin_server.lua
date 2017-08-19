@@ -137,13 +137,13 @@ function MapCycle_CycleMap()
 end
 
 --Keep vanilla behavior when a map change fails
-local function OnMapChangeFailed(mapName)
+local function NewOnMapChangeFailed(mapName)
     Log("Failed to load map '%s', cycling...", mapName);
     oldMapCycle_CycleMap(mapName)
 end
 
-Event.RemoveHook("MapChangeFailed")
-Event.Hook("MapChangeFailed", OnMapChangeFailed)
+Event.RemoveHook("MapChangeFailed", OnMapChangeFailed)
+Event.Hook("MapChangeFailed", NewOnMapChangeFailed)
 
 local function NewServerAgeCheck(self)
 	if GetNSLModEnabled() then
