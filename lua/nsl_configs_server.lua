@@ -422,7 +422,9 @@ if Shine then
     -- for NSL admins who can use sh_adminmenu
     local oldHasAccess = Shine.HasAccess
     function Shine:HasAccess(client, commandName)
-        local ns2id = client:GetUserId()
+        if not client then return true end
+
+        local _, ns2id = Shine:GetUserData(client)
         local oldAccess = oldHasAccess(self, client, commandName)
         local newAccess = GetCanRunCommandviaNSL(ns2id, commandName)
 
@@ -432,7 +434,9 @@ if Shine then
     -- Gives NSL admins access to their group's Shine commands
     local oldGetPermission = Shine.GetPermission
     function Shine:GetPermission(client, commandName)
-        local ns2id = client:GetUserId()
+        if not client then return true end
+
+        local _, ns2id = Shine:GetUserData(client)
         local oldPerm = oldGetPermission(self, client, commandName)
         local newPerm = GetCanRunCommandviaNSL(ns2id, commandName)
 
