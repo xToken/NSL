@@ -199,7 +199,7 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Level = 2
 					clientData.NSL_Rank = "Caster"
 				elseif responsetable.moderator then
-					clientData.NSL_Level = 1
+					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Mod"
 				else
 					clientData.NSL_Level = 0
