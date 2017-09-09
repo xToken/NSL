@@ -101,7 +101,7 @@ originalNS2GameRulesOnCommanderLogout = Class_ReplaceMethod("NS2Gamerules", "OnC
 		originalNS2GameRulesOnCommanderLogout(self, commandStructure, oldCommander)
 		if oldCommander and GetNSLModEnabled() then
 			local teamnum = oldCommander:GetTeamNumber()
-			if TournamentModeSettings[teamnum].ready and (GetGamerules():GetGameState() == kGameState.NotStarted or GetGamerules():GetGameState() == kGameState.PreGame) then
+			if TournamentModeSettings[teamnum].ready and (GetGamerules():GetGameState() <= kGameState.PreGame) then
 				TournamentModeSettings[teamnum].ready = false
 				CheckCancelGameStart()
 				SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
@@ -175,7 +175,7 @@ end
 local originalNS2GamerulesUpdatePregame
 originalNS2GamerulesUpdatePregame = Class_ReplaceMethod("NS2Gamerules", "UpdatePregame", 
 	function(self, timePassed)
-		if (self:GetGameState() == kGameState.PreGame or self:GetGameState() == kGameState.NotStarted) and not self.teamsReady and GetNSLModEnabled() then
+		if self:GetGameState() <= kGameState.PreGame and not self.teamsReady and GetNSLModEnabled() then
 			MonitorCountDown()
 		else
 			originalNS2GamerulesUpdatePregame(self, timePassed)
@@ -278,7 +278,7 @@ end
 local function OnCommandReady(client)
 	local gamerules = GetGamerules()
 	if gamerules and client and GetNSLModEnabled() then
-		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame then
+		if gamerules:GetGameState() <= kGameState.PreGame then
 			ClientReady(client)
 		else
 			CheckforInProgressGameToCancel(client, gamerules)
@@ -310,7 +310,7 @@ end
 local function OnCommandNotReady(client)
 	local gamerules = GetGamerules()
 	if gamerules and client and GetNSLModEnabled() then
-		if gamerules:GetGameState() == kGameState.NotStarted or gamerules:GetGameState() == kGameState.PreGame then
+		if gamerules:GetGameState() <= kGameState.PreGame then
 			ClientNotReady(client)
 		else
 			CheckforInProgressGameToCancel(client, gamerules)
