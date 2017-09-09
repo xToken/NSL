@@ -131,6 +131,28 @@ function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
+local originalNS2GRKillEnemiesNearCommandStructureInPreGame
+--Shrink the pregame damage area to just near the command structure
+originalNS2GRKillEnemiesNearCommandStructureInPreGame = Class_ReplaceMethod("NS2Gamerules", "KillEnemiesNearCommandStructureInPreGame",
+	function(self, timePassed)
+		if self:GetGameState() < kGameState.Countdown then
+
+			local commandStations = Shared.GetEntitiesWithClassname("CommandStructure")
+			for _, ent in ientitylist(commandStations) do
+
+				local enemyPlayers = GetEntitiesForTeam("Player", GetEnemyTeamNumber(ent:GetTeamNumber()))
+				for e = 1, #enemyPlayers do
+
+					local enemy = enemyPlayers[e]
+					if enemy:GetDistance(ent) <= 5 then
+						enemy:TakeDamage(25 * timePassed, nil, nil, nil, nil, 0, 25 * timePassed, kDamageType.Normal)
+					end
+				end
+			end
+		end
+	end
+)
+
 local oldMapCycle_CycleMap = MapCycle_CycleMap
 function MapCycle_CycleMap()
 	--Override to prevent automatic mapcycle from lazy server admins
