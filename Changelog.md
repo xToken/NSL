@@ -1,10 +1,15 @@
 # Changelog
 
+* 9-16-17
+
+Allowed lifeform/weapon purchases during warmup - damage disabled (keatsandyeats)
+Made pregame command structure damage radius smaller (keatsandyeats)
+
 * 8-8-17
 
-Added invalid sound for some NSL messages (pause/admin)
-Added shine command access for NSL admins (if enabled)
-Corrected automatic mapcycle on invalid mapchanges
+Added invalid sound for some NSL messages (pause/admin) (keatsandyeats)
+Added shine command access for NSL admins (if enabled) (keatsandyeats)
+Corrected automatic mapcycle on invalid mapchanges (keatsandyeats)
 
 * 2-8-17
 
