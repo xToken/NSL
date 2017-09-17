@@ -118,17 +118,19 @@ originalNS2GRGetFriendlyFire = Class_ReplaceMethod("NS2Gamerules", "GetFriendlyF
 	end
 )
 
-local originalNS2GRGetWarmUpPlayerLimit
---Override warmup mode
-originalNS2GRGetWarmUpPlayerLimit = Class_ReplaceMethod("NS2Gamerules", "GetWarmUpPlayerLimit", 
-	function(self)
-		return GetNSLModEnabled() and 0 or originalNS2GRGetWarmUpPlayerLimit(self)
-	end
-)
-
 --Override friendly fire function checks
 function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
+end
+
+-- Prevent damage from players in warmup mode
+local oldCanEntityDoDamageTo = CanEntityDoDamageTo
+function CanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, damageType)
+	if GetNSLModEnabled() and GetGameInfoEntity():GetState() == kGameState.WarmUp then
+		return false
+	end
+
+	return oldCanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, damageType)
 end
 
 local originalNS2GRKillEnemiesNearCommandStructureInPreGame
