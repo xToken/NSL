@@ -123,14 +123,14 @@ function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
--- Prevent damage from players in warmup mode
-local oldCanEntityDoDamageTo = CanEntityDoDamageTo
-function CanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, damageType)
+local oldGetCanTakeDamage = LiveMixin.GetCanTakeDamage
+-- Prevent damage to players in warmup mode
+function LiveMixin:GetCanTakeDamage()
 	if GetNSLModEnabled() and GetGameInfoEntity():GetState() == kGameState.WarmUp then
 		return false
 	end
 
-	return oldCanEntityDoDamageTo(attacker, target, cheats, devMode, friendlyFire, damageType)
+	return oldGetCanTakeDamage(self)
 end
 
 local originalNS2GRKillEnemiesNearCommandStructureInPreGame
