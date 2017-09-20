@@ -123,6 +123,14 @@ function GetFriendlyFire()
 	return GetNSLConfigValue("FriendlyFireEnabled") and GetNSLModEnabled()
 end
 
+local originalNS2GRGetWarmUpPlayerLimit
+--Override warmup mode player limit
+originalNS2GRGetWarmUpPlayerLimit = Class_ReplaceMethod("NS2Gamerules", "GetWarmUpPlayerLimit", 
+	function(self)
+		return GetNSLModEnabled() and 100 or originalNS2GRGetWarmUpPlayerLimit(self)
+	end
+)
+
 local oldGetCanTakeDamage = LiveMixin.GetCanTakeDamage
 -- Prevent damage to players in warmup mode
 function LiveMixin:GetCanTakeDamage()
