@@ -5,11 +5,8 @@
 
 --NSL Main Plugin
 --Reworked to function more as a 'league' plugin, not just a ENSL plugin.
-local kCachedDataRate = 50
-local kCachedMoveRate = 30
-local kCachedInterp = 100
-local kCachedSendRate = 20
-local kCachedTickRate = 30
+local kCachedDataRate, kCachedMoveRate, kCachedInterp, kCachedSendRate
+local kCachedTickRate = Server.GetTickrate()
 local kNSLTag = "nsl"
 
 --Supposedly this still not syncronized.
