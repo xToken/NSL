@@ -20,7 +20,7 @@
 		"FirstPersonSpectate":					true,
 		"UseCustomSpawnConfigs":				true,
 		"UseFixedSpawnsWhenLoaded":				false,
-		"UseDefaultSkins":						false,
+		"UseDefaultSkins":						true,
 		"PauseOnDisconnect":					false,
 		"SavePlayerStates":						true,
 		"PausedMaxDuration": 					300,
