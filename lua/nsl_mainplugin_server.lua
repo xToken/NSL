@@ -396,24 +396,27 @@ end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)
 
-function Marine:GetIgnoreVariantModels()
-    return GetNSLConfigValue("UseDefaultSkins")
+--This seems stupid, but gender models are also considered 'variants'.  Allow for marines BUT force 'default' variant
+function MarineVariantMixin:GetVariantModel()
+	if GetNSLConfigValue("UseDefaultSkins") then
+		return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ kMarineVariant.green ]
+	end
+    return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ self.variant ]
 end
 
-function MarineVariantMixin:GetGenderString()
-	if GetNSLConfigValue("UseDefaultSkins") then
-		return "male"
+--Weapon Skin Update call would be skipped when default skins is enabled
+local originalPlayerOnClientUpdated
+originalPlayerOnClientUpdated = Class_ReplaceMethod("Player", "OnClientUpdated",
+	function(self, client)
+		originalPlayerOnClientUpdated(self, client)
+		if GetNSLConfigValue("UseDefaultSkins") then
+			self:UpdateWeaponSkin(client)
+		end
 	end
-    return self.isMale and "male" or "female"
-end
+)
 
-local oldMarineVariantMixinOnClientUpdated = MarineVariantMixin.OnClientUpdated
-function MarineVariantMixin:OnClientUpdated(client)
-	oldMarineVariantMixinOnClientUpdated(self, client)
-	if GetNSLConfigValue("UseDefaultSkins") then
-		self.shoulderPadIndex = 0
-		self.isMale = true
-	end
+function ExoVariantMixin:OnClientUpdated(client)
+	Player.OnClientUpdated(self, client)
 end
 
 function Alien:GetIgnoreVariantModels()
