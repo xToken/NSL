@@ -1,5 +1,10 @@
 # Changelog
 
+* 11-4-17
+
+Adjustments for Default Skins setting - Marines can change sex (using default skin).  Exos cannot change skins anymore, and shoulder pads are back.
+Pregame lerk damage fix (keatsandyeats)
+
 * 9-16-17
 
 Allowed lifeform/weapon purchases during warmup - damage disabled (keatsandyeats)
