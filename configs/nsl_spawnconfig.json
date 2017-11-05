@@ -1,58 +1,83 @@
 {
-	"Version": 1.0,
-	"Configs": [
-		{
-		"LeagueName": 	"NSL",
-		"CustomSpawns":		{
-							"ns2_tram":		[
-												{
-													"effectiveDate":		2014.0910,
-													"expiryDate":			2014.1017,
-													"spawnData":			[
+    "Version": 1.0,
+    "Configs": [
+        {
+			"LeagueName":		"NSL",
+			"CustomSpawns":     {
+                            "ns2_tram":     [
+                                                {
+                                                    "effectiveDate":        2017.1105,
+                                                    "expiryDate":           2018.0303,
+                                                    "spawnData":            [
+                                                                                {
+                                                                                    "name":             "Shipping",
+                                                                                    "team":             "marines",
+                                                                                    "enemyspawns":      ["Warehouse", "Server Room"]
+                                                                                },
+                                                                                {
+                                                                                    "name":             "Warehouse",
+                                                                                    "team":             "aliens",
+                                                                                    "enemyspawns":      ["Shipping"]
+                                                                                },
+                                                                                {
+                                                                                    "name":             "Server Room",
+                                                                                    "team":             "aliens",
+                                                                                    "enemyspawns":      ["Shipping"]
+                                                                                }
+                                                                            ]
+                                                }
+                                            ],
+                            "ns2_summit":   [
+                                                {
+                                                    "effectiveDate":        2017.1105,
+                                                    "expiryDate":           2018.0303,
+                                                    "spawnData":            [
+                                                                                {
+                                                                                    "name":             "Atrium",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Sub Access"]
+                                                                                },
 																				{
-																					"name":				"Shipping",
-																					"team":				"aliens",
-																					"enemyspawns":    	["Warehouse", "Server Room"]
-																				},
-																				{
-																					"name":				"Warehouse",
-																					"team":				"marines",
-																					"enemyspawns":    	["Shipping"]
-																				},
-																				{
-																					"name":				"Server Room",
-																					"team":				"marines",
-																					"enemyspawns":    	["Shipping"]
-																				}
-																			]											
-												},
-												{
-													"effectiveDate":		2014.1018,
-													"expiryDate":			2014.1028,
-													"spawnData":			[
-																				{
-																					"name":				"Shipping",
-																					"team":				"marines",
-																					"enemyspawns":    	["Warehouse", "Server Room"]
-																				},
-																				{
-																					"name":				"Warehouse",
-																					"team":				"aliens",
-																					"enemyspawns":    	["Shipping"]
-																				},
-																				{
-																					"name":				"Server Room",
-																					"team":				"aliens",
-																					"enemyspawns":    	["Shipping"]
-																				}														
-																			]											
-												}
-											]															
-							}
-		},
-		{
-		"LeagueName": 							"AusNS2",
-		},
-	],
-	"EndOfTable": true
+                                                                                    "name":             "Sub Access",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Atrium"]
+                                                                                },
+                                                                                {
+                                                                                    "name":             "Flight Control",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Data Core"]
+                                                                                },
+                                                                                {
+                                                                                    "name":             "Data Core",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Flight Control"]
+                                                                                }
+                                                                            ]
+                                                }
+                                            ],
+                            "ns2_descent":  [
+                                                {
+                                                    "effectiveDate":        2017.1105,
+                                                    "expiryDate":           2018.0303,
+                                                    "spawnData":            [
+                                                                                {
+                                                                                    "name":             "Drone Bay",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Fabrication"]
+                                                                                },
+                                                                                {
+                                                                                    "name":             "Fabrication",
+                                                                                    "team":             "both",
+                                                                                    "enemyspawns":      ["Drone Bay"]
+                                                                                }      
+                                                                            ]
+                                                }
+                                            ]
+                            }
+        },
+        {
+			"LeagueName":		"AusNS2"
+        }
+    ],
+    "EndOfTable": true
 }
