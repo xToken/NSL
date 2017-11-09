@@ -34,13 +34,8 @@
                                                     "spawnData":            [
                                                                                 {
                                                                                     "name":             "Atrium",
-                                                                                    "team":             "both",
+                                                                                    "team":             "marines",
                                                                                     "enemyspawns":      ["Sub Access"]
-                                                                                },
-																				{
-                                                                                    "name":             "Sub Access",
-                                                                                    "team":             "both",
-                                                                                    "enemyspawns":      ["Atrium"]
                                                                                 },
                                                                                 {
                                                                                     "name":             "Flight Control",
