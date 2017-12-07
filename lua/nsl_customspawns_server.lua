@@ -183,28 +183,94 @@ end
 
 table.insert(gConfigLoadedFunctions, LoadCustomTechPointData)
 
-local kTramTop = {"warehouse", "server room"}
+local kMapLocations = {
+	ns2_biodome = {
+		top = "atmosphere exchange",
+		right = "hydroponics",
+		bottom = "reception",
+		left = "platform",
+		middle = "falls",
+		center = "falls",
+	},
+	ns2_descent = {
+		top = "fabrication",
+		right = "monorail",
+		bottom = "drone bay",
+		left = "launch control",
+		middle = "hydroanalysis",
+		center = "hydroanalysis",
+	},
+	ns2_jambi = {
+		["top left"] = "pipeworks",
+		top = {
+			"pipeworks",
+			"waste recycling",
+		},
+		["top right"] = "waste recycling",
+		right = "waste recycling",
+		bottom = "docking bay",
+		left = "electrical core",
+		middle = "gravity",
+		center = "gravity",
+	},
+	ns2_mineral = {
+		["top left"] = "drill site",
+		top = {
+			"drill site",
+			"mineral processing",
+		},
+		["top right"] = "mineral processing",
+		right = "production",
+		bottom = "surface",
+	},
+	ns2_nexus = {
+		top = "silo",
+		right = "receiving",
+		bottom = "relay",
+		left = "extraction",
+	},
+	ns2_summit = {
+		top = "atrium",
+		right = "data core",
+		bottom = "sub access",
+		left = "flight control",
+		middle = "crossroads",
+		center = "crossroads",
+	},
+	ns2_tram = {
+		["top left"] = "warehouse",
+		top = {
+			"warehouse",
+			"server room",
+		},
+		["top right"] = "server room",
+		right = "elevator transfer",
+		bottom = "shipping",
+		left = "repair room",
+	},
+	ns2_veil = {
+		top = "control",
+		right = "pipeline",
+		["bottom right"] = "pipeline",
+		bottom = "cargo",
+		middle = "cargo",
+		["bottom left"] = "sub-sector",
+		left = "sub-sector",
+	},
+}
 
 local function UpdateSpawnForMapSpecificSetups(teamSpawn)
 	local mapname = Shared.GetMapName()
+
 	if teamSpawn then
 		teamSpawn = string.lower(teamSpawn)
-		if mapname == "ns2_tram" then
-			if teamSpawn == "top" then
-				teamSpawn = kTramTop[math.random(1,2)]
-			elseif teamSpawn == "bottom" then
-				teamSpawn = "shipping"
-			end	
-		elseif mapname == "ns2_summit" then
-			if teamSpawn == "top" then
-				teamSpawn = "atrium"
-			elseif teamSpawn == "bottom" then
-				teamSpawn = "sub access"
-			elseif teamSpawn == "left" then
-				teamSpawn = "flight control"
-			elseif teamSpawn == "right" then
-				teamSpawn = "data core"
-			end	
+
+		if kMapLocations[mapname] and kMapLocations[mapname][teamSpawn] then
+			teamSpawn = kMapLocations[mapname][teamSpawn]
+
+			if type(teamSpawn) == "table" then
+				teamSpawn = teamSpawn[math.random(1,#teamSpawn)]
+			end
 		end
 	end
 	return teamSpawn
