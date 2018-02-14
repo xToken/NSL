@@ -63,7 +63,7 @@ end
 --Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
 local originalNS2GameRulesGetCanJoinTeamNumber
 originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
-	function(self, teamNumber)
+	function(self, player, teamNumber)
 		if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
 			if self:GetGameState() == kGameState.Started then
 				local team1Players = GetRealPlayerCountPerTeam(1)
@@ -73,7 +73,11 @@ originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "
 				end
 			end
 		end
-		return originalNS2GameRulesGetCanJoinTeamNumber(self, teamNumber)
+		--block leaving a team for aliens/marines during countdown
+		if self:GetCountingDown() and (teamNumber == kTeamReadyRoom or teamNumber == kSpectatorIndex) and (player:GetTeamNumber() == 1 or player:GetTeamNumber() == 2) then
+			return false
+		end
+		return originalNS2GameRulesGetCanJoinTeamNumber(self, player, teamNumber)
 	end
 )
 
