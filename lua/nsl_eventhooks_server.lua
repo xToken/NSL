@@ -21,6 +21,8 @@ gPlayerDataUpdatedFunctions = { }
 gTeamNamesUpdatedFunctions = { }
 --TeamJoin Functions
 gTeamJoinedFunctions = { }
+--Perf Values Loaded Functions
+gPerfLoadedFunctions = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
@@ -63,5 +65,11 @@ end
 function EstablishConfigDependantSettings(configLoaded)
 	for i = 1, #gConfigLoadedFunctions do
 		gConfigLoadedFunctions[i](configLoaded)
+	end
+end
+
+function ApplyPerfDependantSettings()
+	for i = 1, #gPerfLoadedFunctions do
+		gPerfLoadedFunctions[i]()
 	end
 end

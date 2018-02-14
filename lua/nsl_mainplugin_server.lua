@@ -5,21 +5,19 @@
 
 --NSL Main Plugin
 --Reworked to function more as a 'league' plugin, not just a ENSL plugin.
-local kCachedDataRate = 50
-local kCachedMoveRate = 30
-local kCachedInterp = 100
-local kCachedSendRate = 20
-local kCachedTickRate = 30
 local kNSLTag = "nsl"
 
 --Supposedly this still not syncronized.
 local function SetupClientRatesandConfig(client)
-	--If non-default rates, send to clients.
-	if GetNSLPerfValue("Interp") ~= 100 then
-		Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
-	end
-	if GetNSLPerfValue("MoveRate") ~= 30 then
-		Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
+	--Confirm we scanned the defaults already
+	if GetNSLDefaultPerfValue("Interp") then
+		--If non-default rates, send to clients.
+		if GetNSLDefaultPerfValue("Interp") ~= Shared.GetServerPerformanceData():GetInterpMs() then
+			Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+		end
+		if GetNSLDefaultPerfValue("MoveRate") ~= Shared.GetServerPerformanceData():GetMoverate() then
+			Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+		end
 	end
 	Server.SendNetworkMessage(client, "NSLPluginConfig", {config = kNSLPluginConfigs[GetNSLMode()], league = GetActiveLeague()}, true)
 end
@@ -31,50 +29,47 @@ local function SetupNSLTag()
 	end
 end
 
-local function SetupRates(configLoaded)
+local function SetupRates()
 	
-	if configLoaded == "perf" or configLoaded == "all" then
-		if GetNSLPerfValue("TickRate") > kCachedTickRate then
-			--Tickrate going up, increase it first.
-			Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-			kCachedTickRate = GetNSLPerfValue("TickRate")
-			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
-				Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-				kCachedSendRate = GetNSLPerfValue("ClientRate")
-			end
-		elseif GetNSLPerfValue("TickRate") <= kCachedTickRate then
-			--Tickrate going down, set updaterate first.
-			if GetNSLPerfValue("ClientRate") ~= kCachedSendRate then
-				Shared.ConsoleCommand(string.format("sendrate %f", GetNSLPerfValue("ClientRate")))
-				kCachedSendRate = GetNSLPerfValue("ClientRate")
-			end
-			if GetNSLPerfValue("TickRate") ~= kCachedTickRate then
-				Shared.ConsoleCommand(string.format("tickrate %f", GetNSLPerfValue("TickRate")))
-				kCachedTickRate = GetNSLPerfValue("TickRate")
-			end
+	if GetNSLPerfValue("TickRate") > Server.GetTickrate() then
+		--Tickrate going up, increase it first.
+		Server.SetTickRate(GetNSLPerfValue("TickRate"))
+		
+		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
+			Server.SetSendRate(GetNSLPerfValue("ClientRate"))
 		end
-		if GetNSLPerfValue("MaxDataRate") ~= kCachedDataRate then
-			Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
-			kCachedDataRate = GetNSLPerfValue("MaxDataRate")
+	elseif GetNSLPerfValue("TickRate") <= Server.GetTickrate() then
+		--Tickrate going down, set updaterate first.
+		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
+			Server.SetSendRate(GetNSLPerfValue("ClientRate"))
 		end
-		if GetNSLPerfValue("Interp") ~= kCachedInterp then
-			Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
-			kCachedInterp = GetNSLPerfValue("Interp")
+		if GetNSLPerfValue("TickRate") ~= Server.GetTickrate() then
+			Server.SetTickRate(GetNSLPerfValue("TickRate"))
 		end
-		if GetNSLPerfValue("MoveRate") ~= kCachedMoveRate then
-			Shared.ConsoleCommand(string.format("mr %f", GetNSLPerfValue("MoveRate")))
-			kCachedMoveRate = GetNSLPerfValue("MoveRate")
-		end
-		SetupNSLTag()
 	end
-	if configLoaded == "league" or configLoaded == "all" then
-		Server.SetNetworkFieldTruncationControl(GetNSLConfigValue("NetworkTruncation"))
-		Shared.Message(string.format("Network Truncation set to %s.", GetNSLConfigValue("NetworkTruncation")))
+	
+	if GetNSLPerfValue("MaxDataRate") ~= math.ceil(Server.GetBwLimit() / 1024) then
+		Shared.ConsoleCommand(string.format("bwlimit %f", (GetNSLPerfValue("MaxDataRate") * 1024)))
 	end
+	
+	if GetNSLPerfValue("Interp") ~= Shared.GetServerPerformanceData():GetInterpMs() then
+		Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+	end
+	
+	if GetNSLPerfValue("MoveRate") ~= Shared.GetServerPerformanceData():GetMoverate() then
+		Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+	end
+	
+	SetupNSLTag()
+
+	--If we are not changing this anymore, just completely disable
+	--Server.SetNetworkFieldTruncationControl(GetNSLConfigValue("NetworkTruncation"))
+	--Shared.Message(string.format("Network Truncation set to %s.", GetNSLConfigValue("NetworkTruncation")))
 end
 
 table.insert(gConnectFunctions, SetupClientRatesandConfig)
-table.insert(gConfigLoadedFunctions, SetupRates)
+
+table.insert(gPerfLoadedFunctions, SetupRates)
 
 local function SendClientUpdatedMode(newState)
 	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
@@ -84,6 +79,7 @@ local function SendClientUpdatedMode(newState)
 			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState], league = GetActiveLeague()}, true)
 		end
 	end
+	Server.SetVariableTableCommandsAllowed(not GetNSLModEnabled())
 	SetupNSLTag()
 end
 
@@ -392,6 +388,7 @@ local function SetupServerConfig()
 	Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
 	Server.SetConfigSetting("auto_kick_afk_time", nil)
 	Server.SetConfigSetting("auto_kick_afk_capacity", nil)
+	Server.SetVariableTableCommandsAllowed(not GetNSLModEnabled())
 end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)

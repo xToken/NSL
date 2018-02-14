@@ -12,9 +12,9 @@ local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
 								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.2, leagueConfigComplete = false,
-								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.0, perfConfigComplete = false,
+								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false,
 								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
-								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.0, spawnConfigComplete = false,
+								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.1, spawnConfigComplete = false,
 								teamConfigRequest = false, teamConfigRetries = 0, teamLocalConfig = "configs/nsl_teamconfig.json", teamExpectedVersion = 1.3, teamConfigComplete = false
 								}
 local NSL_Mode = "PCW"
@@ -25,6 +25,7 @@ local NSL_Scores = { }
 local NSL_ServerCommands = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
+local NSL_DefaultPerfCaptured = false
 local cachedScoresValidFor = 10 * 60
 
 function GetNSLMode()
@@ -121,9 +122,7 @@ function SetPerfLevel(state)
 	if NSL_PerfLevel ~= state then
 		NSL_PerfLevel = state
 		SavePluginConfig()
-		if GetNSLModEnabled() then
-			EstablishConfigDependantSettings("all")
-		end
+		ApplyPerfDependantSettings()
 	end
 end
 
@@ -179,13 +178,7 @@ NetworkTruncation					= 0,
 LeagueDecal							= 1
 }
 
-local DefaultPerfConfig = {
-Interp 								= 100,
-MoveRate 							= 30,
-ClientRate 							= 20,
-TickRate 							= 30,
-MaxDataRate 						= 50,
-}
+local DefaultPerfConfig = { PerfLevel = "Default" }
 
 local Configs = { }
 local PerfConfigs = { }
@@ -287,6 +280,20 @@ local function OnServerUpdated()
 		Shared.SendHTTPRequest(teamConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "team") end)
 		configRequestTracking["teamConfigRequest"] = true
 	end
+	--Small grace period to allow other mods to adjust defaults and not mess with us.
+	if not NSL_DefaultPerfCaptured and Shared.GetTime() > 2 then
+		if Shared.GetServerPerformanceData():GetInterpMs() > 0 then
+			--wait for this to be valid
+			DefaultPerfConfig["Interp"] = Shared.GetServerPerformanceData():GetInterpMs()
+			DefaultPerfConfig["MoveRate"] = Shared.GetServerPerformanceData():GetMoverate()
+			DefaultPerfConfig["ClientRate"] = Server.GetSendrate()
+			DefaultPerfConfig["TickRate"] = Server.GetTickrate()
+			DefaultPerfConfig["MaxDataRate"] = math.ceil(Server.GetBwLimit() / 1024)
+			NSL_DefaultPerfCaptured = true
+			PerfConfigs["DEFAULT"] = DefaultPerfConfig
+			ApplyPerfDependantSettings()
+		end
+	end
 end
 
 Event.Hook("UpdateServer", OnServerUpdated)
@@ -315,6 +322,11 @@ function GetNSLPerfValue(value)
 	if PerfConfigs[NSL_PerfLevel] and PerfConfigs[NSL_PerfLevel][value] then
 		return PerfConfigs[NSL_PerfLevel][value]
 	end
+	return GetNSLDefaultPerfValue(value)
+end
+
+function GetNSLDefaultPerfValue(value)
+	--Check defaults read on startup.. probably irrelevant with mergings
 	if DefaultPerfConfig[value] then
 		return DefaultPerfConfig[value]
 	end
