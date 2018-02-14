@@ -21,7 +21,7 @@ local function UnstuckCallback(self)
 	end
 	local ns2id = client:GetUserId()
 	local origin = Vector(UnstuckOriginTracker[ns2id])
-	if not self:GetIsAlive() or (HasMixin(self, "Stun") and self:GetIsStunned()) or (origin - self:GetOrigin()):GetLength() > 0.1 or self:isa("Embryo") then
+	if not self:GetIsAlive() or (HasMixin(self, "Stun") and self:GetIsStunned()) or (origin - self:GetOrigin()):GetLength() > 0.1 or self:isa("Embryo") or GetIsGamePaused() then
 		SendClientMessage(client, GetNSLMessage("UnstuckCancelled"))
 		UnstuckRetryTracker[ns2id] = 0
 		return false
