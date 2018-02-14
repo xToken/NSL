@@ -79,7 +79,7 @@ local function SendClientUpdatedMode(newState)
 			Server.SendNetworkMessage(playerClient, "NSLPluginConfig", {config = kNSLPluginConfigs[newState], league = GetActiveLeague()}, true)
 		end
 	end
-	Server.SetVariableTableCommandsAllowed(not GetNSLModEnabled())
+	Server.SetVariableTableCommandsAllowed(GetNSLMode() ~= "OFFICIAL")
 	SetupNSLTag()
 end
 
@@ -388,7 +388,7 @@ local function SetupServerConfig()
 	Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
 	Server.SetConfigSetting("auto_kick_afk_time", nil)
 	Server.SetConfigSetting("auto_kick_afk_capacity", nil)
-	Server.SetVariableTableCommandsAllowed(not GetNSLModEnabled())
+	Server.SetVariableTableCommandsAllowed(GetNSLMode() ~= "OFFICIAL")
 end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)
