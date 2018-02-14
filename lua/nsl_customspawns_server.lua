@@ -8,23 +8,17 @@ local kSelectedAlienSpawn
 local kCustomTechPointData = { }
 local kValidCustomSpawnData = false
 local kCustomTechPointTeams = { }
-
-local function ReturnCurrentMonthDay()
-	local dstring = Shared.GetGMTString(false)
-	local year, month, day
-	year, month, day = string.match(dstring, "(%d+)-(%d+)-(%d+)")
-	return tonumber(year .. "." .. month .. day)
-end
+local kMapLocations
 
 local function GetMapSpecificSpawns()
 	local customSpawnData = GetNSLConfigValue("CustomSpawns")
 	if customSpawnData then
-		local datedec = ReturnCurrentMonthDay()
+		local now = os.time()
 		local mapname = Shared.GetMapName()
-		if customSpawnData[mapname] and datedec then
-			local mapTechPoints = customSpawnData[mapname]
-			for _, tpData in pairs(mapTechPoints) do
-				if (tpData.effectiveDate and tpData.effectiveDate <= datedec) and (tpData.expiryDate and tpData.expiryDate >= datedec) then
+		if customSpawnData[mapname] then
+			local mapSpawnData = customSpawnData[mapname]
+			for _, tpData in pairs(mapSpawnData) do
+				if (tpData.effectiveDate and os.time(tpData.effectiveDate) <= now) and (tpData.expiryDate and os.time(tpData.expiryDate) >= now) then
 					return tpData.spawnData
 				end
 			end
@@ -95,6 +89,8 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 local function LoadCustomTechPointData(configLoaded)
 		
 	if configLoaded == "all" or configLoaded == "spawn" then
+		--Cache once configs are loaded.
+		kMapLocations = GetNSLConfigValue("FriendlySpawns")
 		local customSpawnData = GetMapSpecificSpawns()
 		local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
 		if customSpawnData then
@@ -132,7 +128,7 @@ local function LoadCustomTechPointData(configLoaded)
 		if #kCustomTechPointData < 2 and kValidCustomSpawnData then
 			--NOT valid data
 			kValidCustomSpawnData = false
-			Shared.Message("NSl - Error configuring custom spawns, invalid response or incorrectly configured weekly config!")
+			Shared.Message("NSL - Error configuring custom spawns, invalid response or incorrectly configured weekly config!")
 			kCustomTechPointData = nil
 		end
 		
@@ -183,29 +179,16 @@ end
 
 table.insert(gConfigLoadedFunctions, LoadCustomTechPointData)
 
-local kTramTop = {"warehouse", "server room"}
-
 local function UpdateSpawnForMapSpecificSetups(teamSpawn)
 	local mapname = Shared.GetMapName()
 	if teamSpawn then
 		teamSpawn = string.lower(teamSpawn)
-		if mapname == "ns2_tram" then
-			if teamSpawn == "top" then
-				teamSpawn = kTramTop[math.random(1,2)]
-			elseif teamSpawn == "bottom" then
-				teamSpawn = "shipping"
-			end	
-		elseif mapname == "ns2_summit" then
-			if teamSpawn == "top" then
-				teamSpawn = "atrium"
-			elseif teamSpawn == "bottom" then
-				teamSpawn = "sub access"
-			elseif teamSpawn == "left" then
-				teamSpawn = "flight control"
-			elseif teamSpawn == "right" then
-				teamSpawn = "data core"
-			end	
-		end
+		if kMapLocations and kMapLocations[mapname] and kMapLocations[mapname][teamSpawn] then
+			teamSpawn = kMapLocations[mapname][teamSpawn]
+			if type(teamSpawn) == "table" then
+				teamSpawn = teamSpawn[math.random(1,#teamSpawn)]
+			end
+  		end
 	end
 	return teamSpawn
 end
@@ -229,7 +212,7 @@ local function SetTeamSpawns(client, ...)
 				team2Spawn = UpdateSpawnForMapSpecificSetups(team2Spawn)
 				
 				Server.teamSpawnOverride = { }
-				if spawns and team1Spawn and team1Spawn ~= "" and team2Spawn and team2Spawn ~= "" and team1Spawn ~= team2Spawn and not GetGamerules():GetGameStarted() then
+				if team1Spawn and team1Spawn ~= "" and team2Spawn and team2Spawn ~= "" and team1Spawn ~= team2Spawn and not GetGamerules():GetGameStarted() then
 					table.insert(Server.teamSpawnOverride, { marineSpawn = string.lower(team1Spawn), alienSpawn = string.lower(team2Spawn) }) 
 					ServerAdminPrint(client, string.format("Setting spawns to %s for marines and %s for aliens.", team1Spawn, team2Spawn))
 					GetGamerules():ResetGame()
