@@ -457,6 +457,8 @@ if Shine then
 end
 
 local Messages = {
+CoinFlip							= "%s has flipped a coin for %s. The result is %s.",
+CoinFlipRecently					= "A coin was flipped too recently, please wait %d seconds.",
 PauseResumeMessage 					= "Game Resumed.  %s have %s pauses remaining",
 PausePausedMessage					= "Game Paused.",
 PauseWarningMessage					= "Game will %s in %d seconds.",
