@@ -1,5 +1,15 @@
 # Changelog
 
+* 2-14-18
+
+Fixed team join function hook not working for officials mainly.
+Updated server settings to prevent some exploits in officials mode.
+You cannot leave the alien or marine team during the countdown phase.
+Unstuck will now also prevent the actual unstuck from triggering during a pause, not just the initiation of one.
+Corrected many minor issues with perf configs and adjusted 'defaults' to be scanned shortly after game init.
+Improved spawn location options & config file settings. (values from keatsandyeats)
+Coin Flip. (keatsandyeats)
+
 * 11-4-17
 
 Adjustments for Default Skins setting - Marines can change sex (using default skin).  Exos cannot change skins anymore, and shoulder pads are back.
