@@ -7,7 +7,7 @@
 								"ns2_tram":     [
 													{
 														"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
-														"expiryDate":           {"year": 2018, "month": 3, "day": 3},
+														"expiryDate":           {"year": 2099, "month": 3, "day": 3},
 														"spawnData":            [
 																					{
 																						"name":             "Shipping",
@@ -30,7 +30,7 @@
 								"ns2_summit":   [
 													{
 														"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
-														"expiryDate":           {"year": 2018, "month": 3, "day": 3},
+														"expiryDate":           {"year": 2099, "month": 3, "day": 3},
 														"spawnData":            [
 																					{
 																						"name":             "Atrium",
@@ -53,7 +53,7 @@
 								"ns2_descent":  [
 													{
 														"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
-														"expiryDate":           {"year": 2018, "month": 3, "day": 3},
+														"expiryDate":           {"year": 2099, "month": 3, "day": 3},
 														"spawnData":            [
 																					{
 																						"name":             "Drone Bay",
