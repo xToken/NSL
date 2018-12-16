@@ -38,6 +38,11 @@
 																						"enemyspawns":      ["Sub Access"]
 																					},
 																					{
+																						"name":             "Sub Access",
+																						"team":             "aliens",
+																						"enemyspawns":      ["Atrium"]
+																					},
+																					{
 																						"name":             "Flight Control",
 																						"team":             "both",
 																						"enemyspawns":      ["Data Core"]
