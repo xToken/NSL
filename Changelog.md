@@ -1,5 +1,10 @@
 # Changelog
 
+* 12-21-18 (Build 100)
+
+Added automatic error reporting on round end
+Added build number, starting at 100 cause i never had it before :D
+
 * 2-14-18
 
 Fixed team join function hook not working for officials mainly.
