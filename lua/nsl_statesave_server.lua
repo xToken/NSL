@@ -65,7 +65,9 @@ originalGamerulesOnClientConnect = Class_ReplaceMethod("Gamerules", "OnClientCon
 
 local oldNS2GamerulesOnClientDisconnect = NS2Gamerules.OnClientDisconnect
 function NS2Gamerules:OnClientDisconnect(client)
-	StoreDisconnectedTeamPlayer(self, client)
+	if GetNSLModEnabled() then
+		StoreDisconnectedTeamPlayer(self, client)
+	end
 	oldNS2GamerulesOnClientDisconnect(self, client)
 end
 
@@ -96,6 +98,24 @@ function RagdollMixin:OnTag(tagName)
 	if not (self.isCached and tagName == "destroy") then
 		oldRagdollMixinOnTag(self, tagName)
 	end
+end
+
+--Block the vanilla bot controller from kicking the bot the moment we add it :<
+local oldBotTeamControllerUpdateBotsForTeam = BotTeamController.UpdateBotsForTeam
+local oldBotTeamControllerUpdateBots = BotTeamController.UpdateBots
+
+function BotTeamController:UpdateBotsForTeam(teamNumber)
+	if GetNSLModEnabled() and GetNSLConfigValue("SavePlayerStates") then
+		return
+	end
+	oldBotTeamControllerUpdateBotsForTeam(self, teamNumber)
+end
+
+function BotTeamController:UpdateBots()
+	if not GetNSLModEnabled() and GetNSLConfigValue("SavePlayerStates") then
+		return
+	end
+	oldBotTeamControllerUpdateBots(self)
 end
 
 function Player:GetDestructionAllowed(destructionAllowedTable)
@@ -237,60 +257,3 @@ function OnVirtualClientMove(client)
 end
 
 Event.Hook("VirtualClientMove", OnVirtualClientMove)
-
---This is seriously retarded...
-local function OnCheckConnectionAllowed(userId)
-
-    --check if the user is banned
-	local bannedPlayers = GetBannedPlayersList()
-    for b = #bannedPlayers, 1, -1 do
-        local ban = bannedPlayers[b]
-        if ban.id == userId then
-            local now = Shared.GetSystemTime()
-            if ban.time == 0 or now < ban.time then
-                Shared.Message(string.format("Rejected connection to banned client %s", userId))
-                return false
-            else
-				Shared.ConsoleCommand("sv_unban " .. tostring(userId))
-				break
-            end
-        end
-    end
-
-    local reservedSlots = Server.GetReservedSlotsConfig()
-    if not reservedSlots or not reservedSlots.amount or not reservedSlots.ids then
-        return true
-    end
-
-    local newPlayerIsReserved = false
-    for name, id in pairs(reservedSlots.ids) do
-        if id == userId then
-            newPlayerIsReserved = true
-            break
-        end
-    end
-
-	--Dont count NSLVirtualClients in MaxPlayers
-    local numPlayers = Server.GetNumPlayers() - NSL_VirtualClientCount
-    local maxPlayers = Server.GetMaxPlayers()
-    if (numPlayers < (maxPlayers - reservedSlots.amount)) or (newPlayerIsReserved and (numPlayers < maxPlayers)) then
-        return true
-    end
-
-    Shared.Message(string.format("Rejected connection to client %s as there are no free slots avaible.", userId))
-    return false
-
-end
-
---Find old reserveslot hook
-local HookTable = debug.getregistry()["Event.HookTable"]
-if HookTable then
-	for k, v in pairs(HookTable) do
-		if k == "CheckConnectionAllowed" then
-			Event.RemoveHook("CheckConnectionAllowed", v[1])
-			break
-		end
-	end
-end
-
-Event.Hook("CheckConnectionAllowed", OnCheckConnectionAllowed)
