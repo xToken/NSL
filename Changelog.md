@@ -1,5 +1,10 @@
 # Changelog
 
+## 12-27-18 (Build 101)
+
+- Fixed assert that could cause instability if disconnected 'saved' players were kicked, and then the original player re-joined after.
+- Updated decal system to allow for individual decals for each team, with a <10 character name.
+
 ## 12-21-18 (Build 100)
 
 - Added automatic error reporting on round end

@@ -13,39 +13,37 @@ local NSLDontGenPlayerOnConnect = false
 local kDisconnectTag = "[D/C]"
 
 local function StoreDisconnectedTeamPlayer(self, client)
-	if client then
-		local player = client:GetControllingPlayer()
-		--If we kicked already cached player, just assume something might have gone wrong, and dont save again.
-		if player and not player.isCached and GetNSLConfigValue("SavePlayerStates") then
-			local teamNumber = player:GetTeamNumber()
-			if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
-				--Valid team, player, config opt.  Check gamestate.
-				if self:GetGameStarted() then
-					--Do things
-					--Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
-					local id = client:GetUserId()
-					local name = player:GetName()
-					local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
-					NSLDontGenPlayerOnConnect = true
-					local newclient = Server.AddVirtualClient() 
-					--Fake client to prevent death of retarded amount of NS2 codebase that is reliant on valid clients without ANY checks if not.
-					NSLDontGenPlayerOnConnect = false
-					player:RemoveSpectators(tempplayer)
-					player:SetControllerClient(newclient)
-					tempplayer:SetControllerClient(client)
-					--Block things
-					player.isCached = true
-					player:SetName(kDisconnectTag .. name)
-					--Player ENT should be disjoined, cache to table.
-					NSL_VirtualClients[id] = newclient
-					NSL_DisconnectedIDs[name] = id
-					NSL_VirtualClientCount = NSL_VirtualClientCount + 1
-					--Force Pause
-					--Will consume a pause for the team, but will always pause even if out.
-					--During crash, team may pause before, so check.
-					if not GetIsGamePaused() and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
-						TriggerDisconnectNSLPause(name, teamNumber, 1, true)
-					end
+	local player = client:GetControllingPlayer()
+	--If we kicked already cached player, just assume something might have gone wrong, and dont save again.
+	if player and not player.isCached and GetNSLConfigValue("SavePlayerStates") then
+		local teamNumber = player:GetTeamNumber()
+		if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
+			--Valid team, player, config opt.  Check gamestate.
+			if self:GetGameStarted() then
+				--Do things
+				--Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
+				local id = client:GetUserId()
+				local name = player:GetName()
+				local tempplayer = CreateEntity(Skulk.kMapName, Vector(0, 0, 0), teamNumber)
+				NSLDontGenPlayerOnConnect = true
+				local newclient = Server.AddVirtualClient() 
+				--Fake client to prevent death of retarded amount of NS2 codebase that is reliant on valid clients without ANY checks if not.
+				NSLDontGenPlayerOnConnect = false
+				player:RemoveSpectators(tempplayer)
+				player:SetControllerClient(newclient)
+				tempplayer:SetControllerClient(client)
+				--Block things
+				player.isCached = true
+				player:SetName(kDisconnectTag .. name)
+				--Player ENT should be disjoined, cache to table.
+				NSL_VirtualClients[id] = newclient
+				NSL_DisconnectedIDs[name] = id
+				NSL_VirtualClientCount = NSL_VirtualClientCount + 1
+				--Force Pause
+				--Will consume a pause for the team, but will always pause even if out.
+				--During crash, team may pause before, so check.
+				if not GetIsGamePaused() and (GetNSLConfigValue("PauseOnDisconnect") or NSLPauseDisconnectOverride) then
+					TriggerDisconnectNSLPause(name, teamNumber, 1, true)
 				end
 			end
 		end
@@ -63,10 +61,20 @@ originalGamerulesOnClientConnect = Class_ReplaceMethod("Gamerules", "OnClientCon
 	end
 )
 
+function CleanupVirtualClient(client)
+	for k, v in pairs(NSL_VirtualClients) do
+		if NSL_VirtualClients[k] and NSL_VirtualClients[k] == client then
+			NSL_VirtualClients[k] = nil
+		end
+	end
+end
+
 local oldNS2GamerulesOnClientDisconnect = NS2Gamerules.OnClientDisconnect
 function NS2Gamerules:OnClientDisconnect(client)
-	if GetNSLModEnabled() then
+	if GetNSLModEnabled() and client and not client:GetIsVirtual() then
 		StoreDisconnectedTeamPlayer(self, client)
+	elseif client and client:GetIsVirtual() then
+		CleanupVirtualClient(client)
 	end
 	oldNS2GamerulesOnClientDisconnect(self, client)
 end
