@@ -7,7 +7,7 @@
 kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL'} )
 
 --For reference
-kNSLPluginBuild = 100
+kNSLPluginBuild = 101
 
 Script.Load("lua/nsl_class.lua")
 Script.Load("lua/nsl_mainplugin_shared.lua")

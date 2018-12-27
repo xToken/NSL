@@ -1,5 +1,5 @@
 {
-	"Version": 1.3,
+	"Version": 1.4,
 	"Configs": [
 		{
 		"LeagueName": 		"NSL",
@@ -17,16 +17,16 @@
 								"titus":				[ "titusgaming" ]
 							},
 		"TeamLogos":		{
-								"NSL": 1
+								"test": "nsl_logo"
 							},
 		"LogoLocations":	{
 								"ns2_veil":
 									{
-										"control": {"origin": [55.65, -1.4, -95.1], "yaw": -89.538, "pitch": 0, "roll": 0},
-										"sub-sector": {"origin": [-63, -2.6, -156.75], "yaw": -89.538, "pitch": 0, "roll": 0},
-										"cargo": {"origin": [-87.33, -3.8, -78.75], "yaw": -89.538, "pitch": 0, "roll": 0},
-										"pipeline": {"origin": [-54.05, -7.4, -8.94], "yaw": -89.538, "pitch": 0, "roll": 0},
-										"nanogrid": {"origin": [-1.71, -1.9, -94.3], "yaw": -89.538, "pitch": 0, "roll": 0, "decal": 1}
+										"control": {"origin": [55.65, -1.4, -95.1]},
+										"sub-sector": {"origin": [-63, -2.6, -156.75]},
+										"cargo": {"origin": [-87.33, -3.8, -78.75]},
+										"pipeline": {"origin": [-54.05, -7.4, -8.94]},
+										"nanogrid": {"origin": [-1.71, -1.9, -94.3], "decal": "nsl_logo"}
 									},
 								"ns2_summit":
 									{

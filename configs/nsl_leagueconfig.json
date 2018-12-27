@@ -1,5 +1,5 @@
 {
-	"Version": 2.3,
+	"Version": 2.4,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -28,7 +28,7 @@
 		"PausedMaxDuration": 					300,
 		"MessageColor":							"CC2EFA",
 		"NetworkTruncation":					1,
-		"LeagueDecal":							1,
+		"LeagueDecal":							"nsl_logo",
 		"GATHER": 								{
 													"OverrideTeamNames": 					false
 												},
