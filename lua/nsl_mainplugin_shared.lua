@@ -12,6 +12,7 @@ local kMaxTeamNameLength = 50
 local kMaxAdminChatLength = 250
 local kMaxFunctionMessageLength = 80
 local kMaxDecalPathLength = 120
+local kMaxTeamDecalNameLength = 10
 
 local kTeamNameUpdateMessage =
 {
@@ -97,7 +98,7 @@ Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
 
 local kNSLDecalUpdateMessage =
 {
-    decalIndex = "integer (0 to 25)",
+    decalName = string.format("string (%d)", kMaxTeamDecalNameLength + 1),
     origin = "vector",
     yaw = "float",
     pitch = "float",

@@ -23,11 +23,11 @@ local kNSLConfigUpdateFunctions = { }
 local teamConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_teamconfig.json"
 local teamConfigLocalFile = "configs/nsl_teamconfig.json"
 local kNSLModel = PrecacheAsset("models/teamlogos/nsllogos.model")
-local kNSLMaterial = PrecacheAsset("materials/teamlogos/teamlogos.material")
-local kNSLTeamDecals = PrecacheAsset("materials/teamlogos/logos.dds")
+local kNSLCachedDecals = { }
 local kNSLTeamConfig = { }
 local kTeamWinScreensEnabled = false
 local kNSLChatSoundWarning = PrecacheAsset("sound/NS2.fev/common/invalid")
+PrecacheAsset("materials/teamlogos/teamlogos.surface_shader")
 
 local function OnNewTeamNames(message)
 	kTeam1NameLocal = message.team1name
@@ -437,24 +437,25 @@ end
 AddClientUIScriptForTeam(kSpectatorIndex, "GUINSLSpectatorTechMap")
 
 local function InitNSLDecal(decal, origin, yaw, pitch, roll)
-	
-	if decal > 0 then
+	if decal then
 		local renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
 		renderModel:SetModel(kNSLModel)
+		if not kNSLCachedDecals[decal] then
+			kNSLCachedDecals[decal] = PrecacheAsset(string.format("materials/teamlogos/%s/%s.material", decal, decal))
+		end
 		local renderMaterial = Client.CreateRenderMaterial()
-		renderMaterial:SetMaterial(kNSLMaterial)  
+		renderMaterial:SetMaterial(kNSLCachedDecals[decal])  
 		renderModel:AddMaterial(renderMaterial)
 		local coords = Angles(pitch, yaw, roll):GetCoords(origin)
 		coords:Scale(4)
 		renderModel:SetCoords(coords)
-		renderMaterial:SetParameter("textureIndex", decal - 1)
-		table.insert(kNSLDecals, {model = renderModel, material = renderMaterial, origin = origin, yaw = yaw, decal = decal})
+		table.insert(kNSLDecals, {model = renderModel, material = renderMaterial, origin = origin, decal = decal})
 	end
 end
 
 local function OnNewNSLDecal(message)
 	if message then
-		InitNSLDecal(message.decalIndex, message.origin, message.yaw, message.pitch, message.roll)
+		InitNSLDecal(message.decalName, message.origin, message.yaw, message.pitch, message.roll)
 	end
 end
 

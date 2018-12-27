@@ -16,16 +16,16 @@ end
 
 local function GetNSLDecalForTP(techPoints)
 	local tpDecals = { }
-	local logoNumbers = GetNSLConfigValue("TeamLogos")
-	if logoNumbers then
+	local logos = GetNSLConfigValue("TeamLogos")
+	if logos then
 		local t1name = GetActualTeamName(1)
 		local t2name = GetActualTeamName(2)
-		local team1decalnum = logoNumbers[GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name)] or GetNSLConfigValue("LeagueDecal")
-		local team2decalnum = logoNumbers[GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name)] or GetNSLConfigValue("LeagueDecal")
+		local team1decal = logos[GetNSLBadgeNameFromTeamName(t1name) or string.lower(t1name)] or GetNSLConfigValue("LeagueDecal")
+		local team2decal = logos[GetNSLBadgeNameFromTeamName(t2name) or string.lower(t2name)] or GetNSLConfigValue("LeagueDecal")
 		--Build transfer table of TP Locations to current Decal
 		for _, techPoint in ipairs(techPoints) do
 			if techPoint:GetAttached() then
-				tpDecals[string.lower(techPoint:GetLocationName())] = techPoint.occupiedTeam == 1 and team1decalnum or team2decalnum
+				tpDecals[string.lower(techPoint:GetLocationName())] = techPoint.occupiedTeam == 1 and team1decal or team2decal
 			end
 		end
 	end
@@ -63,7 +63,7 @@ local function SyncAllLogos(spec)
 				if loc and loc.data and loc.decal then
 					local origin = ConvertTabletoOrigin(loc.data.origin)
 					if origin then
-						Server.SendNetworkMessage(spec, "NSLDecal", { decalIndex = loc.decal, origin = origin, pitch = loc.data.pitch, yaw = loc.data.yaw, roll = loc.data.roll }, true)
+						Server.SendNetworkMessage(spec, "NSLDecal", { decalName = loc.decal, origin = origin, pitch = loc.data.pitch or 0, yaw = loc.data.yaw or -89.538, roll = loc.data.roll or 0 }, true)
 					end
 				end
 			end
