@@ -27,7 +27,7 @@ local function StoreDisconnectedTeamPlayer(self, client)
 				local newclient = Server.AddVirtualClient() 
 				--Fake client to prevent death of retarded amount of NS2 codebase that is reliant on valid clients without ANY checks if not.
 				NSLDontGenPlayerOnConnect = false
-				player:RemoveSpectators(tempplayer)
+				player:RemoveSpectators(nil)
 				player:SetControllerClient(newclient)
 				tempplayer:SetControllerClient(client)
 				--Block things
