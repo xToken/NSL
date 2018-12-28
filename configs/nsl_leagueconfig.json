@@ -1,5 +1,5 @@
 {
-	"Version": 2.4,
+	"Version": 2.5,
 	"Configs": [
 		{
 		"LeagueName": 							"NSL",
@@ -46,12 +46,12 @@
 													"MercsRequireApproval": 				true,
 													"OverrideTeamNames": 					true
 												},
-		"Badges":				 				{
-													"1":									"ensl_mod",
-													"2":									"ensl_caster",
-													"3":									"ensl_ref",
-													"4":									"ensl_admin"
-												},
+		"Badges":				 				[
+													{"badge": "ensl_mod", 		"name": "NSL Moderator"},
+													{"badge": "ensl_caster", 	"name": "NSL Caster"},
+													{"badge": "ensl_ref", 		"name": "NSL Referee"},
+													{"badge": "ensl_admin",		"name": "NSL Admin"},
+												],
 		"REFS":									[
 													344054,
 													3490104,
