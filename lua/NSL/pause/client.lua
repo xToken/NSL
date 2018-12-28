@@ -105,6 +105,7 @@ function AddGUIScriptToPausedUpdates(GUIClassName)
     table.insert(kPausedUpdateScripts, GUIClassName)
 end
 
+local playerData
 local originalGUIManagerUpdate
 originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update", 
 	function(self, deltaTime)
@@ -118,6 +119,12 @@ originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update",
 			end
 			scoreboardUpdate = math.max(0, scoreboardUpdate - deltaTime)
 			if scoreboardUpdate == 0 then
+				if not playerData then
+					playerData = GetNSLUpValue(Scoreboard_ReloadPlayerData, "playerData")
+				end
+				for id, data in pairs(playerData) do
+					data.LastUpdateTime = data.LastUpdateTime - kPausedScoreboardUpdateRate - deltaTime
+				end
 				Scoreboard_ReloadPlayerData()
 				scoreboardUpdate = kPausedScoreboardUpdateRate
 			end
