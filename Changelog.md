@@ -1,5 +1,14 @@
 # Changelog
 
+## 12-28-18 (Build 102)
+- Restructured NSL mod files, will allow for better maintainability
+- NSL Mod will now grant NSL team badges based on team ID (format for badge is ENSL#Team_ID).  This is the format used by the NSL Team Badges mod
+- Decals now use individual textures, will load the team texture based on team ID.  Each team decal should be placed in a folder in materials\teamlogos\teamID\decal.material.
+	- Each material file can reference the same shader, shader = "materials/teamlogos/teamlogos.surface_shader"
+	- There should be 3 .dds textures created, albedoMap, emissiveMap and opacityMap.
+- Fixed missing names on NSL badges
+- Tons of other fixes I forgot :D
+
 ## 12-27-18 (Build 101)
 
 - Fixed assert that could cause instability if disconnected 'saved' players were kicked, and then the original player re-joined after.

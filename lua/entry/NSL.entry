@@ -1,7 +1,7 @@
 modEntry = {
-	Client = "lua/nsl_client.lua",
-	Server = "lua/nsl_server.lua",
-	Predict = "lua/nsl_predict.lua",
-	FileHooks = "lua/nsl_filehooks.lua",
+	Client = "lua/NSL/nsl_client.lua",
+	Server = "lua/NSL/nsl_server.lua",
+	Predict = "lua/NSL/nsl_predict.lua",
+	FileHooks = "lua/NSL/nsl_filehooks.lua",
 	Priority = 5
 }
