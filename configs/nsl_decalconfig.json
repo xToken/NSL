@@ -1,0 +1,58 @@
+{
+	"Version": 1.0,
+	"Configs": [
+		{
+		"LeagueName": 		"NSL",
+		"LogoLocations":	{
+								"ns2_veil":
+									{
+										"control": {"origin": [55.65, -1.4, -95.1]},
+										"sub-sector": {"origin": [-63, -2.6, -156.75]},
+										"cargo": {"origin": [-87.33, -3.8, -78.75]},
+										"pipeline": {"origin": [-54.05, -7.4, -8.94]},
+										"doubleLogo": {"origin": [-1.71, -1.9, -94.3], "decal": "nsl_logo", "active": true}
+									},
+								"ns2_summit":
+									{
+									
+									
+									
+									},
+								"ns2_tram":
+									{
+									
+									
+									
+									},
+								"ns2_biodome":
+									{
+									
+									
+									
+									},
+								"ns2_derelict":
+									{
+									
+									
+									
+									},
+								"ns2_descent":
+									{
+									
+									
+									
+									},
+								"ns2_jambi":
+									{
+									
+									
+									
+									}		
+							}
+		},
+		{
+		"LeagueName": 							"AusNS2",
+		}
+	],
+	"EndOfTable": true
+}
