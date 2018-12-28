@@ -1,5 +1,10 @@
 # Changelog
 
+## 12-28-18 (Build 103)
+- Statesave no longer transfers spectators of the disconnected player to the temporary player that is disconnected.
+- PlayerInfoEntity is now allowed to update during pauses
+- Backdated scoreboard update times to allow disconnected clients to be deleted during a pause.
+
 ## 12-28-18 (Build 102)
 - Restructured NSL mod files, will allow for better maintainability
 - NSL Mod will now grant NSL team badges based on team ID (format for badge is ENSL#Team_ID).  This is the format used by the NSL Team Badges mod
