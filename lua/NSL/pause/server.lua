@@ -27,26 +27,28 @@ end
 gSharedGetTimeAdjustments = 0
 
 local UpdatingClasses = {	
-"ScriptActor",
-"Clog",
-"DeathTrigger",
-"Gamerules",
-"ObjectiveInfo",
-"ParticleEffect",
-"Pheromone",
-"PredictedProjectile",
-"Ragdoll",
-"SoundEffect",
-"SpawnBlocker",
-"SporeCloud",
-"TeamInfo",
-"TeamJoin",
-"TimedEmitter",
-"Tunnel",
-"TunnelProp",
-"ViewModel",
-"Web"
+	"ScriptActor",
+	"Clog",
+	"DeathTrigger",
+	"Gamerules",
+	"ObjectiveInfo",
+	"ParticleEffect",
+	"Pheromone",
+	"PredictedProjectile",
+	"Ragdoll",
+	"SoundEffect",
+	"SpawnBlocker",
+	"SporeCloud",
+	"TeamInfo",
+	"TeamJoin",
+	"TimedEmitter",
+	"Tunnel",
+	"TunnelProp",
+	"ViewModel",
+	"Web"
 }
+
+local AllowedCallbackClassNames = { "PlayerInfoEntity" }
 
 local ClassUpdatesBlock = { }
 table.insert(ClassUpdatesBlock, {name = "CatalystMixin", OnProcessMove = nil })
@@ -116,7 +118,7 @@ local originalNS2EntityAddTimedCallback
 originalNS2EntityAddTimedCallback = Class_ReplaceMethod("Entity", "AddTimedCallback", 
 	function(self, func, interval, early)
 		local function BlockCallsIfPaused(self, deltaTime)
-			if GetIsGamePaused() then
+			if GetIsGamePaused() and not table.contains(AllowedCallbackClassNames, self:GetClassName()) then
 				return true
 			else
 				return func(self, deltaTime)
