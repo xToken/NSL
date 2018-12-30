@@ -10,14 +10,14 @@ local NSLPauseDisconnectOverride = false
 local NSLDontGenPlayerOnConnect = false
 local kDisconnectTag = "[D/C]"
 
-local function StoreDisconnectedTeamPlayer(self, client)
+local function StoreDisconnectedTeamPlayer(gameRules, client)
 	local player = client:GetControllingPlayer()
 	--If we kicked already cached player, just assume something might have gone wrong, and dont save again.
 	if player and not player.isCached and GetNSLConfigValue("SavePlayerStates") then
 		local teamNumber = player:GetTeamNumber()
 		if teamNumber == kMarineTeamType or teamNumber == kAlienTeamType then
 			--Valid team, player, config opt.  Check gamestate.
-			if self:GetGameStarted() then
+			if gameRules:GetGameStarted() then
 				--Do things
 				--Okay, so we are going to SAVE this player ent.  Then make a fake one to pass for the rest of the code.
 				local id = client:GetUserId()
