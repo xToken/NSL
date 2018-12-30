@@ -9,6 +9,8 @@ gChatCommands = { }
 gArgumentedChatCommands = { }
 --Functions on connect
 gConnectFunctions = { }
+--Functions on disconnect
+gDisconnectFunctions = { }
 --Plugin Activation Functions
 gPluginStateChange = { }
 --Game End Functions
@@ -33,6 +35,16 @@ local function OnClientConnected(client)
 end
 
 Event.Hook("ClientConnect", OnClientConnected)
+
+local function OnClientDisconnect(client)    
+    if GetNSLModEnabled() then
+		for i = 1, #gDisconnectFunctions do
+			gDisconnectFunctions[i](client)
+		end
+	end 
+end
+
+Event.Hook("ClientDisconnect", OnClientDisconnect)
 
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
