@@ -26,9 +26,9 @@ function SendAllClientsMessage(message, changesound)
 	Server.SendNetworkMessage("NSLSystemMessage", BuildAdminMessage(message, nil, nil, changesound), true)
 end
 
-function SendClientMessage(client, message)
+function SendClientMessage(client, message, changesound)
 	if client then
-		Server.SendNetworkMessage(client, "NSLSystemMessage", BuildAdminMessage(message, nil, client), true)
+		Server.SendNetworkMessage(client, "NSLSystemMessage", BuildAdminMessage(message, nil, client, changesound), true)
 	end
 end
 
