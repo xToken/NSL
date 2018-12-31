@@ -12,12 +12,13 @@ kNSLPluginConfigString["PCW"] = kNSLPluginConfigs.PCW
 kNSLPluginConfigString["OFFICIAL"] = kNSLPluginConfigs.OFFICIAL
 
 -- For reference
-kNSLPluginBuild = 103
+kNSLPluginBuild = 104
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")
 
 Script.Load("lua/NSL/handicap/shared.lua")
+Script.Load("lua/NSL/heartbeat/shared.lua")
 Script.Load("lua/NSL/gameinfo/shared.lua")
 Script.Load("lua/NSL/pause/shared.lua")
 Script.Load("lua/NSL/playerdata/shared.lua")

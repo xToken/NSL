@@ -14,7 +14,8 @@ local networkVars =
 	team2name = string.format("string (%d)", kMaxTeamNameLength + 1),
 	team1score = "integer (0 to 10)",
 	team2score = "integer (0 to 10)",
-	teamupdates = "integer (0 to 9)"
+	teamupdates = "integer (0 to 9)",
+	heartbeat = "boolean"
 }
 
 local function ApplyClientCFGInitialUpdate(self)
@@ -36,7 +37,7 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
 			self.team1score = 0
 			self.team2score = 0
 			self.teamupdates = 0
-			
+			self.heartbeat = GetNSLConfigValue("HeartbeatRequired")
 		end
 		
 		if Client then
@@ -84,6 +85,10 @@ function GameInfo:GetTeam2Score()
 	return self.team2score
 end
 
+function GameInfo:GetHeartbeatRequired()
+	return self.heartbeat
+end
+
 if Server then
 
 	function GameInfo:SetNSLConfig(cfg)
@@ -108,6 +113,10 @@ if Server then
 	
 	function GameInfo:SetTeam2Score(t2s)
 		self.team2score = Clamp(t2s, 0, 10)
+	end
+	
+	function GameInfo:SetHeartbeatRequired(hb)
+		self.heartbeat = hb
 	end
 
 end

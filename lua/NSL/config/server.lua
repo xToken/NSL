@@ -11,7 +11,7 @@ local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/maste
 local decalConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_decalconfig.json"
 local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.5, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.6, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false,
 								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
 								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.1, spawnConfigComplete = false,
@@ -177,6 +177,7 @@ local DefaultConfig = {
 	ErrorReportURL						= "",
 	MessageColor						= "00BFFF",
 	NetworkTruncation					= 0,
+	HeartbeatRequired					= false,
 	LeagueDecal							= "nsl_logo"
 }
 
@@ -473,7 +474,7 @@ local Messages = {
 	PauseDisconnectedMessage			= "%s disconnected, pausing game.",
 	PauseTooManyPausesMessage			= "Your team is out of pauses.",
 	TournamentModeTeamReadyAlert 		= "%s are ready, waiting on %s to start game.",
-	TournamentModeCountdown 			= "Game will start in %s seconds!",
+	TournamentModeCountdown 			= "Game will start in %s second%s!",
 	TournamentModeReadyAlert 			= "Both teams need to ready for the game to start.",
 	TournamentModeTeamReady				= "%s has %s for %s.",
 	TournamentModeGameCancelled			= "Game start cancelled.",
@@ -488,7 +489,10 @@ local Messages = {
 	UnstuckFailed						= "Unstuck Failed after %s attempts.",
 	MercApprovalNeeded					= "The opposite team will need to approve you as a merc.",
 	MercApproved 						= "%s has been approved as a merc for %s.",
-	MercsReset 							= "Merc approvals have been reset."
+	MercsReset 							= "Merc approvals have been reset.",
+	HeartbeatOverride					= "Heartbeat Messages have been disabled for your client.",
+	HeartbeatWarn						= "Heartbeat Messages not recieved by server in the last %s seconds.  Type heartbeat in console if you are still connected, otherwise you will be disconnected!",
+	HeartbeatCritical					= "Heartbeat Messages not recieved by server in the last %s seconds.  Type heartbeat in console if you are still connected, otherwise you will be disconnected in %s seconds!",
 }
 
 function GetNSLMessage(message)

@@ -8,6 +8,7 @@ Script.Load("lua/NSL/nsl_shared.lua")
 
 -- Load client defs
 Script.Load("lua/NSL/eventhooks/client.lua")
+Script.Load("lua/NSL/heartbeat/client.lua")
 Script.Load("lua/NSL/pause/client.lua")
 Script.Load("lua/NSL/teammanager/client.lua")
 
