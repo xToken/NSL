@@ -125,8 +125,20 @@ end
 local function AnnounceTournamentModeCountDown()
 
 	if TournamentModeSettings.countdownstarted and TournamentModeSettings.countdownstarttime - TournamentModeSettings.countdownstartcount < Shared.GetTime() and TournamentModeSettings.countdownstartcount ~= 0 then
-		if (math.fmod(TournamentModeSettings.countdownstartcount, 5) == 0 or TournamentModeSettings.countdownstartcount <= 5) then
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount))
+		if TournamentModeSettings.countdownstartcount > 60 then
+			if math.fmod(TournamentModeSettings.countdownstartcount, 30) == 0 then
+				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+			end
+		elseif TournamentModeSettings.countdownstartcount > 15 then
+			if math.fmod(TournamentModeSettings.countdownstartcount, 15) == 0 then
+				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+			end
+		elseif TournamentModeSettings.countdownstartcount > 5 then
+			if math.fmod(TournamentModeSettings.countdownstartcount, 5) == 0 then
+				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+			end
+		elseif TournamentModeSettings.countdownstartcount <= 5 then
+			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, TournamentModeSettings.countdownstartcount > 1 and "s" or ""), true)
 		end
 		TournamentModeSettings.countdownstartcount = TournamentModeSettings.countdownstartcount - 1
 	end
@@ -206,19 +218,20 @@ end
 local function OnCommandForceStartRound(client, duration)
 	if not client then return end
 	local NS2ID = client:GetUserId()
-	local duration = tonumber(duration) or 15
+	local duration = math.max(tonumber(duration) or GetNSLConfigValue("TournamentModeGameStartDelay"), 1)
 	if GetIsNSLRef(NS2ID) then
 		ClearTournamentModeState()
 		TournamentModeSettings[1].ready = true
 		TournamentModeSettings[2].ready = true
 		CheckGameCountdownStart()
 		TournamentModeSettings.countdownstarttime = Shared.GetTime() + duration
-		SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), duration))
+		TournamentModeSettings.countdownstartcount = duration
 		ServerAdminPrint(client, "Forcing game start.")
 	end
 end
 
-Event.Hook("Console_sv_nslforcestart",               OnCommandForceStartRound)
+Event.Hook("Console_sv_nslforcestart", OnCommandForceStartRound)
+RegisterNSLHelpMessageForCommand("sv_nslforcestart: <seconds> - Will force the game start countdown to start in the provided amount of seconds, or 15 if blank.", true)
 
 local function OnCommandCancelRoundStart(client)
 	if not client then return end
@@ -230,7 +243,8 @@ local function OnCommandCancelRoundStart(client)
 	end
 end
 
-Event.Hook("Console_sv_nslcancelstart",               OnCommandCancelRoundStart)
+Event.Hook("Console_sv_nslcancelstart", OnCommandCancelRoundStart)
+RegisterNSLHelpMessageForCommand("sv_nslcancelstart: Will cancel a game start countdown currently in progress.", true)
 
 local function ClientReady(client)
 
@@ -290,7 +304,8 @@ local function OnCommandReady(client)
 	end
 end
 
-Event.Hook("Console_ready",                 OnCommandReady)
+Event.Hook("Console_ready", OnCommandReady)
+RegisterNSLHelpMessageForCommand("ready: Marks your team as ready to begin the game.", false)
 gChatCommands["ready"] = OnCommandReady
 gChatCommands["!ready"] = OnCommandReady
 gChatCommands["rdy"] = OnCommandReady
@@ -322,7 +337,8 @@ local function OnCommandNotReady(client)
 	end
 end
 
-Event.Hook("Console_notready",                 OnCommandNotReady)
+Event.Hook("Console_notready", OnCommandNotReady)
+RegisterNSLHelpMessageForCommand("notready: Marks your team as not ready to begin the game.", false)
 gChatCommands["notready"] = OnCommandNotReady
 gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady
