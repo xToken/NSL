@@ -200,6 +200,7 @@ local function OnCommandOverrideTeamnames(client, team1name, team2name)
 end
 
 Event.Hook("Console_sv_nslsetteamnames", OnCommandOverrideTeamnames)
+RegisterNSLHelpMessageForCommand("sv_nslsetteamnames: <team1name, team2name> Will set the team names manually, also will prevent automatic team name updates.", true)
 
 local function OnCommandSwitchTeamNames(client)
 	if client then
@@ -215,6 +216,7 @@ local function OnCommandSwitchTeamNames(client)
 end
 
 Event.Hook("Console_sv_nslswitchteams", OnCommandSwitchTeamNames)
+RegisterNSLHelpMessageForCommand("sv_nslswitchteams: Will switch team names (best used if setting team names manually).", true)
 
 local function OnCommandSetTeamScores(client, team1score, team2score)
 	team1score = tonumber(team1score)
@@ -234,6 +236,27 @@ local function OnCommandSetTeamScores(client, team1score, team2score)
 end
 
 Event.Hook("Console_sv_nslsetteamscores", OnCommandSetTeamScores)
+RegisterNSLHelpMessageForCommand("sv_nslsetteamscores: <t1score, t2score> Will set the team scores manually.", true)
+
+local function OnCommandSetTeamIDs(client, team1id, team2id)
+	team1id = tonumber(team1id)
+	team2id = tonumber(team2id)
+	if client then
+		local NS2ID = client:GetUserId()
+		if GetIsNSLRef(NS2ID) then
+			if team1id then
+				teamData[1].id = team1id
+			end
+			if team2id then
+				teamData[2].id = team2id
+			end
+			UpdateCallbacksWithNewTeamData(teamData, teamScore)
+		end
+	end
+end
+
+Event.Hook("Console_sv_nslsetteamids", OnCommandSetTeamIDs)
+RegisterNSLHelpMessageForCommand("sv_nslsetteamids: <t1id, t2id> Will set the team ids manually.", true)
 
 local function ApproveMercs(teamnum, playerid)
 	local enemyteam = GetEnemyTeamNumber(teamnum)
@@ -296,6 +319,7 @@ local function OnClientCommandApproveMercs(client, team, target)
 end
 
 Event.Hook("Console_sv_nslapprovemercs", OnClientCommandApproveMercs)
+RegisterNSLHelpMessageForCommand("sv_nslapprovemercs: <team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.", true)
 
 local function ClearMercs(teamnum)
 	local enemyteam = GetEnemyTeamNumber(teamnum)
@@ -333,15 +357,10 @@ local function OnClientCommandClearMercs(client, team)
 end
 
 Event.Hook("Console_sv_nslclearmercs", OnClientCommandClearMercs)
+RegisterNSLHelpMessageForCommand("sv_nslclearmercs: <team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.", true)
 
 local function OnClientCommandMercHelp(client)
 	if client then
-		local NS2ID = client:GetUserId()
-		if GetIsNSLRef(NS2ID) then
-			--Print Ref only merc commands
-			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
-			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
-		end
 		ServerAdminPrint(client, "rejectmercs" .. ": " .. "Chat command, will clear any merc approvals for your team.")
 		ServerAdminPrint(client, "clearmercs" .. ": " .. "Chat or console command, will also clear any merc approvals for your team.")
 		ServerAdminPrint(client, "/mercsok" .. ": " .. "Chat command, will approve opposing teams merc(s).")
@@ -354,3 +373,4 @@ local function OnClientCommandMercHelp(client)
 end
 
 Event.Hook("Console_sv_nslmerchelp", OnClientCommandMercHelp)
+RegisterNSLHelpMessageForCommand("sv_nslmerchelp: Displays specific help information pertaining to approving and clearing mercs.", false)
