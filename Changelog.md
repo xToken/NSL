@@ -1,5 +1,12 @@
 # Changelog
 
+## 12-31-18 (Build 104)
+- Added heartbeat system, clients need to send message every few seconds or they will be disconnected by the server after 20 seconds of no messages.
+- Added command to set team IDs manually.
+- Updated formatting of countdown messages, added alternate sound to last 5 seconds
+- Updated help command structure and location of help messages in code.
+- Other small changes as part of restructuring & code cleanup
+
 ## 12-28-18 (Build 103)
 - Statesave no longer transfers spectators of the disconnected player to the temporary player that is disconnected.
 - PlayerInfoEntity is now allowed to update during pauses

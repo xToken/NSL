@@ -205,7 +205,7 @@ local function TournamentModeOnDisconnect(client)
 	end
 end
 
-Event.Hook("ClientDisconnect", TournamentModeOnDisconnect)
+table.insert(gDisconnectFunctions, TournamentModeOnDisconnect)
 
 local function CheckGameCountdownStart()
 	if TournamentModeSettings[1].ready and TournamentModeSettings[2].ready then
