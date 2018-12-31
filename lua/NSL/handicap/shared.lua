@@ -19,25 +19,6 @@ function Player:GetHandicap()
     return self.handicap
 end
 
-if Server then
-
-	function Player:GetName(realName)
-		if self:GetHandicap() < 1 and not realName then
-			return string.format("%s (%.0f%%)", self.name, ( 1 - self:GetHandicap() ) * 100)
-		end
-		return self.name
-	end
-	
-	local originalNS2PlayerCopyPlayerDataFrom
-	originalNS2PlayerCopyPlayerDataFrom = Class_ReplaceMethod("Player", "CopyPlayerDataFrom", 
-		function(self, player)
-			originalNS2PlayerCopyPlayerDataFrom(self, player)
-			self.handicap = player.handicap
-		end
-	)
-
-end
-
 local origDamageMixinDoDamage = DamageMixin.DoDamage
 function DamageMixin:DoDamage( damage, ... )
 	
@@ -62,20 +43,5 @@ function DamageMixin:DoDamage( damage, ... )
 
 	return origDamageMixinDoDamage( self, damage, ... ) 
 end
-
-local function OnClientHandicap( client, value )
-	if not client or not value then return end
-	value = tonumber(value)
-	if value == nil or value > 1 or value < 0.1 then return end
-	
-	local player = client:GetControllingPlayer()
-	if not player then return end
-	
-	player:SetHandicap(value)
-	
-	ServerAdminPrint(client, string.format("%s set handicap to (%.0f%%)", player:GetName(true), ( 1 - player:GetHandicap() ) * 100 ))
-end
-
-Event.Hook("Console_sv_nslhandicap", OnClientHandicap)
 
 Class_Reload( "Player", {handicap = "float (0 to 1 by 0.01)"} )
