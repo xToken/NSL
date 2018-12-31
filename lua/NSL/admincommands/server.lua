@@ -48,31 +48,14 @@ end
 local function OnClientCommandNSLHelp(client)
 	if client then
 		local NS2ID = client:GetUserId()
-		if GetIsNSLRef(NS2ID) then
-			ServerAdminPrint(client, "sv_nslsay" .. ": " .. "<message> - Will send a message to all connected players that displays in yellow.")
-			ServerAdminPrint(client, "sv_nsltsay" .. ": " .. "<team, message> - Will send a message to all players on the team provided that displays in yellow.")
-			ServerAdminPrint(client, "sv_nslpsay" .. ": " .. "<player, message> - Will send a message to the provided player that displays in yellow.")
-			ServerAdminPrint(client, "sv_nslcfg" .. ": " .. "<state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.")
-			ServerAdminPrint(client, "sv_nslconfig" .. ": " .. "<league> - Changes the league settings used by the NSL plugin.")
-			ServerAdminPrint(client, "sv_nslperfconfig" .. ": " .. "<config> - Changes the performance config used by the NSL plugin.")
-			ServerAdminPrint(client, "sv_nslapprovemercs" .. ": " .. "<team, opt. player> - Forces approval of teams mercs, '1' approving for marines which allows alien mercs.")
-			ServerAdminPrint(client, "sv_nslclearmercs" .. ": " .. "<team> - 1,2 - Clears approval of teams mercs, '1' clearing any alien mercs.")
-			ServerAdminPrint(client, "sv_nslpause" .. ": " .. "Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.")
-			ServerAdminPrint(client, "sv_nslsetpauses" .. ": " .. "<team, pauses> - Sets the number of pauses remaining for a team.")
-			ServerAdminPrint(client, "sv_nslforcestart" .. ": " .. "<seconds> - Will force the game start countdown to start in the provided amount of seconds, or 15 if blank.")
-			ServerAdminPrint(client, "sv_nslcancelstart" .. ": " .. "Will cancel a game start countdown currently in progress.")
-			ServerAdminPrint(client, "sv_nslsetteamnames" .. ": " .. "<team1name, team2name> Will set the team names manually, will prevent automatic team name updates.")
-			ServerAdminPrint(client, "sv_nslswitchteams" .. ": " .. "Will switch team names (best used if setting team names manually).")
-			ServerAdminPrint(client, "sv_nslsetteamscores" .. ": " .. "<t1score, t2score> Will set the team scores manually.")
-			ServerAdminPrint(client, "sv_nslsetteamspawns" .. ": " .. "marinespawnname, alienspawnname, Spawns teams at specified locations. Locations must be exact")
-			ServerAdminPrint(client, "sv_nslpassword" .. ": " .. "Sets a password on the server, works like sv_password.")
-			ServerAdminPrint(client, "sv_nslleagueadmins" .. ": " .. "Toggles league staff having access to administrative commands on server.")
-			ServerAdminPrint(client, "sv_nslreplaceplayer" .. ": " .. "<newPlayer, oldPlayer> Will force different player to take crashed/disconnect players place.")
-			ServerAdminPrint(client, "sv_nsllistcachedplayers" .. ": " .. "Will list currently cached players names and steamIDs, for sv_nslreplaceplayer cmd.")
+		local ref = GetIsNSLRef(NS2ID)
+		for _, t in ipairs(gNSLHelpMessages) do
+			if t.refOnly and ref then
+				ServerAdminPrint(client, t.message)
+			elseif not t.refOnly then
+				ServerAdminPrint(client, t.message)
+			end
 		end
-		ServerAdminPrint(client, "sv_nslinfo" .. ": " .. "<team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.")
-		ServerAdminPrint(client, "sv_nslhandicap" .. ": " .. "<0.1 - 1> Lowers your damage to the specified percentage.")
-		ServerAdminPrint(client, "sv_nslmerchelp" .. ": " .. "Displays specific help information pertaining to approving and clearing mercs.")
 	end
 end
 
@@ -163,6 +146,7 @@ end
 
 Event.Hook("Console_sv_nslcfg", OnClientCommandSetMode)
 CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.")
+RegisterNSLHelpMessageForCommand("sv_nslcfg: <state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.", true)
 
 local function OnAdminCommandSetLeague(client, league)
 	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, true)
@@ -174,6 +158,7 @@ end
 
 Event.Hook("Console_sv_nslconfig", OnClientCommandSetLeague)
 CreateServerAdminCommand("Console_sv_nslconfig", OnAdminCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
+RegisterNSLHelpMessageForCommand("sv_nslconfig: <league> - Changes the league settings used by the NSL plugin.", true)
 
 local function OnAdminCommandSetPerfConfig(client, perfcfg)
 	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, true)
@@ -185,6 +170,7 @@ end
 
 Event.Hook("Console_sv_nslperfconfig", OnClientCommandSetPerfConfig)
 CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
+RegisterNSLHelpMessageForCommand("sv_nslperfconfig: <config> - Changes the performance config used by the NSL plugin.", true)
 
 local function OnAdminCommandSetLeagueAccess(client)
 	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLLeagueAccess, true)

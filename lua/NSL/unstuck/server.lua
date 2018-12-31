@@ -90,8 +90,9 @@ gChatCommands["/stuck"] = RegisterClientStuck
 gChatCommands["\\stuck"] = RegisterClientStuck
 gChatCommands["unstuck"] = RegisterClientStuck
 
-Event.Hook("Console_stuck",               RegisterClientStuck)
-Event.Hook("Console_unstuck",               RegisterClientStuck)
+Event.Hook("Console_stuck", RegisterClientStuck)
+Event.Hook("Console_unstuck", RegisterClientStuck)
+RegisterNSLHelpMessageForCommand("unstuck: Will automatically attempt to unstuck you after a few seconds.", false)
 
 -- Tap into Shines unstuck also to prevent if paused
 local function CheckShineUnstuckHook()

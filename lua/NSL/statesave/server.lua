@@ -201,6 +201,7 @@ local function OnClientCommandEnablePauseTesting(client)
 end
 
 Event.Hook("Console_sv_nslpausedisconnect", OnClientCommandEnablePauseTesting)
+RegisterNSLHelpMessageForCommand("sv_nslpausedisconnect: Enables automatic pausing on client disconnect.", true)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
@@ -233,8 +234,9 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 end
 
 Event.Hook("Console_sv_nslreplaceplayer", OnClientCommandForceReplacement)
+RegisterNSLHelpMessageForCommand("sv_nslreplaceplayer: <newPlayer, oldPlayer> Will force different player to take crashed/disconnect players place.", true)
 
-local function OnClientCommandListCachedPlayers(client, team)
+local function OnClientCommandListCachedPlayers(client)
 	if client then
 		local NS2ID = client:GetUserId()	
 		if GetIsNSLRef(NS2ID) then
@@ -247,6 +249,7 @@ local function OnClientCommandListCachedPlayers(client, team)
 end
 
 Event.Hook("Console_sv_nsllistcachedplayers", OnClientCommandListCachedPlayers)
+RegisterNSLHelpMessageForCommand("sv_nsllistcachedplayers: Will list currently cached players names and steamIDs, for sv_nslreplaceplayer cmd.", true)
 
 Class_Reload( "Player" )
 

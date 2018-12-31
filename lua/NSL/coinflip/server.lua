@@ -26,3 +26,5 @@ Event.Hook("Console_coinflip", OnCommandCoinFlip)
 gChatCommands["coinflip"] = OnCommandCoinFlip
 gChatCommands["!coinflip"] = OnCommandCoinFlip
 gChatCommands["!flip"] = OnCommandCoinFlip
+
+RegisterNSLHelpMessageForCommand("coinflip: Simulates a coinflip and returns heads or tails.", false)

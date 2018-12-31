@@ -25,6 +25,8 @@ gTeamNamesUpdatedFunctions = { }
 gTeamJoinedFunctions = { }
 --Perf Values Loaded Functions
 gPerfLoadedFunctions = { }
+--NSL Help Messages (sv_nslhelp)
+gNSLHelpMessages = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
@@ -107,3 +109,9 @@ local function UpdateNSLEntityTeams(teamData, teamScore)
 end
 
 table.insert(gTeamNamesUpdatedFunctions, UpdateNSLEntityTeams)
+
+function RegisterNSLHelpMessageForCommand(message, refOnly)
+	if message then
+		table.insert(gNSLHelpMessages, {message = message, refOnly = (refOnly == true)})
+	end
+end

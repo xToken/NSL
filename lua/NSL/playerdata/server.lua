@@ -360,6 +360,7 @@ local function OnClientCommandViewNSLInfo(client, team)
 end
 
 Event.Hook("Console_sv_nslinfo", OnClientCommandViewNSLInfo)
+RegisterNSLHelpMessageForCommand("sv_nslinfo: <team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.", false)
 
 local function MakeNSLMessage(message, header)
 	local m = { }
@@ -402,6 +403,7 @@ local function OnClientCommandChat(client, ...)
 end
 
 Event.Hook("Console_sv_nslsay", OnClientCommandChat)
+RegisterNSLHelpMessageForCommand("sv_nslsay: <message> - Will send a message to all connected players that displays in yellow.", true)
 
 local function OnClientCommandTeamChat(client, team, ...)
 	if not client then return end
@@ -419,6 +421,7 @@ local function OnClientCommandTeamChat(client, team, ...)
 end
 
 Event.Hook("Console_sv_nsltsay", OnClientCommandTeamChat)
+RegisterNSLHelpMessageForCommand("sv_nsltsay: <team, message> - Will send a message to all players on the team provided that displays in yellow.", true)
 
 local function OnClientCommandPlayerChat(client, target, ...)
 	if not client then return end
@@ -436,6 +439,7 @@ local function OnClientCommandPlayerChat(client, target, ...)
 end
 
 Event.Hook("Console_sv_nslpsay", OnClientCommandPlayerChat)
+RegisterNSLHelpMessageForCommand("sv_nslpsay: <player, message> - Will send a message to the provided player that displays in yellow.", true)
 
 local function OnRecievedFunction(client, message)
 
@@ -514,3 +518,4 @@ local function OnClientCommandShowFunctionData(client, target)
 end
 
 Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
+RegisterNSLHelpMessageForCommand("sv_nslfunctiondata: <player> - Will display logged client side hooks for the provided player.", true)

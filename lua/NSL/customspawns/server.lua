@@ -228,3 +228,4 @@ local function SetTeamSpawns(client, ...)
 end
 
 Event.Hook("Console_sv_nslsetteamspawns", SetTeamSpawns)
+RegisterNSLHelpMessageForCommand("sv_nslsetteamspawns: marinespawnname, alienspawnname, Spawns teams at specified locations. Locations must be exact", true)

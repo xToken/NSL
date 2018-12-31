@@ -491,6 +491,7 @@ function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 end
 
 Event.Hook("Console_gpause", OnCommandPause)
+RegisterNSLHelpMessageForCommand("gpause: Pauses the game.", false)
 gChatCommands["pause"] = OnCommandPause
 gChatCommands["!pause"] = OnCommandPause
 
@@ -524,6 +525,7 @@ local function OnCommandUnPause(client)
 end
 
 Event.Hook("Console_unpause", OnCommandUnPause)
+RegisterNSLHelpMessageForCommand("unpause: Readies your team to resume the game.", false)
 gChatCommands["unpause"] = OnCommandUnPause
 gChatCommands["!unpause"] = OnCommandUnPause
 gChatCommands["resume"] = OnCommandUnPause
@@ -554,6 +556,7 @@ local function OnCommandAdminPause(client)
 end
 
 Event.Hook("Console_sv_nslpause", OnCommandAdminPause)
+RegisterNSLHelpMessageForCommand("sv_nslpause: Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.", true)
 
 local function OnCommandAdminSetPauses(client, teamnum, pauses)
 	
@@ -571,3 +574,4 @@ local function OnCommandAdminSetPauses(client, teamnum, pauses)
 end
 
 Event.Hook("Console_sv_nslsetpauses", OnCommandAdminSetPauses)
+RegisterNSLHelpMessageForCommand("sv_nslsetpauses: <team, pauses> - Sets the number of pauses remaining for a team.", true)
