@@ -34,18 +34,17 @@ local function UpdateNonTechPointDecalData(techPoints, decalLocations)
 end
 
 local function UpdateTechPointDecalData(techPoints, decalLocations)
-	local team1decal = GetDecalNameforTeamId(GetNSLTeamID(1)) and GetNSLTeamID(1) or GetNSLConfigValue("LeagueDecal")
-	local team2decal = GetDecalNameforTeamId(GetNSLTeamID(2)) and GetNSLTeamID(2) or GetNSLConfigValue("LeagueDecal")
+	local team1decal = GetDecalNameforTeamId(GetNSLTeamID(1)) and GetNSLTeamID(1) or nil
+	local team2decal = GetDecalNameforTeamId(GetNSLTeamID(2)) and GetNSLTeamID(2) or nil
 	--Build transfer table of TP Locations to current Decal
 	for _, techPoint in ipairs(techPoints) do
 		if techPoint:GetAttached() then
 			if decalLocations[string.lower(techPoint:GetLocationName())] then
 				decalLocations[string.lower(techPoint:GetLocationName())].decal = techPoint.occupiedTeam == 1 and team1decal or team2decal
-				decalLocations[string.lower(techPoint:GetLocationName())].active = true
+				decalLocations[string.lower(techPoint:GetLocationName())].active = decalLocations[string.lower(techPoint:GetLocationName())].decal and true or false
 			end
 		else
 			if decalLocations[string.lower(techPoint:GetLocationName())] then
-				decalLocations[string.lower(techPoint:GetLocationName())].decal = GetNSLConfigValue("LeagueDecal")
 				decalLocations[string.lower(techPoint:GetLocationName())].active = false
 			end
 		end

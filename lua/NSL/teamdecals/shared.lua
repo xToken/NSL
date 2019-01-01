@@ -59,7 +59,7 @@ function NSLDecal:OnCreate()
 	self.pitch = 0
 	self.roll = 0
 	self.active = false
-	self.decal_name = "nsl_logo"
+	self.decal_name = ""
 	
 end
 
@@ -92,7 +92,9 @@ function NSLDecal:SetYawPitchRoll(yaw, pitch, roll)
 end
 
 function NSLDecal:SetDecal(decal)
-    self.decal_name = string.sub(decal, 1, kMaxDecalNameLength)
+	if decal then
+    	self.decal_name = string.sub(decal, 1, kMaxDecalNameLength)
+    end
 end
 
 if Client then
@@ -109,7 +111,7 @@ if Client then
 				ClearRenderModel(self)
 			end
 
-			if not self._renderModel and self.active then
+			if not self._renderModel and self.active and self.decal_name ~= "" then
 				
 				self._renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
 				self._renderMaterial = Client.CreateRenderMaterial()
