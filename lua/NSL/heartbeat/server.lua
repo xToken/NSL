@@ -20,7 +20,7 @@ local function UpdateHeartbeatStates(deltatime)
 				if not client then
 					table.remove(kClientHeartbeatIds, i)
 					kClientHeartbeatCache[id] = nil
-				elseif kClientHeartbeatCache[id].override == false then
+				elseif kClientHeartbeatCache[id].override == false and not client:GetIsVirtual() then
 					if kClientHeartbeatCache[id].lastTime + kHeartbeatWarn < Shared.GetTime(true) and kClientHeartbeatCache[id].warn == false then
 						SendClientMessage(client, string.format(GetNSLMessage("HeartbeatWarn"), kHeartbeatWarn), true)
 						kClientHeartbeatCache[id].warn = true
