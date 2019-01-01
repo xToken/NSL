@@ -1,5 +1,9 @@
 # Changelog
 
+## 1-1-19 (Build 105)
+- Updated decal system to only show team decals if valid decal exists for the team
+- Added hints for spectator tech tree buttons
+
 ## 12-31-18 (Build 104)
 - Added heartbeat system, clients need to send message every few seconds or they will be disconnected by the server after 20 seconds of no messages.
 - Added command to set team IDs manually.
