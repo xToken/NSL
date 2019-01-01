@@ -2,6 +2,8 @@
 	
 	<inputs>
 		<input name="albedoMap" type="texture" address="wrap"/>
+		<input name="opacityMap" type="texture" address="wrap"/>
+		<input name="emissiveMap" type="texture" address="wrap"/>
 	</inputs>
 	
 	<code>
@@ -15,8 +17,8 @@
 			//uv.y = (row + uv.y) / numRows;
 			
 			material.albedo = tex2D(albedoMap, uv).rgb;
-			//material.opacity = tex2D(opacityMap, uv).r;
-			//material.emissive = tex2D(emissiveMap, uv).rgb;
+			material.opacity = tex2D(opacityMap, uv).r;
+			material.emissive = tex2D(emissiveMap, uv).rgb;
 		}
 	]]>
 	</code>
