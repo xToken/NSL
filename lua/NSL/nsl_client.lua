@@ -10,6 +10,7 @@ Script.Load("lua/NSL/nsl_shared.lua")
 Script.Load("lua/NSL/eventhooks/client.lua")
 Script.Load("lua/NSL/heartbeat/client.lua")
 Script.Load("lua/NSL/pause/client.lua")
+Script.Load("lua/NSL/spectator_techtree/client.lua")
 Script.Load("lua/NSL/teammanager/client.lua")
 
 local kNSLChatSoundWarning = PrecacheAsset("sound/NS2.fev/common/invalid")
