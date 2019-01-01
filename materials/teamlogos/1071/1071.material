@@ -1,3 +1,5 @@
 shader = "materials/teamlogos/teamlogos.surface_shader"
 albedoMap = "materials/teamlogos/1071/1071.dds"
+emissiveMap = "materials/teamlogos/1071/1071_emissive.dds"
+opacityMap = "materials/teamlogos/1071/1071_opacity.dds"
 surface = "metal"
