@@ -14,7 +14,26 @@ local function LookupDecalLocations()
 	return nil
 end
 
-local function UpdateLocationDecalData(techPoints, decalLocations)
+local function UpdateNonTechPointDecalData(techPoints, decalLocations)
+	local techPointLocations = { }
+	for _, techPoint in ipairs(techPoints) do
+		table.insert(techPointLocations, string.lower(techPoint:GetLocationName()))
+	end
+	for loc, data in pairs(decalLocations) do
+		if loc and data then
+			if not table.contains(techPointLocations, loc) then
+				if not data.decal then
+					data.decal = GetNSLConfigValue("LeagueDecal")
+				end
+				if not data.angles then
+					data.angles = Angles(0,0,0)
+				end
+			end
+		end
+	end
+end
+
+local function UpdateTechPointDecalData(techPoints, decalLocations)
 	local team1decal = GetDecalNameforTeamId(GetNSLTeamID(1)) and GetNSLTeamID(1) or GetNSLConfigValue("LeagueDecal")
 	local team2decal = GetDecalNameforTeamId(GetNSLTeamID(2)) and GetNSLTeamID(2) or GetNSLConfigValue("LeagueDecal")
 	--Build transfer table of TP Locations to current Decal
@@ -33,10 +52,13 @@ local function UpdateLocationDecalData(techPoints, decalLocations)
 	end
 end
 
-local function GetNSLDecalLocations(techPoints)
+local function GetNSLDecalLocations()
 	local decalLocations = LookupDecalLocations()
 	if decalLocations then
-		UpdateLocationDecalData(techPoints, decalLocations)
+		-- Map has decal location data
+		local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
+		UpdateTechPointDecalData(techPoints, decalLocations)
+		UpdateNonTechPointDecalData(techPoints, decalLocations)
 	end
 	return decalLocations
 end
@@ -48,27 +70,31 @@ local function ConvertTabletoOrigin(t)
 	return nil
 end
 
+local function ConvertTabletoAngles(t)
+	if t and type(t) == "table" and #t == 3 then
+		return Angles((t[1] / 180) * math.pi, (t[2] / 180) * math.pi , (t[3] / 180) * math.pi)
+	end
+	return nil
+end
+
+
 local function UpdateOrCreateAllNSLDecals()
 	local override = (GetNSLMode() == "PCW" or GetNSLMode() == "OFFICIAL")
-	local techPoints = Shared.GetEntitiesWithClassname("TechPoint")
-	local decalLocations = GetNSLDecalLocations(EntityListToTable(techPoints))
+	local decalLocations = GetNSLDecalLocations()
 	if decalLocations then
 		for loc, data in pairs(decalLocations) do
-			--Only sync valid decal locations on a SyncAll
 			if loc and data then
 				local origin = ConvertTabletoOrigin(data.origin)
+				local angles = ConvertTabletoAngles(data.angles)
 				if origin then
 					if decalEntities[loc] then
 						decalEntities[loc]:SetDecal(data.decal)
 						decalEntities[loc]:SetActive(data.active and override)
-						decalEntities[loc]:SetYawPitchRoll(data.yaw or -89.538, data.pitch or 0, data.roll or 0)
 					else
-						decalEntities[loc] = Server.CreateEntity("nsldecal", {origin = origin})
+						decalEntities[loc] = Server.CreateEntity("nsldecal", {origin = origin, angles = angles})
 						decalEntities[loc]:SetDecal(data.decal)
 						decalEntities[loc]:SetActive(data.active and override)
-						decalEntities[loc]:SetYawPitchRoll(data.yaw or -89.538, data.pitch or 0, data.roll or 0)
 					end
-					--Server.SendNetworkMessage(spec, "NSLDecal", { decalName = loc.decal, origin = origin, pitch = loc.data.pitch or 0, yaw = loc.data.yaw or -89.538, roll = loc.data.roll or 0 }, true)
 				end
 			end
 		end

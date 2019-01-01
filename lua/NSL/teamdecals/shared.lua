@@ -45,9 +45,6 @@ local kOverrideDecalRender = false
 local networkVars =
 {
     decal_name = string.format("string (%d)", kMaxDecalNameLength),
-	yaw = "angle ( 7 bits )",
-	pitch = "angle ( 7 bits )",
-	roll = "angle ( 7 bits )",
 	active = "boolean"
 }
 
@@ -119,7 +116,7 @@ if Client then
 				self._renderModel:SetModel(kNSLDecalModel)
 				self._renderMaterial:SetMaterial(GetDecalNameforTeamId(self.decal_name))
 				self._renderModel:AddMaterial(self._renderMaterial)
-				local coords = Angles(self.pitch, self.yaw, self.roll):GetCoords(self:GetOrigin())
+				local coords = self:GetCoords()
 				coords:Scale(4)
 				self._renderModel:SetCoords(coords)
 				self.rendereddecal_name = self.decal_name
