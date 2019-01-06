@@ -208,8 +208,8 @@ local function OnCommandSwitchTeamNames(client)
 		if GetIsNSLRef(NS2ID) then
 			overridenames = true
 			local team1name = teamData[1].name
-			teamData[2].name = teamData[2].name
-			teamData[1].name = team1name
+			teamData[1].name = teamData[2].name
+			teamData[2].name = team1name
 			UpdateCallbacksWithNewTeamData(teamData, teamScore)
 		end
 	end
