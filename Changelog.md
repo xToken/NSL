@@ -1,5 +1,8 @@
 # Changelog
 
+## 1-6-19 (Build 106)
+- Fixed silly typo causing sv_nslswitchteams not to actually switch the team names
+
 ## 1-1-19 (Build 105)
 - Updated decal system to only show team decals if valid decal exists for the team
 - Added hints for spectator tech tree buttons
