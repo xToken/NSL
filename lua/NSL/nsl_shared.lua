@@ -12,7 +12,7 @@ kNSLPluginConfigString["PCW"] = kNSLPluginConfigs.PCW
 kNSLPluginConfigString["OFFICIAL"] = kNSLPluginConfigs.OFFICIAL
 
 -- For reference
-kNSLPluginBuild = 106
+kNSLPluginBuild = 107
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")

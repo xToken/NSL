@@ -1,5 +1,8 @@
 # Changelog
 
+## 1-6-19 (Build 107)
+- Added networked tournamentmode boolean from ProGMod
+
 ## 1-6-19 (Build 106)
 - Fixed silly typo causing sv_nslswitchteams not to actually switch the team names
 

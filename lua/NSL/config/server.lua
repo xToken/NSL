@@ -97,11 +97,6 @@ function SetNSLMode(state)
 	if NSL_Mode ~= state then
 		NSL_Mode = state
 		SavePluginConfig()
-		if NSL_Mode == "DISABLED" then
-			GetGamerules():OnTournamentModeDisabled()
-		else
-			GetGamerules():OnTournamentModeEnabled()
-		end
 		for i = 1, #gPluginStateChange do
 			gPluginStateChange[i](NSL_Mode)
 		end

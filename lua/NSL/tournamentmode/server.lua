@@ -342,3 +342,15 @@ RegisterNSLHelpMessageForCommand("notready: Marks your team as not ready to begi
 gChatCommands["notready"] = OnCommandNotReady
 gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady
+
+local function UpdateTournamentMode(newState)
+	if newState == "PCW" or newState == "OFFICIAL" or newState == "GATHER" then
+		GetGamerules():OnTournamentModeEnabled()
+		GetGameInfoEntity():SetTournamentMode(true)
+	else
+		GetGamerules():OnTournamentModeDisabled()
+		GetGameInfoEntity():SetTournamentMode(false)
+	end
+end
+
+table.insert(gPluginStateChange, UpdateTournamentMode)
