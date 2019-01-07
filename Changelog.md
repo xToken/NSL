@@ -1,5 +1,8 @@
 # Changelog
 
+## 1-7-19 (Build 108)
+- Changed SpectatorTechMaps to hook vanilla techmap system, this should ensure compatibility with ProGMod tech trees
+
 ## 1-6-19 (Build 107)
 - Added networked tournamentmode boolean from ProGMod
 
