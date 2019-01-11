@@ -104,9 +104,11 @@ local function GetRefBadgeforID(ns2id)
 end
 
 local function GetBadgeForPlayerData(data)
-	if data.NSL_League == "NSL" then
+	-- Special case the eNSL league because they cant seem to leave the E behind.....
+	if GetActiveLeague() == "NSL" then
 		return NSL_ENSL_Badge_Title..ToString(data.NSL_TID)
 	end
+	return GetActiveLeague()..ToString(data.NSL_TID)
 end
 
 local function UpdateClientBadge(ns2id, data)

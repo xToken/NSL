@@ -71,6 +71,10 @@ function GameInfo:GetNSLConfig()
 	return self.nslconfig
 end
 
+function GameInfo:GetLeagueName()
+	return self.league
+end
+
 function GameInfo:GetTeam1Name()
 	return self.team1name
 end
@@ -99,6 +103,10 @@ if Server then
 
 	function GameInfo:SetNSLConfig(cfg)
 		self.nslconfig = kNSLPluginConfigString[cfg] and kNSLPluginConfigString[cfg] or kNSLPluginConfigs.DISABLED
+	end
+	
+	function GameInfo:SetLeagueName(newLeagueName)
+		self.league = newLeagueName
 	end
 	
 	function GameInfo:SetTeamsUpdated()

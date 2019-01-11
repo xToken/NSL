@@ -110,6 +110,9 @@ function SetActiveLeague(state)
 		if GetNSLModEnabled() then
 			EstablishConfigDependantSettings("all")
 		end
+		for i = 1, #gLeagueChangeFunctions do
+			gLeagueChangeFunctions[i](NSL_League)
+		end
 	end
 end
 

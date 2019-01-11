@@ -17,6 +17,8 @@ gPluginStateChange = { }
 gGameEndFunctions = { }
 --Config Loaded Functions
 gConfigLoadedFunctions = { }
+--LeagueChanged Functions
+gLeagueChangeFunctions = { }
 --PlayerData Updated Functions
 gPlayerDataUpdatedFunctions = { }
 --TeamNames Updated Functions
@@ -115,3 +117,10 @@ function RegisterNSLHelpMessageForCommand(message, refOnly)
 		table.insert(gNSLHelpMessages, {message = message, refOnly = (refOnly == true)})
 	end
 end
+
+local function OnUpdateLeagueName(newLeagueName)
+	local gameInfo = GetGameInfoEntity()
+	if not gameInfo then return end
+	GetGameInfoEntity():SetLeagueName(newLeagueName)
+end
+table.insert(gLeagueChangeFunctions, OnUpdateLeagueName)
