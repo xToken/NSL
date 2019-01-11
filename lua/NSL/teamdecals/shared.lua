@@ -3,16 +3,16 @@
 -- lua/NSL/teamdecals/shared.lua
 -- - Dragon
 
-local teamDecals
+local teamDecals = { }
+local globalDecals = { }
 
-local function ScanTeamDecalFiles()
+local function ScanTeamDecalFiles(leagueName)
 
-	local decalFiles = { }
-	Shared.GetMatchingFileNames( "materials/teamlogos/*.material", true, decalFiles )
-	teamDecals = { }
-	
-	for _, decalFile in ipairs(decalFiles) do
-		local _, _, decal = string.find(decalFile, "materials/teamlogos/*/(.*).material$" )
+	local leagueDecalFiles = { }
+	Shared.GetMatchingFileNames( string.format("materials/teamlogos/%s/*.material", leagueName), true, leagueDecalFiles )
+	teamDecals[leagueName] = { }
+	for _, decalFile in ipairs(leagueDecalFiles) do
+		local _, _, decal = string.find(decalFile, string.format("materials/teamlogos/%s/*/(.*).material$", leagueName) )
 		local decalTable = { }
 		local i = 1
 		for str in string.gmatch(decal, "([^/]+)") do
@@ -20,17 +20,35 @@ local function ScanTeamDecalFiles()
 			i = i + 1
 		end
 		if #decalTable == 2 then
-			teamDecals[decalTable[1]] = decalFile
+			teamDecals[leagueName][decalTable[1]] = decalFile
 		end
 	end
-
+	local decalFiles = { }
+	Shared.GetMatchingFileNames( "materials/teamlogos/*.material", true, decalFiles )
+	for _, decalFile in ipairs(leagueDecalFiles) do
+		if not table.contains(leagueDecalFiles, decalFile) then
+			local _, _, decal = string.find(decalFile, "materials/teamlogos/*/(.*).material$" )
+			local decalTable = { }
+			local i = 1
+			for str in string.gmatch(decal, "([^/]+)") do
+				decalTable[i] = str
+				i = i + 1
+			end
+			if #decalTable == 2 then
+				globalDecals[decalTable[1]] = decalFile
+			end
+		end
+	end
 end
 	
 function GetDecalNameforTeamId(teamId)
-	if not teamDecals then
-		ScanTeamDecalFiles()
+	local gameInfo = GetGameInfoEntity()
+	if not gameInfo then return nil end
+	local leagueName = gameInfo:GetLeagueName()
+	if not teamDecals[leagueName] then
+		ScanTeamDecalFiles(leagueName)
 	end
-	return teamDecals[ToString(teamId)]
+	return teamDecals[leagueName][ToString(teamId)] and teamDecals[leagueName][ToString(teamId)] or globalDecals[ToString(teamId)]
 end
 
 class 'NSLDecal' (Entity)
@@ -116,6 +134,8 @@ if Client then
 				self._renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
 				self._renderMaterial = Client.CreateRenderMaterial()
 				self._renderModel:SetModel(kNSLDecalModel)
+				Print(ToString(GetDecalNameforTeamId(self.decal_name)))
+				Print(self.decal_name)
 				self._renderMaterial:SetMaterial(GetDecalNameforTeamId(self.decal_name))
 				self._renderModel:AddMaterial(self._renderMaterial)
 				local coords = self:GetCoords()

@@ -1,0 +1,5 @@
+shader = "materials/teamlogos/teamlogos.surface_shader"
+albedoMap = "materials/teamlogos/NSL/nsl_logo/nsl_logo.dds"
+emissiveMap = "materials/teamlogos/NSL/nsl_logo/nsl_logo_emissive.dds"
+opacityMap = "materials/teamlogos/NSL/nsl_logo/nsl_logo_opacity.dds"
+surface = "metal"
