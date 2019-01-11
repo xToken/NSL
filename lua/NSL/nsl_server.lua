@@ -13,7 +13,7 @@ Script.Load("lua/NSL/config/server.lua")
 -- Load remaining server defs
 Script.Load("lua/NSL/admincommands/server.lua")
 Script.Load("lua/NSL/coinflip/server.lua")
-Script.Load("lua/NSL/consistencychecks/server.lua")
+--Script.Load("lua/NSL/consistencychecks/server.lua") -- Loaded by filereplace
 Script.Load("lua/NSL/customspawns/server.lua")
 Script.Load("lua/NSL/errorreporter/server.lua")
 Script.Load("lua/NSL/firstpersonspecblock/server.lua")

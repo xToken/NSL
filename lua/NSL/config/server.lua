@@ -9,11 +9,9 @@ local leagueConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/mast
 local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_perfconfig.json"
 local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_spawnconfig.json"
 local decalConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_decalconfig.json"
-local consistencyConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_consistencyconfig.json"
 local configRequestTracking = { 
 								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.6, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false,
-								consistencyConfigRequest = false, consistencyConfigRetries = 0, consistencyLocalConfig = "configs/nsl_consistencyconfig.json", consistencyExpectedVersion = 1.0, consistencyConfigComplete = false,
 								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.1, spawnConfigComplete = false,
 								decalConfigRequest = false, decalConfigRetries = 0, decalLocalConfig = "configs/nsl_decalconfig.json", decalExpectedVersion = 1.1, decalConfigComplete = false
 								}
@@ -267,11 +265,7 @@ local function OnServerUpdated()
 		Shared.SendHTTPRequest(perfConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "perf") end)
 		configRequestTracking["perfConfigRequest"] = true
 	end
-	if not configRequestTracking["consistencyConfigRequest"] and configRequestTracking["perfConfigComplete"] then
-		Shared.SendHTTPRequest(consistencyConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "consistency") end)
-		configRequestTracking["consistencyConfigRequest"] = true
-	end
-	if not configRequestTracking["spawnConfigRequest"] and configRequestTracking["consistencyConfigComplete"] then
+	if not configRequestTracking["spawnConfigRequest"] and configRequestTracking["perfConfigComplete"] then
 		Shared.SendHTTPRequest(spawnConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "spawn") end)
 		configRequestTracking["spawnConfigRequest"] = true
 	end
