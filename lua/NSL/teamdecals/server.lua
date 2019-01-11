@@ -107,7 +107,7 @@ end
 table.insert(gTeamNamesUpdatedFunctions, UpdateAllNSLDecals)
 
 local function OnDecalConfigLoaded(config)
-	if config == "all" or config == "decal" then
+	if (config == "all" or config == "decal") and GetNSLModEnabled() then
 		UpdateOrCreateAllNSLDecals()
 	end
 end

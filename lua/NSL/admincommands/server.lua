@@ -186,15 +186,17 @@ CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetPerf
 
 local function SetupServerConfig()
 	-- Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
-	Server.SetConfigSetting("rookie_friendly", false)
-	Server.SetConfigSetting("force_even_teams_on_join", false)
-	Server.SetConfigSetting("auto_team_balance", {enabled_after_seconds = 0, enabled = false, enabled_on_unbalance_amount = 2})
-	Server.SetConfigSetting("end_round_on_team_unbalance", nil)
-	Server.SetConfigSetting("end_round_on_team_unbalance_check_after_time", nil)
-	Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
-	Server.SetConfigSetting("auto_kick_afk_time", nil)
-	Server.SetConfigSetting("auto_kick_afk_capacity", nil)
-	Server.SetVariableTableCommandsAllowed(GetNSLMode() ~= "OFFICIAL")
+	if GetNSLModEnabled() then
+		Server.SetConfigSetting("rookie_friendly", false)
+		Server.SetConfigSetting("force_even_teams_on_join", false)
+		Server.SetConfigSetting("auto_team_balance", {enabled_after_seconds = 0, enabled = false, enabled_on_unbalance_amount = 2})
+		Server.SetConfigSetting("end_round_on_team_unbalance", nil)
+		Server.SetConfigSetting("end_round_on_team_unbalance_check_after_time", nil)
+		Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
+		Server.SetConfigSetting("auto_kick_afk_time", nil)
+		Server.SetConfigSetting("auto_kick_afk_capacity", nil)
+		Server.SetVariableTableCommandsAllowed(GetNSLMode() ~= "OFFICIAL")
+	end
 end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)

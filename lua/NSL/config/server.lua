@@ -254,9 +254,7 @@ local function OnConfigResponse(response, request)
 				PerfConfigs[string.upper(config.PerfLevel)] = config
 			end
 		end
-		if GetNSLModEnabled() then
-			EstablishConfigDependantSettings(request)
-		end
+		EstablishConfigDependantSettings(request)
 	end
 end
 

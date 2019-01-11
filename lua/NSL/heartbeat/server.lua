@@ -78,7 +78,7 @@ Event.Hook("Console_heartbeat", OnCommandOverrideHeartbeat)
 RegisterNSLHelpMessageForCommand("heartbeat: Disables heartbeat requirement for your client.  Only use if having connection problems!", false)
 
 local function SetupServerConfig(config)
-	if config == "all" or config == "league" then
+	if (config == "all" or config == "league") and GetNSLModEnabled() then
 		local gameInfo = GetGameInfoEntity()
 		if gameInfo then
 			gameInfo:SetHeartbeatRequired(GetNSLConfigValue("HeartbeatRequired"))

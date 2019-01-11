@@ -88,7 +88,7 @@ originalNS2GRGetChooseTechPoint = Class_ReplaceMethod("NS2Gamerules", "ChooseTec
 
 local function LoadCustomTechPointData(configLoaded)
 		
-	if configLoaded == "all" or configLoaded == "spawn" then
+	if (configLoaded == "all" or configLoaded == "spawn") and GetNSLModEnabled() then
 		--Cache once configs are loaded.
 		kMapLocations = GetNSLConfigValue("FriendlySpawns")
 		local customSpawnData = GetMapSpecificSpawns()
