@@ -5,7 +5,8 @@
 		"LeagueName": 			"NSL",
 		"ConsistencyConfig":	{
 									"restrict": [ 
-												"lua/entry/*.entry"
+												"lua/entry/*.entry",
+												"lua/*.lua"
 												],
 									"check": 	[ 	
 												"game_setup.xml", 
@@ -46,7 +47,8 @@
 		"LeagueName": 			"AusNS2",
 		"ConsistencyConfig":	{
 									"restrict": [ 
-												"lua/entry/*.entry"
+												"lua/entry/*.entry",
+												"lua/*.lua"
 												],
 									"check": 	[ 	
 												"game_setup.xml", 
