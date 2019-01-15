@@ -33,7 +33,7 @@ local function ApplyNSLConsistencyConfig()
 				Shared.Message("Skipped " .. numHashed .. " " .. ignore[c] .. " files for consistency")
 			end
 		end
-		
+
 		if type(consistencyConfig.restrict) == "table" then
 			local restrict = consistencyConfig.restrict
 			for c = 1, #restrict do

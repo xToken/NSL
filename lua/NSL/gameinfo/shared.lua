@@ -101,7 +101,7 @@ end
 if Server then
 
 	function GameInfo:SetNSLConfig(cfg)
-		self.nslconfig = cfg or kNSLPluginConfigs.DISABLED
+		self.nslconfig = cfg
 	end
 	
 	function GameInfo:SetLeagueName(newLeagueName)

@@ -68,7 +68,7 @@ local function LoadConfig()
 	local defaultConfig = { mode = "PCW", league = "ENSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
-	NSL_Mode = kNSLPluginConfigs[kNSLPluginConfigs[config.mode]] and kNSLPluginConfigs[kNSLPluginConfigs[config.mode]] or kNSLPluginConfigs.PCW
+	NSL_Mode = type(config.mode) == "number" and config.mode or kNSLPluginConfigs.PCW
 	NSL_League = config.league or "ENSL"
 	-- temp hack for league rename
 	if NSL_League == "NSL" then 
