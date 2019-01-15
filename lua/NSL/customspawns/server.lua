@@ -193,7 +193,7 @@ local function LoadCustomTechPointData(config)
 
 		elseif kValidCustomSpawnData then
 
-			gamerules:ResetGame()
+			GetGamerules():ResetGame()
 
 		end
 
