@@ -12,9 +12,6 @@ local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
 local NSL_PlayerDataTimeout = 30
 
--- Maybe someday they will full leave ENSL behind..........
-local NSL_ENSL_Badge_Title = "ENSL#"
-
 --These are the only mandatory fields
 --S_ID 		- Steam ID
 --NICK 		- Nickname on Site
@@ -104,16 +101,13 @@ local function GetRefBadgeforID(ns2id)
 end
 
 local function GetBadgeForPlayerData(data)
-	-- Special case the eNSL league because they cant seem to leave the E behind.....
-	if GetActiveLeague() == "NSL" then
-		return NSL_ENSL_Badge_Title..ToString(data.NSL_TID)
-	end
-	return GetActiveLeague()..ToString(data.NSL_TID)
+	return GetActiveLeague().."#"..ToString(data.NSL_TID)
 end
 
 local function UpdateClientBadge(ns2id, data)
 	local refBadge, badgeName = GetRefBadgeforID(ns2id)
 	local teamBadge = GetBadgeForPlayerData(data)
+	local teamBadgeName = GetNSLConfigValue("BadgeTitle")
 	local success
 	local row = 1
 	if refBadge then
@@ -126,7 +120,7 @@ local function UpdateClientBadge(ns2id, data)
 	if teamBadge then
 		success = GiveBadge(ns2id, teamBadge, row)
 		if success then
-			SetFormalBadgeName(teamBadge, data.NSL_Team)
+			SetFormalBadgeName(teamBadge, teamBadgeName .. data.NSL_Team)
 		end
 	end
 end
@@ -148,9 +142,9 @@ local function UpdateCallbacksWithNSLData(player, nslData)
 			gPlayerDataUpdatedFunctions[i](player, nslData)
 		end
 		if player.playerInfo then
-			player.playerInfo:SetupNSLData(nsldata) 
+			player.playerInfo:SetupNSLData(nslData) 
 		end
-		ServerAdminPrint(Server.GetOwner(player), string.format("%s Username verified as %s", GetActiveLeague(), nslData.NICK))
+		SendClientServerAdminMessage(Server.GetOwner(player), "NSL_USERNAME_VERIFIED", GetActiveLeague(), nslData.NICK)
 	end
 end
 
@@ -166,11 +160,11 @@ local function OnClientConnectENSLResponse(response)
 				local player = GetPlayerMatchingNS2Id(ns2id)
 				local clientData = {
 					S_ID = responsetable.steam.id or "",
-					NICK = responsetable.username or "Invalid",
-					NSL_Team = responsetable.team and responsetable.team.name or "No Team",
+					NICK = string.UTF8SanitizeForNS2(responsetable.username or "Invalid"),
+					NSL_Team = string.UTF8SanitizeForNS2(responsetable.team and responsetable.team.name or "No Team"),
 					NSL_ID = responsetable.id or "",
 					NSL_TID = responsetable.team and responsetable.team.id or "",
-					NSL_League = "NSL"
+					NSL_League = "ENSL"
 				}
 				if responsetable.admin then
 					clientData.NSL_Level = 4
@@ -220,8 +214,8 @@ local function OnClientConnectAUSNS2Response(response)
 					local player = GetPlayerMatchingNS2Id(ns2id)
 					NSL_ClientData[ns2id] = {
 					S_ID = responsetable.SteamID or "",
-					NICK = responsetable.UserName or "Invalid",
-					NSL_Team = responsetable.TeamName or "No Team",
+					NICK = string.UTF8SanitizeForNS2(responsetable.UserName or "Invalid"),
+					NSL_Team = string.UTF8SanitizeForNS2(responsetable.TeamName or "No Team"),
 					NSL_ID = responsetable.UserID or "",
 					NSL_TID = responsetable.TeamID or "",
 					NSL_Level = responsetable.IsAdmin and 1 or 0,
@@ -303,7 +297,7 @@ end
 Event.Hook("UpdateServer", OnServerUpdated)
 
 local function UpdatePlayerDataOnActivation(newState)
-	if newState == "PCW" or newState == "OFFICIAL" or newState == "GATHER" then
+	if not newState == kNSLPluginConfigs.DISABLED then
 		local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
 		for p = 1, #playerList do
 			local playerClient = Server.GetOwner(playerList[p])
@@ -332,37 +326,24 @@ local function GetPlayerList(query)
 	end
 end
 
-local function GetPlayerString(player)
-	local playerClient = Server.GetOwner(player)
-	if playerClient then
-		local pNS2ID = playerClient:GetUserId()
-		local NSLData = GetNSLUserData(pNS2ID)
-		local gID = GetGameIDMatchingNS2ID(pNS2ID)
-		if NSLData == nil then
-			local sID = "0:" .. (pNS2ID % 2) .. ":" .. math.floor(pNS2ID / 2)
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, HCap : %.0f%%, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID, (1 - player:GetHandicap() ) * 100)
-		else
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, HCap : %.0f%%, LNick : %s, LTeam : %s, LID : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, (1 - player:GetHandicap() ) * 100, NSLData.NICK, NSLData.NSL_Team, NSLData.NSL_ID or 0)
-		end				
-	end
-	return ""
-end
-
 local function OnClientCommandViewNSLInfo(client, team)
 	if client then
 		local NS2ID = client:GetUserId()
 		local playerList = GetPlayerList(team)				
 		if playerList then
-			ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, HCap = Handicap, LNick = League Nickname, LTeam = League Team, LID = League ID")
+			SendClientServerAdminMessage(client, "NSL_PLAYER_INFO_HEADING")
 			for p = 1, #playerList do
-				ServerAdminPrint(client, GetPlayerString(playerList[p]))
+				local playerClient = Server.GetOwner(playerList[p])
+				if playerClient then
+					Server.SendNetworkMessage(client, "NSLPlayerInfoMessage", {clientId = playerList[p]:GetClientIndex(), gameId = GetGameIDMatchingNS2ID(playerClient:GetUserId())}, true)
+				end
 			end
 		end
 	end
 end
 
 Event.Hook("Console_sv_nslinfo", OnClientCommandViewNSLInfo)
-RegisterNSLHelpMessageForCommand("sv_nslinfo: <team> - marines,aliens,specs,other,all - Will return the player details from the corresponding league site.", false)
+RegisterNSLHelpMessageForCommand("SV_NSLINFO", false)
 
 local function MakeNSLMessage(message, header)
 	local m = { }
@@ -374,18 +355,18 @@ end
 
 local function OnCommandChat(client, target, message, header)
 	if target == nil then
-		Server.SendNetworkMessage("NSLSystemMessage", MakeNSLMessage(message, header), true)
+		Server.SendNetworkMessage("NSLAdminChat", MakeNSLMessage(message, header), true)
 	else
 		if type(target) == "number" then
 			local playerRecords = GetEntitiesForTeam("Player", target)
 			for _, player in ipairs(playerRecords) do
 				local pclient = Server.GetOwner(player)
 				if pclient then
-					Server.SendNetworkMessage(pclient, "NSLSystemMessage", MakeNSLMessage(message, header), true)
+					Server.SendNetworkMessage(pclient, "NSLAdminChat", MakeNSLMessage(message, header), true)
 				end
 			end
 		elseif type(target) == "userdata" and target:isa("Player") then
-			Server.SendNetworkMessage(target, "NSLSystemMessage", MakeNSLMessage(message, header), true)
+			Server.SendNetworkMessage(target, "NSLAdminChat", MakeNSLMessage(message, header), true)
 		end
 	end
 end
@@ -405,7 +386,7 @@ local function OnClientCommandChat(client, ...)
 end
 
 Event.Hook("Console_sv_nslsay", OnClientCommandChat)
-RegisterNSLHelpMessageForCommand("sv_nslsay: <message> - Will send a message to all connected players that displays in yellow.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLSAY", true)
 
 local function OnClientCommandTeamChat(client, team, ...)
 	if not client then return end
@@ -423,7 +404,7 @@ local function OnClientCommandTeamChat(client, team, ...)
 end
 
 Event.Hook("Console_sv_nsltsay", OnClientCommandTeamChat)
-RegisterNSLHelpMessageForCommand("sv_nsltsay: <team, message> - Will send a message to all players on the team provided that displays in yellow.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLTSAY", true)
 
 local function OnClientCommandPlayerChat(client, target, ...)
 	if not client then return end
@@ -441,7 +422,7 @@ local function OnClientCommandPlayerChat(client, target, ...)
 end
 
 Event.Hook("Console_sv_nslpsay", OnClientCommandPlayerChat)
-RegisterNSLHelpMessageForCommand("sv_nslpsay: <player, message> - Will send a message to the provided player that displays in yellow.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLPSAY", true)
 
 local function OnRecievedFunction(client, message)
 
@@ -462,22 +443,6 @@ end
 
 Server.HookNetworkMessage("ClientFunctionReport", OnRecievedFunction)
 
-local function GetFunctionString(player)
-	local playerClient = Server.GetOwner(player)
-	if playerClient then
-		local pNS2ID = playerClient:GetUserId()
-		local NSLData = GetNSLUserData(pNS2ID)
-		local gID = GetGameIDMatchingNS2ID(pNS2ID)
-		if NSLData == nil then
-			local sID = "0:" .. (pNS2ID % 2) .. ":" .. math.floor(pNS2ID / 2)
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, League Information Unavailable or Unregistered User.", player:GetName(), sID, pNS2ID, gID)
-		else
-			return string.format("IGN : %s, sID : %s, NS2ID : %s, gID : %s, LNick : %s", player:GetName(), NSLData.S_ID, pNS2ID, gID, NSLData.NICK)
-		end				
-	end
-	return ""
-end
-
 local function OnClientCommandShowFunctionData(client, target)
 	if not client then return end
 	local NS2ID = client:GetUserId()
@@ -496,28 +461,29 @@ local function OnClientCommandShowFunctionData(client, target)
 					local pNS2ID = playerClient:GetUserId()
 					if NSL_FunctionData[pNS2ID] and (not targetPlayer or (targetClient and pNS2ID == targetClient:GetUserId())) then
 						if not heading then
-							ServerAdminPrint(client, "IGN = In-Game Name, sID = SteamID, gID = GameID, LNick = League Nickname")
+							SendClientServerAdminMessage(client, "NSL_FUNCTION_DATA_HEADING")
+							SendClientServerAdminMessage(client, "NSL_PLAYER_INFO_HEADING")
 							heading = true
 						end
-						ServerAdminPrint(client, "Function Data For " .. GetFunctionString(playerList[p]))
+						Server.SendNetworkMessage(client, "NSLPlayerInfoMessage", {clientId = playerList[p]:GetClientIndex(), gameId = GetGameIDMatchingNS2ID(pNS2ID)}, true)
 						for k, v in ipairs(NSL_FunctionData[pNS2ID]) do
 							--Check for value updates if this is a detection type that updates.. itself?
 							if NSL_FunctionData[pNS2ID][v] then
-								ServerAdminPrint(client, v .. ":" .. NSL_FunctionData[pNS2ID][v])
+								SendClientServerAdminMessage(client, "NSL_FUNCTION_DATA_REPORT_UPDATES", v, NSL_FunctionData[pNS2ID][v])
 							else
-								ServerAdminPrint(client, v)
+								SendClientServerAdminMessage(client, "NSL_FUNCTION_DATA_REPORT", v)
 							end
 						end
-						ServerAdminPrint(client, "End Function Data")
+						SendClientServerAdminMessage(client, "NSL_FUNCTION_DATA_END")
 					end
 				end
 			end
 		end
 		if not heading then
-			ServerAdminPrint(client, "No function data currently logged")
+			SendClientServerAdminMessage(client, "NSL_FUNCTION_DATA_NONE")
 		end
 	end
 end
 
 Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
-RegisterNSLHelpMessageForCommand("sv_nslfunctiondata: <player> - Will display logged client side hooks for the provided player.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLFUNCTIONDATA", true)

@@ -138,4 +138,4 @@ local function OnClientCommandNSLFPS(client)
 end
 
 Event.Hook("Console_sv_nslfirstpersonspectate", OnClientCommandNSLFPS)
-RegisterNSLHelpMessageForCommand("sv_nslfirstpersonspectate: Moves you into first person spectate for the player you are currently spectating.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLFIRSTPERSONSPECTATE", true)

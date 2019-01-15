@@ -5,18 +5,17 @@
 
 --NSL Configs
 local configFileName = "NSLConfig.json"
-local leagueConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_leagueconfig.json"
+local leaguesConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_leagues.json"
+local leagueConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/leagueconfigs/%s.json"
 local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_perfconfig.json"
-local spawnConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_spawnconfig.json"
-local decalConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master/configs/nsl_decalconfig.json"
+local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/nsl_leagueconfig.json", leagueExpectedVersion = 2.6, leagueConfigComplete = false,
-								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false,
-								spawnConfigRequest = false, spawnConfigRetries = 0, spawnLocalConfig = "configs/nsl_spawnconfig.json", spawnExpectedVersion = 1.1, spawnConfigComplete = false,
-								decalConfigRequest = false, decalConfigRetries = 0, decalLocalConfig = "configs/nsl_decalconfig.json", decalExpectedVersion = 1.1, decalConfigComplete = false
-								}
-local NSL_Mode = "PCW"
-local NSL_League = "NSL"
+								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.0, leaguesConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.0, leagueConfigComplete = false,
+								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
+							}
+local NSL_Mode = kNSLPluginConfigs.DISABLED
+local NSL_League = "ENSL"
 local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
@@ -24,14 +23,16 @@ local NSL_ServerCommands = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
 local NSL_DefaultPerfCaptured = false
+local kNSLMaxConfigRetries = 2
 local cachedScoresValidFor = 10 * 60
+local queryLeague = { "DEFAULT" }
 
 function GetNSLMode()
 	return NSL_Mode
 end
 
 function GetNSLModEnabled()
-	return NSL_Mode ~= "DISABLED"
+	return NSL_Mode ~= kNSLPluginConfigs.DISABLED
 end
 
 function GetActiveLeague()
@@ -59,12 +60,21 @@ function RegisterNSLServerCommand(commandName, commandFunction, helpText, option
 	CreateServerAdminCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed)
 end
 
+local function SavePluginConfig()
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked })
+end
+
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "NSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false }
+	local defaultConfig = { mode = "PCW", league = "ENSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
-	NSL_Mode = config.mode or "PCW"
-	NSL_League = config.league or "NSL"
+	NSL_Mode = kNSLPluginConfigs[kNSLPluginConfigs[config.mode]] and kNSLPluginConfigs[kNSLPluginConfigs[config.mode]] or kNSLPluginConfigs.PCW
+	NSL_League = config.league or "ENSL"
+	-- temp hack for league rename
+	if NSL_League == "NSL" then 
+		NSL_League = "ENSL"
+		SavePluginConfig()
+	end
 	NSL_PerfLevel = config.perf or "DEFAULT"
 	NSL_LeagueAdminsAccess = config.adminaccess or false
 	NSL_PerfConfigsBlocked = config.perfconfigsblocked or false
@@ -87,10 +97,6 @@ end
 
 SetSeasonOnLoad()
 
-local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked })
-end
-
 function SetNSLMode(state)
 	if NSL_Mode ~= state then
 		NSL_Mode = state
@@ -106,7 +112,7 @@ function SetActiveLeague(state)
 		NSL_League = state
 		SavePluginConfig()
 		if GetNSLModEnabled() then
-			EstablishConfigDependantSettings("all")
+			EstablishConfigDependantSettings("reload")
 		end
 		for i = 1, #gLeagueChangeFunctions do
 			gLeagueChangeFunctions[i](NSL_League)
@@ -145,40 +151,6 @@ function UpdateNSLScores(team1name, team1score, team2name, team2score)
 	SavePluginConfig()
 end
 
-local DefaultConfig = {
-	LeagueName							= "Default",
-	AutomaticMapCycleDelay				= 180 * 60,
-	PauseEndDelay 						= 5,
-	PauseStartDelay 					= 1,
-	PauseMaxPauses 						= 3,
-	PausedReadyNotificationDelay 		= 30,
-	PauseEnabled 						= true,
-	FriendlyFireDamagePercentage 		= 0.33,
-	FriendlyFireEnabled			 		= false,
-	TournamentModeAlertDelay 			= 30,
-	TournamentModeGameStartDelay 		= 15,
-	PausedMaxDuration 					= 120,
-	TournamentModeForfeitClock			= 0,
-	TournamentModeRestartDuration 		= 90,
-	Limit6PlayerPerTeam 				= false,
-	MercsRequireApproval 				= false,
-	FirstPersonSpectate					= false,
-	UseCustomSpawnConfigs				= false,
-	UseFixedSpawnsPerMap				= false,
-	UseDefaultSkins						= false,
-	PauseOnDisconnect					= false,
-	SavePlayerStates					= false,
-	OverrideTeamNames					= false,
-	ReportErrors						= false,
-	ErrorReportURL						= "",
-	MessageColor						= "00BFFF",
-	NetworkTruncation					= 0,
-	HeartbeatRequired					= false,
-	LeagueDecal							= "nsl_logo"
-}
-
-local DefaultPerfConfig = { PerfLevel = "Default" }
-
 local Configs = { }
 local PerfConfigs = { }
 
@@ -192,37 +164,30 @@ local function OnLoadLocalConfig(configFile)
 	return config
 end
 
-local function ValidateResponse(response, request)
+local function ValidateResponse(response, request, additionalparam)
 	local responseTable
 	if response then
 		responseTable = json.decode(response)
 		if not responseTable or type(responseTable) ~= "table" or not responseTable.Version or not responseTable.EndOfTable then
-			if configRequestTracking[request .. "ConfigRetries"] < 3 then
+			if configRequestTracking[request .. "ConfigRetries"] < kNSLMaxConfigRetries then
 				configRequestTracking[request .. "ConfigRequest"] = false
 				configRequestTracking[request .. "ConfigRetries"] = configRequestTracking[request .. "ConfigRetries"] + 1
 				responseTable = nil
 			else
 				Shared.Message(string.format("NSL - Failed getting %s config from GitHub, using local copy.", request))
-				responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
+				responseTable = OnLoadLocalConfig(string.format(configRequestTracking[request .. "LocalConfig"], additionalparam))
 			end
 		elseif responseTable.Version < configRequestTracking[request .. "ExpectedVersion"] then
 			--Old version still on github, use local cache
 			Shared.Message(string.format("NSL - Old copy of %s config on GitHub, using local copy.", request))
-			responseTable = OnLoadLocalConfig(configRequestTracking[request .. "LocalConfig"])
+			responseTable = OnLoadLocalConfig(string.format(configRequestTracking[request .. "LocalConfig"], additionalparam))
 		end
 		if responseTable then
 			--GOOD DATA ITS AMAZING
-			configRequestTracking[request .. "ConfigComplete"] = true
+			configRequestTracking[request .. "ConfigComplete"] = additionalparam == nil and true or false
 		end
 	end
 	return responseTable
-end
-
-local function CheckForExistingConfig(leagueName)
-	if not Configs[leagueName] then
-		Configs[leagueName] = { }
-		--Shared.Message("NSL - Adding league " .. leagueName .. ".")
-	end
 end
 
 local function tablemerge(tab1, tab2)
@@ -237,55 +202,79 @@ local function tablemerge(tab1, tab2)
 	end
 end
 
-local function OnConfigResponse(response, request)
-	response = ValidateResponse(response, request)
-	if response and response.Configs then
-		for i, config in ipairs(response.Configs) do
-			if config.LeagueName then
-				--assume valid, update Configs table, always uppercase
-				CheckForExistingConfig(string.upper(config.LeagueName))
-				--Shared.Message("NSL - Loading config " .. request .. " for " .. config.LeagueName .. ".")
-				tablemerge(Configs[string.upper(config.LeagueName)], config)
-			elseif config.PerfLevel then
+local function OnLoadLocalDefaultConfig()
+	Configs["DEFAULT"] = { }
+	tablemerge(Configs["DEFAULT"], OnLoadLocalConfig(defaultConfigFile))
+end
+
+OnLoadLocalDefaultConfig()
+-- Load local copy.  While ideally not needed, best to have some config ready by default.  The updated copy will be gotten later anyways
+
+local function OnConfigResponse(response, request, additionalparam)
+	response = ValidateResponse(response, request, additionalparam)
+	if response and request == "leagues" then
+		for _, league in ipairs(response.Leagues) do
+			Configs[string.upper(league)] = { }
+			table.insert(queryLeague, league)
+		end
+	elseif response and request == "league" then
+		if response.LeagueName and Configs[string.upper(response.LeagueName)] then
+			--Assume valid, update Configs table, always uppercase
+			--Shared.Message("NSL - Loading config for " .. response.LeagueName .. ".")
+			tablemerge(Configs[string.upper(response.LeagueName)], response)
+			-- Get ready for next league query
+			table.remove(queryLeague, 1)
+			configRequestTracking["leagueConfigRetries"] = 0
+			configRequestTracking["leagueConfigRequest"] = false
+		end
+	elseif response and response.Configs and request == "perf" then
+		for _, config in ipairs(response.Configs) do
+			if config.PerfLevel then
 				--Performance configs
 				--Shared.Message("NSL - Loading perf config " .. config.PerfLevel .. ".")
 				PerfConfigs[string.upper(config.PerfLevel)] = config
 			end
 		end
-		EstablishConfigDependantSettings(request)
 	end
 end
 
 local function OnServerUpdated()
-	if not configRequestTracking["leagueConfigRequest"] then
-		Shared.SendHTTPRequest(leagueConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "league") end)
-		configRequestTracking["leagueConfigRequest"] = true
+	if not configRequestTracking["leaguesConfigRequest"] then
+		Shared.SendHTTPRequest(leaguesConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "leagues") end)
+		configRequestTracking["leaguesConfigRequest"] = true
+	end
+	if not configRequestTracking["leagueConfigRequest"] and configRequestTracking["leaguesConfigComplete"] then
+		-- Query all individual league configs
+		if queryLeague[1] then
+			Shared.SendHTTPRequest(string.format(leagueConfigUpdateURL, queryLeague[1]), "GET", function(response) OnConfigResponse(response, "league", queryLeague[1]) end)
+			configRequestTracking["leagueConfigRequest"] = true
+		else
+			--Out of leagues to load, we are done!
+			configRequestTracking["leagueConfigComplete"] = true
+		end
 	end
 	if not configRequestTracking["perfConfigRequest"] and configRequestTracking["leagueConfigComplete"] then
 		Shared.SendHTTPRequest(perfConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "perf") end)
 		configRequestTracking["perfConfigRequest"] = true
 	end
-	if not configRequestTracking["spawnConfigRequest"] and configRequestTracking["perfConfigComplete"] then
-		Shared.SendHTTPRequest(spawnConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "spawn") end)
-		configRequestTracking["spawnConfigRequest"] = true
-	end
-	if not configRequestTracking["decalConfigRequest"] and configRequestTracking["spawnConfigComplete"] then
-		Shared.SendHTTPRequest(decalConfigUpdateURL, "GET", function(response) OnConfigResponse(response, "decal") end)
-		configRequestTracking["decalConfigRequest"] = true
-	end
 	--Small grace period to allow other mods to adjust defaults and not mess with us.
 	if not NSL_DefaultPerfCaptured and Shared.GetTime() > 2 then
 		if Shared.GetServerPerformanceData():GetInterpMs() > 0 then
 			--wait for this to be valid
-			DefaultPerfConfig["Interp"] = Shared.GetServerPerformanceData():GetInterpMs()
-			DefaultPerfConfig["MoveRate"] = Shared.GetServerPerformanceData():GetMoverate()
-			DefaultPerfConfig["ClientRate"] = Server.GetSendrate()
-			DefaultPerfConfig["TickRate"] = Server.GetTickrate()
-			DefaultPerfConfig["MaxDataRate"] = math.ceil(Server.GetBwLimit() / 1024)
-			NSL_DefaultPerfCaptured = true
-			PerfConfigs["DEFAULT"] = DefaultPerfConfig
+			PerfConfigs["DEFAULT"] = {
+				Interp = Shared.GetServerPerformanceData():GetInterpMs(),
+				MoveRate = Shared.GetServerPerformanceData():GetMoverate(),
+				ClientRate = Server.GetSendrate(),
+				TickRate = Server.GetTickrate(),
+				MaxDataRate = math.ceil(Server.GetBwLimit() / 1024)
+			}
 			ApplyPerfDependantSettings()
+			NSL_DefaultPerfCaptured = true
 		end
+	end
+	if NSL_DefaultPerfCaptured and configRequestTracking["perfConfigComplete"] then
+		EstablishConfigDependantSettings("complete")
+		Event.RemoveHook("UpdateServer", OnServerUpdated)
 	end
 end
 
@@ -304,8 +293,8 @@ function GetNSLConfigValue(value)
 		end
 	end
 	--Base Config
-	if DefaultConfig[value] then
-		return DefaultConfig[value]
+	if Configs["DEFAULT"][value] then
+		return Configs["DEFAULT"][value]
 	end
 	return nil
 end
@@ -319,11 +308,7 @@ function GetNSLPerfValue(value)
 end
 
 function GetNSLDefaultPerfValue(value)
-	--Check defaults read on startup.. probably irrelevant with mergings
-	if DefaultPerfConfig[value] then
-		return DefaultPerfConfig[value]
-	end
-	return nil
+	return PerfConfigs["DEFAULT"][value]
 end
 
 function GetNSLLeagueValid(league)
@@ -446,45 +431,4 @@ if Shine then
 
         return oldPerm or newPerm
     end
-end
-
-local Messages = {
-	CoinFlip							= "%s has flipped a coin for %s. The result is %s.",
-	CoinFlipRecently					= "A coin was flipped too recently, please wait %d seconds.",
-	PauseResumeMessage 					= "Game Resumed.  %s have %s pauses remaining",
-	PausePausedMessage					= "Game Paused.",
-	PauseWarningMessage					= "Game will %s in %d seconds.",
-	PauseResumeWarningMessage 			= "Game will automatically resume in %d seconds.",
-	PausePlayerMessage					= "%s has paused the game.",
-	PauseTeamReadiedMessage				= "%s readied for %s, resuming game.",
-	PauseTeamReadyMessage				= "%s readied for %s, waiting for the %s.",
-	PauseTeamReadyPeriodicMessage		= "%s are ready, waiting for the %s.",
-	PauseNoTeamReadyMessage				= "No team is ready to resume, type unpause in console to ready for your team.",
-	PauseCancelledMessage				= "Game Pause Cancelled.",
-	PauseDisconnectedMessage			= "%s disconnected, pausing game.",
-	PauseTooManyPausesMessage			= "Your team is out of pauses.",
-	TournamentModeTeamReadyAlert 		= "%s are ready, waiting on %s to start game.",
-	TournamentModeCountdown 			= "Game will start in %s second%s!",
-	TournamentModeReadyAlert 			= "Both teams need to ready for the game to start.",
-	TournamentModeTeamReady				= "%s has %s for %s.",
-	TournamentModeGameCancelled			= "Game start cancelled.",
-	TournamentModeForfeitWarning		= "%s have %d %s left to ready before forfeiting.",
-	TournamentModeGameForfeited			= "%s have forfeit the round due to not reading within %s seconds.",
-	TournamentModeReadyNoComm			= "Your team needs a commander to ready.",
-	TournamentModeStartedGameCancelled  = "%s un-readied for the %s, resetting game.",
-	UnstuckCancelled					= "You moved or were unable to be unstuck currently.",
-	Unstuck								= "Unstuck!",
-	UnstuckIn							= "You will be unstuck in %s seconds.",
-	UnstuckRecently						= "You have unstucked too recently, please wait %d seconds.",
-	UnstuckFailed						= "Unstuck Failed after %s attempts.",
-	MercApprovalNeeded					= "The opposite team will need to approve you as a merc.",
-	MercApproved 						= "%s has been approved as a merc for %s.",
-	MercsReset 							= "Merc approvals have been reset.",
-	HeartbeatOverride					= "Heartbeat Messages have been disabled for your client.",
-	HeartbeatWarn						= "Heartbeat Messages not recieved by server in the last %s seconds.  Type heartbeat in console if you are still connected, otherwise you will be disconnected!",
-	HeartbeatCritical					= "Heartbeat Messages not recieved by server in the last %s seconds.  Type heartbeat in console if you are still connected, otherwise you will be disconnected in %s seconds!",
-}
-
-function GetNSLMessage(message)
-	return Messages[message] or ""
 end

@@ -15,9 +15,9 @@ local function OnCommandCoinFlip(client)
 		if timeleft <= 0 then
 			local flip = math.random(0,1) == 0 and "HEADS" or "TAILS"
 			LastCoinFlipTime = Shared.GetTime()
-			SendAllClientsMessage(string.format(GetNSLMessage("CoinFlip"), playername, teamname, flip))
+			SendAllClientsMessage("CoinFlip", false, playername, teamname, flip)
 		else
-			SendClientMessage(client, string.format(GetNSLMessage("CoinFlipRecently"), timeleft))
+			SendClientMessage(client, "CoinFlipRecently", false, timeleft)
 		end
 	end
 end
@@ -27,4 +27,4 @@ gChatCommands["coinflip"] = OnCommandCoinFlip
 gChatCommands["!coinflip"] = OnCommandCoinFlip
 gChatCommands["!flip"] = OnCommandCoinFlip
 
-RegisterNSLHelpMessageForCommand("coinflip: Simulates a coinflip and returns heads or tails.", false)
+RegisterNSLHelpMessageForCommand("CMD_COINFLIP", false)

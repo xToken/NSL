@@ -168,7 +168,7 @@ function MoveClientToStoredPlayer(client, ns2ID)
 				oldplayer.sendTechTreeBase = true
 				oldplayer:AddTimedCallback(RemoveCachedFlag, 0.1)
 				--oldplayer is actually the 'newplayer' lol.. but its the OLDPlayer entity that was disconnected.. so that.
-				Server.SendNetworkMessage(oldplayer, "NSLSystemMessage", {color = GetNSLConfigValue("MessageColor"), message = string.format(" %s Player Restored.", name), header = "NSL: "}, true )
+				Server.SendNetworkMessage(oldplayer, "NSLAdminChat", {color = GetNSLConfigValue("MessageColor"), message = string.format(" %s Player Restored.", name), header = "NSL: "}, true )
 			end
 		end
 	end
@@ -195,13 +195,13 @@ local function OnClientCommandEnablePauseTesting(client)
 		local NS2ID = client:GetUserId()	
 		if GetIsNSLRef(NS2ID) then
 			NSLPauseDisconnectOverride = not NSLPauseDisconnectOverride
-			ServerAdminPrint(client, "NSL Pause on Disconnect " .. ConditionalValue(NSLPauseDisconnectOverride, "enabled.", "disabled."))
+			SendClientServerAdminMessage(client, "NSL_PAUSE_DISCONNECT_TOGGLE", ConditionalValue(NSLPauseDisconnectOverride, "enabled.", "disabled."))
 		end
 	end
 end
 
 Event.Hook("Console_sv_nslpausedisconnect", OnClientCommandEnablePauseTesting)
-RegisterNSLHelpMessageForCommand("sv_nslpausedisconnect: Enables automatic pausing on client disconnect.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLPAUSEDISCONNECT", true)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
@@ -219,37 +219,37 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 				if replaceClient and id and NSL_VirtualClients[id] then
 					--it worked, holy shit
 					if MoveClientToStoredPlayer(replaceClient, id) then
-						ServerAdminPrint(client, "Set " .. tostring(newPlayer) .. " as replacement for " .. tostring(oldPlayer) .. ".")
+						SendClientServerAdminMessage(client, "NSL_MANUALLY_REPLACED_PLAYER", tostring(newPlayer), tostring(oldPlayer))
 					else
-						ServerAdminPrint(client, "Something went wrong when caching the player :(.")
+						SendClientServerAdminMessage(client, "NSL_MANUAL_REPLACE_PLAYER_ERROR")
 					end
 				else
-					ServerAdminPrint(client, "Couldn't find cached player " .. tostring(oldPlayer) .. ".")
+					SendClientServerAdminMessage(client, "NSL_MANUAL_REPLACE_FIND_CACHED_PLAYER", tostring(oldPlayer))
 				end
 			else
-				ServerAdminPrint(client, "Couldn't find replacement player " .. tostring(newPlayer) .. ".")
+				SendClientServerAdminMessage(client, "NSL_MANUAL_REPLACE_FIND_TARGET_PLAYER", tostring(newPlayer))
 			end
 		end
 	end
 end
 
 Event.Hook("Console_sv_nslreplaceplayer", OnClientCommandForceReplacement)
-RegisterNSLHelpMessageForCommand("sv_nslreplaceplayer: <newPlayer, oldPlayer> Will force different player to take crashed/disconnect players place.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLREPLACEPLAYER", true)
 
 local function OnClientCommandListCachedPlayers(client)
 	if client then
 		local NS2ID = client:GetUserId()	
 		if GetIsNSLRef(NS2ID) then
-			ServerAdminPrint(client, "Cached Players listed below.")
+			SendClientServerAdminMessage(client, "NSL_CACHED_PLAYERS_HEADING")
 			for k, v in pairs(NSL_DisconnectedIDs) do
-				ServerAdminPrint(client, string.format("Cached Player - Name - %s, ID - %s", k, v))
+				SendClientServerAdminMessage(client, "NSL_CACHED_PLAYERS_LISTING", k, v)
 			end
 		end
 	end
 end
 
 Event.Hook("Console_sv_nsllistcachedplayers", OnClientCommandListCachedPlayers)
-RegisterNSLHelpMessageForCommand("sv_nsllistcachedplayers: Will list currently cached players names and steamIDs, for sv_nslreplaceplayer cmd.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLLISTCACHEDPLAYERS", true)
 
 Class_Reload( "Player" )
 

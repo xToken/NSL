@@ -30,15 +30,14 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
 		originalGameInfoOnCreate(self)
 		
 		if Server then
-            
-			self.nslconfig = kNSLPluginConfigString[GetNSLMode()] and kNSLPluginConfigString[GetNSLMode()] or kNSLPluginConfigs.DISABLED
+			self.nslconfig = GetNSLMode()
 			self.league = string.sub(GetActiveLeague(), 1, kMaxLeagueNameLength) 
 			self.team1name = kTeam1Name
 			self.team2name = kTeam2Name
 			self.team1score = 0
 			self.team2score = 0
 			self.teamupdates = 0
-			self.heartbeat = GetNSLConfigValue("HeartbeatRequired")
+			self.heartbeat = false
 			self.tournamentMode = GetNSLModEnabled()
 		end
 		
@@ -102,7 +101,7 @@ end
 if Server then
 
 	function GameInfo:SetNSLConfig(cfg)
-		self.nslconfig = kNSLPluginConfigString[cfg] and kNSLPluginConfigString[cfg] or kNSLPluginConfigs.DISABLED
+		self.nslconfig = cfg or kNSLPluginConfigs.DISABLED
 	end
 	
 	function GameInfo:SetLeagueName(newLeagueName)
@@ -139,4 +138,4 @@ if Server then
 
 end
 
-Shared.LinkClassToMap("GameInfo", GameInfo.kMapName, networkVars)
+Class_Reload("GameInfo", networkVars)

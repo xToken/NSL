@@ -78,7 +78,7 @@ end
 
 
 local function UpdateOrCreateAllNSLDecals()
-	local override = (GetNSLMode() == "PCW" or GetNSLMode() == "OFFICIAL")
+	local validMode = (GetNSLMode() == kNSLPluginConfigs.PCW or GetNSLMode() == kNSLPluginConfigs.OFFICIAL)
 	local decalLocations = GetNSLDecalLocations()
 	if decalLocations then
 		for loc, data in pairs(decalLocations) do
@@ -88,11 +88,11 @@ local function UpdateOrCreateAllNSLDecals()
 				if origin then
 					if decalEntities[loc] then
 						decalEntities[loc]:SetDecal(data.decal)
-						decalEntities[loc]:SetActive(data.active and override)
+						decalEntities[loc]:SetActive(data.active and validMode)
 					else
 						decalEntities[loc] = Server.CreateEntity("nsldecal", {origin = origin, angles = angles})
 						decalEntities[loc]:SetDecal(data.decal)
-						decalEntities[loc]:SetActive(data.active and override)
+						decalEntities[loc]:SetActive(data.active and validMode)
 					end
 				end
 			end
@@ -107,7 +107,7 @@ end
 table.insert(gTeamNamesUpdatedFunctions, UpdateAllNSLDecals)
 
 local function OnDecalConfigLoaded(config)
-	if (config == "all" or config == "decal") and GetNSLModEnabled() then
+	if (config == "complete" or config == "reload") and GetNSLModEnabled() then
 		UpdateOrCreateAllNSLDecals()
 	end
 end

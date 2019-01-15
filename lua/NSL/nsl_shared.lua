@@ -5,14 +5,9 @@
 
 -- NSL shared references
 kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL'} )
-kNSLPluginConfigString = { }
-kNSLPluginConfigString["DISABLED"] = kNSLPluginConfigs.DISABLED
-kNSLPluginConfigString["GATHER"] = kNSLPluginConfigs.GATHER
-kNSLPluginConfigString["PCW"] = kNSLPluginConfigs.PCW
-kNSLPluginConfigString["OFFICIAL"] = kNSLPluginConfigs.OFFICIAL
 
 -- For reference
-kNSLPluginBuild = 108
+kNSLPluginBuild = 110
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")
@@ -26,18 +21,23 @@ Script.Load("lua/NSL/spectator_techtree/shared.lua")
 Script.Load("lua/NSL/teamdecals/shared.lua")
 
 -- NSL Network Messages below
-local kMaxAdminChatLength = 250
 local kMaxFunctionMessageLength = 80
+local kNSLMessageIDMax = 255
+local kMaxAdminChatLength = 250
+local kNSLMessageAltMax = 25
 
-local kAdminChatMessage =
+local kNSLSystemMessage =
 {
-	header = string.format("string (%d)", kMaxAdminChatLength + 1),
-    message = string.format("string (%d)", kMaxAdminChatLength + 1),
+	header = "integer (0 to 2)",
+	messageid = string.format("integer (0 to %d)", kNSLMessageIDMax),
+    messageparam1 = string.format("string (%d)", kNSLMessageAltMax + 1),
+    messageparam2 = string.format("string (%d)", kNSLMessageAltMax + 1),
+    messageparam3 = string.format("string (%d)", kNSLMessageAltMax + 1),
 	color = string.format("string (%d)", 7),
 	changesound = "boolean" -- bool for now. later maybe filenames, or ints and keep an index somewhere
 }
 
-Shared.RegisterNetworkMessage("NSLSystemMessage", kAdminChatMessage)
+Shared.RegisterNetworkMessage("NSLSystemMessage", kNSLSystemMessage)
 
 local kTechTreeRequest = 
 {
@@ -53,3 +53,31 @@ local kFunctionTrigger =
 }
 
 Shared.RegisterNetworkMessage("ClientFunctionReport", kFunctionTrigger)
+
+local kNSLServerAdminChatMessage =
+{
+	messageid = string.format("integer (0 to %d)", kNSLMessageIDMax),
+    messageparam1 = string.format("string (%d)", kNSLMessageAltMax + 1),
+    messageparam2 = string.format("string (%d)", kNSLMessageAltMax + 1),
+    messageparam3 = string.format("string (%d)", kNSLMessageAltMax + 1),
+}
+
+Shared.RegisterNetworkMessage("NSLServerAdminPrint", kNSLServerAdminChatMessage)
+
+local kAdminChatMessage =
+{
+	header = string.format("string (%d)", kMaxAdminChatLength + 1),
+    message = string.format("string (%d)", kMaxAdminChatLength + 1),
+	color = string.format("string (%d)", 7),
+	changesound = "boolean" -- bool for now. later maybe filenames, or ints and keep an index somewhere
+}
+
+Shared.RegisterNetworkMessage("NSLAdminChat", kAdminChatMessage)
+
+local kNSLPlayerInfoMessage =
+{
+	clientId = "entityid",
+    gameId = "integer (0 to 4095)",
+}
+
+Shared.RegisterNetworkMessage("NSLPlayerInfoMessage", kNSLPlayerInfoMessage)

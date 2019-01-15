@@ -23,7 +23,7 @@ local function UnstuckCallback(self)
 	local ns2id = client:GetUserId()
 	local origin = Vector(UnstuckOriginTracker[ns2id])
 	if not self:GetIsAlive() or (HasMixin(self, "Stun") and self:GetIsStunned()) or (origin - self:GetOrigin()):GetLength() > 0.1 or self:isa("Embryo") or GetIsGamePaused() then
-		SendClientMessage(client, GetNSLMessage("UnstuckCancelled"))
+		SendClientMessage(client, "UnstuckCancelled", false)
 		UnstuckRetryTracker[ns2id] = 0
 		return false
 	end
@@ -39,7 +39,7 @@ local function UnstuckCallback(self)
 		LastUnstuckTracker[ns2id] = Shared.GetTime()
 		UnstuckOriginTracker[ns2id] = nil
 		UnstuckRetryTracker[ns2id] = 0
-		SendClientMessage(client, GetNSLMessage("Unstuck"))
+		SendClientMessage(client, "Unstuck", false)
 		return false
 	else
 		if UnstuckRetryTracker[ns2id] < kMaxUnstuckAttemps then
@@ -50,7 +50,7 @@ local function UnstuckCallback(self)
 		else
 			UnstuckOriginTracker[ns2id] = nil
 			LastUnstuckTracker[ns2id] = 0
-			SendClientMessage(client, string.format(GetNSLMessage("UnstuckFailed"), UnstuckRetryTracker[ns2id]))
+			SendClientMessage(client, "UnstuckFailed", false, UnstuckRetryTracker[ns2id])
 			UnstuckRetryTracker[ns2id] = 0
 			return false
 		end
@@ -69,7 +69,7 @@ local function RegisterClientStuck(client)
 		if LastUnstuckTracker[ns2id] == nil or LastUnstuckTracker[ns2id] + kUnstuckRate < Shared.GetTime() then
 			if GetIsGamePaused() then
 				-- sploiters
-				SendClientMessage(client, "Cannot unstuck during pause!")
+				SendClientMessage(client, "PauseUnstuck", false)
 				return
 			end
 			local player = client:GetControllingPlayer()
@@ -78,9 +78,9 @@ local function RegisterClientStuck(client)
 			LastUnstuckTracker[ns2id] = Shared.GetTime()
 			UnstuckRetryTracker[ns2id] = 0
 			player:AddTimedCallback(UnstuckIntialCallback, unstucktime)
-			SendClientMessage(client, string.format(GetNSLMessage("UnstuckIn"), unstucktime))
+			SendClientMessage(client, "UnstuckIn", false, unstucktime)
 		else
-			SendClientMessage(client, string.format(GetNSLMessage("UnstuckRecently"), (LastUnstuckTracker[ns2id] + kUnstuckRate) - Shared.GetTime()))
+			SendClientMessage(client, "UnstuckRecently", false, (LastUnstuckTracker[ns2id] + kUnstuckRate) - Shared.GetTime())
 		end
 	end
 end
@@ -92,7 +92,7 @@ gChatCommands["unstuck"] = RegisterClientStuck
 
 Event.Hook("Console_stuck", RegisterClientStuck)
 Event.Hook("Console_unstuck", RegisterClientStuck)
-RegisterNSLHelpMessageForCommand("unstuck: Will automatically attempt to unstuck you after a few seconds.", false)
+RegisterNSLHelpMessageForCommand("CMD_UNSTUCK", false)
 
 -- Tap into Shines unstuck also to prevent if paused
 local function CheckShineUnstuckHook()

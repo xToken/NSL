@@ -1,0 +1,147 @@
+{
+"Version": 3.0,
+"LeagueName": 							"DEFAULT",
+"PlayerDataURL": 						"www.yournicewebsite.com",
+"PlayerDataFormat":						"DEFAULT",
+"PlayerRefLevel": 						2,
+"PlayerAdminLevel":						3,
+"AutomaticMapCycleDelay":				10800,
+"PauseEndDelay": 						5,
+"PauseStartDelay": 						5,
+"PauseMaxPauses": 						2,
+"PausedReadyNotificationDelay": 		30,
+"PauseEnabled": 						true,
+"FriendlyFireDamagePercentage": 		0.33,
+"FriendlyFireEnabled":			 		true,
+"TournamentModeAlertDelay": 			30,
+"TournamentModeGameStartDelay": 		15,
+"FirstPersonSpectate":					true,
+"UseCustomSpawnConfigs":				true,
+"UseFixedSpawnsWhenLoaded":				false,
+"UseDefaultSkins":						true,
+"PauseOnDisconnect":					false,
+"SavePlayerStates":						true,
+"ReportErrors":							true,
+"ErrorReportURL":						"https://m2xo9pp3kc.execute-api.us-east-2.amazonaws.com/default/SubmitErrorReports",
+"PausedMaxDuration": 					300,
+"MessageColor":							"CC2EFA",
+"NetworkTruncation":					1,
+"HeartbeatRequired":					true,
+"LeagueDecal":							"default_logo",
+"BadgeTitle":							"DEFAULT TEAM - ",
+"TournamentModeForfeitClock":			0,
+"TournamentModeRestartDuration": 		90,
+"Limit6PlayerPerTeam": 					false,
+"MercsRequireApproval": 				false,
+"OverrideTeamNames": 					true,
+"GATHER": 								{
+											"OverrideTeamNames": 					false
+										},
+"PCW": 									{
+											"OverrideTeamNames": 					true
+										},
+"OFFICIAL":								{
+											"TournamentModeForfeitClock":			900,
+											"TournamentModeRestartDuration": 		30,
+											"Limit6PlayerPerTeam": 					true,
+											"MercsRequireApproval": 				true,
+											"OverrideTeamNames": 					true
+										},
+"Badges":				 				[
+											{"badge": "mod", 		"name": "Moderator"},
+										],
+"REFS":									[
+											123456789101112131415
+										],
+"AdminGroups":							{
+											"2":{
+												"commands": 
+												[
+													"sv_kick", "sv_say",  "sv_changemap", "sh_adminmenu", "sh_kick",
+													"sh_say", "sh_changelevel"
+												],
+												"type": "allowed"
+											},
+											"3":{
+												"commands": 
+												[
+													"sv_ban", "sv_unban",  "sv_kick",  "sv_say", "sv_changemap" "sv_reset", "sv_switchteam", 
+													"sv_rrall", "sv_eject", "sv_tsay", "sv_psay", "sh_adminmenu", "sh_ban", "sh_unban",
+													"sh_kick", "sh_say", "sh_changelevel", "sh_reset", "sh_setteam", "sh_rr", "sh_eject"
+												],
+												"type": "allowed"
+											},
+											"4":{
+												"commands": 
+												[
+													"sv_rcon", "sh_rcon"
+												],
+												"type": "disallowed"
+											}		
+										},
+"CustomSpawns":    						{
+											"ns2_descent":  [
+																{
+																	"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
+																	"expiryDate":           {"year": 2099, "month": 3, "day": 3},
+																	"spawnData":            [
+																								{
+																									"name":             "Drone Bay",
+																									"team":             "both",
+																									"enemyspawns":      ["Fabrication"],
+																									"weight": 1
+																								}    
+																							]
+																}
+															]
+						                },
+"LogoLocations":						{
+											"ns2_veil":
+												{
+													"control": {"origin": [55.65, -1.4, -95.1], "angles": [0, -90, 0]},
+													"sub-sector": {"origin": [-63, -2.6, -156.75], "angles": [0, -90, 0]},
+													"cargo": {"origin": [-87.33, -3.8, -78.75], "angles": [0, -90, 0]},
+													"pipeline": {"origin": [-54.05, -7.4, -8.94], "angles": [0, -90, 0]},
+												},
+											"ns2_summit":
+												{
+													"crossroads":{"origin": [46, 5.75, 57.88], "angles": [0, -90, 0]},
+													"sub access":{"origin": [-47.25, 3, 52.88], "angles": [0, -90, 0]},
+													"data core":{"origin": [30.13, 8.38, 141.13], "angles": [0, -135, 0]},
+													"atrium":{"origin": [91.75, 4.88, 77.75], "angles": [0, -90, 0]},
+													"flight control":{"origin": [23.38, 3.13, -26.63], "angles": [0, -90, 0]},
+												},
+											"ns2_tram":
+												{
+													"shipping":{"origin": [-82.38, -1.0, 45.88], "angles": [0, -90, 0]},
+													"elevator transfer":{"origin": [-31.75, 0.5, 91], "angles": [0, -90, 0]},
+													"repair room":{"origin": [-19.38, -1.63, -15.25], "angles": [0, -90, 0]},
+													"warehouse":{"origin": [37.45, 0.5, 28.13], "angles": [0, -90, 0]},
+													"server room":{"origin": [30.13, 3.13, 124.33], "angles": [0, -90, 0]},
+												},
+											"ns2_biodome":
+												{
+													"platform":{"origin": [45.24, 0.13, -76.93], "angles": [0, -90, 0]},
+													"reception":{"origin": [-24.25, -0.38, -4], "angles": [0, -90, 0]},
+													"hydroponics":{"origin": [64.25, -6.13, 86.13], "angles": [0, -90, 0]},
+													"atmosphere exchange":{"origin": [141.63, -0.38, -2.13], "angles": [0, -90, 0]},
+													"falls":{"origin": [74.52, -8.5, -2.62], "angles": [0, -90, 0]},
+												},
+											"ns2_jambi":
+												{
+													"docking bay": {"origin": [-107.13, 65.13, 77], "angles": [0, -90, 0]},
+													"gravity": {"origin": [-46.79, 66.44, 101.88], "angles": [0, -90, 0]},
+													"electrical core": {"origin": [-53.57, 64, -9], "angles": [0, -90, 0]},
+													"waste recycling": {"origin": [21.79, 59.0, 132.91], "angles": [-6.5, -90, 0]},
+													"pipeworks": {"origin": [21.62, 65.9, 4.11], "angles": [0, -90, 0]}
+												},
+											"ns2_mineral":
+												{
+													"surface": {"origin": [-56.96, 2, -36.5], "angles": [0, -135, 0]},
+													"drill site": {"origin": [90.63, -11.13, -50], "angles": [0, -45, 0]},
+													"mineral processing": {"origin": [90.31, -6.13, 71.13], "angles": [0, -90, 0]},
+													"production": {"origin": [0.88, 0.5, 80.5], "angles": [0, -90, 0]}
+												}
+										},
+"EndOfTable": true
+}

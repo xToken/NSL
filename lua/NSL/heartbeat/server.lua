@@ -10,37 +10,34 @@ local kClientHeartbeatCache = { }
 local kHeartbeatWarn = 8
 local kHeartbeatCritical = 12
 local kHeartbeatDisconnect = 20
+local kHeartbeatEventRegistered = false
 
 local function UpdateHeartbeatStates(deltatime)
-	if GetNSLConfigValue("HeartbeatRequired") then
-		if lastHeartbeatUpdate + kHeartbeatUpdateRate < Shared.GetTime(true) then
-			for i = #kClientHeartbeatIds, 1, -1 do
-				local id = kClientHeartbeatIds[i]
-				local client = Server.GetClientById(id)
-				if not client then
+	if lastHeartbeatUpdate + kHeartbeatUpdateRate < Shared.GetTime(true) then
+		for i = #kClientHeartbeatIds, 1, -1 do
+			local id = kClientHeartbeatIds[i]
+			local client = Server.GetClientById(id)
+			if not client then
+				table.remove(kClientHeartbeatIds, i)
+				kClientHeartbeatCache[id] = nil
+			elseif kClientHeartbeatCache[id].override == false and not client:GetIsVirtual() then
+				if kClientHeartbeatCache[id].lastTime + kHeartbeatWarn < Shared.GetTime(true) and kClientHeartbeatCache[id].warn == false then
+					SendClientMessage(client, "NSL_HEARTBEAT_WARN", true, kHeartbeatWarn)
+					kClientHeartbeatCache[id].warn = true
+				elseif kClientHeartbeatCache[id].lastTime + kHeartbeatCritical < Shared.GetTime(true) and kClientHeartbeatCache[id].critical == false then
+					SendClientMessage(client, "NSL_HEARTBEAT_CRITICAL", true, kHeartbeatCritical, kHeartbeatDisconnect - kHeartbeatCritical)
+					kClientHeartbeatCache[id].critical = true
+				elseif kClientHeartbeatCache[id].lastTime + kHeartbeatDisconnect < Shared.GetTime(true) and kClientHeartbeatCache[id].disconnect == false then
+					Server.DisconnectClient(client, string.format("Heartbeat not recieved in %s seconds.", kHeartbeatDisconnect))
+					Shared.Message("Client ID " .. id .. " disconnected for missing heartbeat response for " .. kHeartbeatDisconnect .. " seconds.")
 					table.remove(kClientHeartbeatIds, i)
 					kClientHeartbeatCache[id] = nil
-				elseif kClientHeartbeatCache[id].override == false and not client:GetIsVirtual() then
-					if kClientHeartbeatCache[id].lastTime + kHeartbeatWarn < Shared.GetTime(true) and kClientHeartbeatCache[id].warn == false then
-						SendClientMessage(client, string.format(GetNSLMessage("HeartbeatWarn"), kHeartbeatWarn), true)
-						kClientHeartbeatCache[id].warn = true
-					elseif kClientHeartbeatCache[id].lastTime + kHeartbeatCritical < Shared.GetTime(true) and kClientHeartbeatCache[id].critical == false then
-						SendClientMessage(client, string.format(GetNSLMessage("HeartbeatCritical"), kHeartbeatCritical, kHeartbeatDisconnect - kHeartbeatCritical), true)
-						kClientHeartbeatCache[id].critical = true
-					elseif kClientHeartbeatCache[id].lastTime + kHeartbeatDisconnect < Shared.GetTime(true) and kClientHeartbeatCache[id].disconnect == false then
-						Server.DisconnectClient(client, string.format("Heartbeat not recieved in %s seconds.", kHeartbeatDisconnect))
-						Shared.Message("Client ID " .. id .. " disconnected for missing heartbeat response for " .. kHeartbeatDisconnect .. " seconds.")
-						table.remove(kClientHeartbeatIds, i)
-						kClientHeartbeatCache[id] = nil
-					end
 				end
 			end
-			lastHeartbeatUpdate = Shared.GetTime(true)
 		end
+		lastHeartbeatUpdate = Shared.GetTime(true)
 	end
 end
-
-Event.Hook("UpdateServer", UpdateHeartbeatStates)
 
 local function CreateHeartbeatTable(id)
 	table.insert(kClientHeartbeatIds, id)
@@ -70,19 +67,26 @@ local function OnCommandOverrideHeartbeat(client)
 			CreateHeartbeatTable(id)
 		end
 		kClientHeartbeatCache[id].override = true
-		SendClientMessage(client, GetNSLMessage("HeartbeatOverride"), true)
+		SendClientMessage(client, "NSL_HEARTBEAT_OVERRIDE", true)
 	end
 end
 
 Event.Hook("Console_heartbeat", OnCommandOverrideHeartbeat)
-RegisterNSLHelpMessageForCommand("heartbeat: Disables heartbeat requirement for your client.  Only use if having connection problems!", false)
+RegisterNSLHelpMessageForCommand("CMD_HANDICAP", false)
 
 local function SetupServerConfig(config)
-	if (config == "all" or config == "league") and GetNSLModEnabled() then
+	if (config == "complete" or config == "reload") and GetNSLModEnabled() then
 		local gameInfo = GetGameInfoEntity()
 		if gameInfo then
 			gameInfo:SetHeartbeatRequired(GetNSLConfigValue("HeartbeatRequired"))
 		end
+		if not kHeartbeatEventRegistered then
+			Event.Hook("UpdateServer", UpdateHeartbeatStates)
+			kHeartbeatEventRegistered = true
+		end
+	elseif kHeartbeatEventRegistered then
+		Event.RemoveHook("UpdateServer", UpdateHeartbeatStates)
+		kHeartbeatEventRegistered = false
 	end
 end
 

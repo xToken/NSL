@@ -382,14 +382,14 @@ local function UpdateMoveState(deltatime)
 			gamestate.gamepausedmessagetime = (gamestate.gamepausedmessagetime + deltatime)
 			if gamestate.gamepausedmessagetime > GetNSLConfigValue("PausedReadyNotificationDelay") and gamestate.gamepausedcountdown == 0 then
 				if gamestate.team2resume and not gamestate.team1resume then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyPeriodicMessage"), GetActualTeamName(2), GetActualTeamName(1)))
+					SendAllClientsMessage("PauseTeamReadyPeriodicMessage", false, GetActualTeamName(2), GetActualTeamName(1))
 				elseif gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyPeriodicMessage"), GetActualTeamName(1), GetActualTeamName(2)))
+					SendAllClientsMessage("PauseTeamReadyPeriodicMessage", false, GetActualTeamName(1), GetActualTeamName(2))
 				elseif not gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
+					SendAllClientsMessage("PauseNoTeamReadyMessage", false)
 				end
 				if GetNSLConfigValue("PausedMaxDuration") ~= 0 then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeWarningMessage"), ((GetNSLConfigValue("PausedMaxDuration") - gamestate.gamepauseddelta))), true)
+					SendAllClientsMessage("PauseResumeWarningMessage", true, ((GetNSLConfigValue("PausedMaxDuration") - gamestate.gamepauseddelta)))
 				end
 				gamestate.gamepausedmessagetime = 0
 			end
@@ -404,7 +404,7 @@ local function UpdateMoveState(deltatime)
 			gamestate.serverpauseloopenabled = false
 			if gamestate.gamepausingteam ~= 0 then
 				local pausesremaining = (GetNSLConfigValue("PauseMaxPauses") - (gamestate.teampauses[GetActualTeamName(gamestate.gamepausingteam)] or 0))
-				SendAllClientsMessage(string.format(GetNSLMessage("PauseResumeMessage"), GetActualTeamName(gamestate.gamepausingteam), pausesremaining))
+				SendAllClientsMessage("PauseResumeMessage", false, GetActualTeamName(gamestate.gamepausingteam), pausesremaining)
 			end
 			gamestate.gamepausedtime = 0
 			gamestate.gamepausingteam = 0
@@ -416,12 +416,12 @@ local function UpdateMoveState(deltatime)
 		if gamestate.gameprepausedelta >= 1 then
 			gamestate.gamepausedcountdown = (gamestate.gamepausedcountdown - 1)
 			if gamestate.gamepausedcountdown > 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("PauseWarningMessage"), ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown)), true)
+				SendAllClientsMessage("PauseWarningMessage", true, ConditionalValue(GetIsGamePaused(), "resume", "pause"), (gamestate.gamepausedcountdown))
 			else
 				if not GetIsGamePaused() then
 					SaveEntStates()
 					gamestate.serverpauseloopenabled = true
-					SendAllClientsMessage(GetNSLMessage("PausePausedMessage"))
+					SendAllClientsMessage("PausePausedMessage", false)
 					gamestate.gamepausedtime = Shared.GetTime()
 				else
 					--Since other event already running, just let the final trigger run there (will be next frame).
@@ -456,9 +456,9 @@ local function OnCommandPause(client)
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseStartDelay")
 					gamestate.gamepausingteam = teamnumber
 					gamestate.serverprepauseloopenabled = true
-					SendAllClientsMessage(string.format(GetNSLMessage("PausePlayerMessage"), player:GetName()), true)
+					SendAllClientsMessage("PausePlayerMessage", true, player:GetName())
 				else
-					SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
+					SendClientMessage(client, "PauseTooManyPausesMessage", false)
 				end
 			end
 		end
@@ -482,16 +482,16 @@ function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 				gamestate.gamepausedcountdown = pauseDelay
 				gamestate.gamepausingteam = pausingTeam
 				gamestate.serverprepauseloopenabled = true
-				SendAllClientsMessage(string.format(GetNSLMessage("PauseDisconnectedMessage"), name))
+				SendAllClientsMessage("PauseDisconnectedMessage", false, name)
 			else
-				SendClientMessage(client, GetNSLMessage("PauseTooManyPausesMessage"))
+				SendClientMessage(client, "PauseTooManyPausesMessage", false)
 			end
 		end
 	end
 end
 
 Event.Hook("Console_gpause", OnCommandPause)
-RegisterNSLHelpMessageForCommand("gpause: Pauses the game.", false)
+RegisterNSLHelpMessageForCommand("CMD_GPAUSE", false)
 gChatCommands["pause"] = OnCommandPause
 gChatCommands["!pause"] = OnCommandPause
 
@@ -508,13 +508,13 @@ local function OnCommandUnPause(client)
 					gamestate.team2resume = not gamestate.team2resume
 				end
 				if gamestate.team2resume and not gamestate.team1resume then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyMessage"), player:GetName(), GetActualTeamName(2), GetActualTeamName(1)))
+					SendAllClientsMessage("PauseTeamReadyMessage", false, player:GetName(), GetActualTeamName(2), GetActualTeamName(1))
 				elseif gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadyMessage"), player:GetName(), GetActualTeamName(1), GetActualTeamName(2)))
+					SendAllClientsMessage("PauseTeamReadyMessage", false, player:GetName(), GetActualTeamName(1), GetActualTeamName(2))
 				elseif not gamestate.team1resume and not gamestate.team2resume then
-					SendAllClientsMessage(GetNSLMessage("PauseNoTeamReadyMessage"))
+					SendAllClientsMessage("PauseNoTeamReadyMessage", false)
 				elseif gamestate.gamepausedcountdown == 0 then
-					SendAllClientsMessage(string.format(GetNSLMessage("PauseTeamReadiedMessage"), player:GetName(), GetActualTeamName(teamnumber)))
+					SendAllClientsMessage("PauseTeamReadiedMessage", false, player:GetName(), GetActualTeamName(teamnumber))
 					gamestate.serverprepauseloopenabled = true
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseEndDelay")
 				end
@@ -525,7 +525,7 @@ local function OnCommandUnPause(client)
 end
 
 Event.Hook("Console_unpause", OnCommandUnPause)
-RegisterNSLHelpMessageForCommand("unpause: Readies your team to resume the game.", false)
+RegisterNSLHelpMessageForCommand("CMD_UNPAUSE", false)
 gChatCommands["unpause"] = OnCommandUnPause
 gChatCommands["!unpause"] = OnCommandUnPause
 gChatCommands["resume"] = OnCommandUnPause
@@ -544,19 +544,30 @@ local function OnCommandAdminPause(client)
 					gamestate.gamepausedcountdown = ConditionalValue(GetIsGamePaused(), GetNSLConfigValue("PauseEndDelay"), GetNSLConfigValue("PauseStartDelay"))
 				else
 					gamestate.serverprepauseloopenabled = false
-					SendAllClientsMessage(GetNSLMessage("PauseCancelledMessage"))
+					SendAllClientsMessage("PauseCancelledMessage", false)
 					gamestate.gamepausedcountdown = 0
 				end
 			
-				ServerAdminPrint(client, "Game " .. ConditionalValue(not GetIsGamePaused(), "pausing.", "unpausing."))
+				SendClientServerAdminMessage(client, "NSL_ADMIN_PAUSED", ConditionalValue(not GetIsGamePaused(), "pausing.", "unpausing."))
 			end
 		end
 	end
 	
 end
 
+function NSLTriggerUnpause()
+	if GetIsGamePaused() then
+		if gamestate.gamepausedcountdown == 0 then
+			gamestate.serverprepauseloopenabled = true
+			gamestate.team1resume = false
+			gamestate.team2resume = false
+			gamestate.gamepausedcountdown = 1
+		end
+	end
+end
+
 Event.Hook("Console_sv_nslpause", OnCommandAdminPause)
-RegisterNSLHelpMessageForCommand("sv_nslpause: Will pause/unpause game using standard delays.  Does not consume teams allowed pauses.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLPAUSE", true)
 
 local function OnCommandAdminSetPauses(client, teamnum, pauses)
 	
@@ -567,11 +578,11 @@ local function OnCommandAdminSetPauses(client, teamnum, pauses)
 		if GetIsNSLRef(NS2ID) and teamnum and pauses and ValidateTeamNumber(teamnum) then
 			local teamname = GetActualTeamName(teamnum)
 			gamestate.teampauses[teamname] = Clamp(GetNSLConfigValue("PauseMaxPauses") - pauses, 0, GetNSLConfigValue("PauseMaxPauses"))
-			ServerAdminPrint(client, string.format("%s now have %s pauses remaining.", teamname, Clamp(pauses, 0, GetNSLConfigValue("PauseMaxPauses"))))
+			SendClientServerAdminMessage(client, "NSL_TEAM_PAUSES_LEFT", teamname, Clamp(pauses, 0, GetNSLConfigValue("PauseMaxPauses")))
 		end
 	end
 	
 end
 
 Event.Hook("Console_sv_nslsetpauses", OnCommandAdminSetPauses)
-RegisterNSLHelpMessageForCommand("sv_nslsetpauses: <team, pauses> - Sets the number of pauses remaining for a team.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLSETPAUSES", true)

@@ -28,8 +28,8 @@ local function OnClientHandicap( client, value )
 	
 	player:SetHandicap(value)
 	
-	ServerAdminPrint(client, string.format("%s set handicap to (%.0f%%)", player:GetName(true), ( 1 - player:GetHandicap() ) * 100 ))
+	SendClientServerAdminMessage(client, "NSL_HANDICAP_SET", player:GetName(true), ( 1 - player:GetHandicap() ) * 100 )
 end
 
 Event.Hook("Console_sv_nslhandicap", OnClientHandicap)
-RegisterNSLHelpMessageForCommand("sv_nslhandicap: <0.1 - 1> Lowers your damage to the specified percentage.", false)
+RegisterNSLHelpMessageForCommand("SV_NSLHANDICAP", false)
