@@ -6,11 +6,11 @@
 --NS2 Tournament Mod Server side script
 
 local TournamentModeSettings = { 
-countdownstarted = false, 
-countdownstarttime = 0, 
-countdownstartcount = 0, 
-lastmessage = 0,  
-roundstarted = 0
+	countdownstarted = false, 
+	countdownstarttime = 0, 
+	countdownstartcount = 0, 
+	lastmessage = 0,  
+	roundstarted = 0
 }
 
 function TournamentModeOnGameEnd()
@@ -94,7 +94,7 @@ ClearTournamentModeState()
 
 local function CheckCancelGameStart()
 	if TournamentModeSettings.countdownstarttime ~= 0 then
-		SendAllClientsMessage(GetNSLMessage("TournamentModeGameCancelled"))
+		SendAllClientsMessage("TournamentModeGameCancelled", false)
 		ClearTournamentModeState()
 	end
 end
@@ -108,7 +108,7 @@ originalNS2GameRulesOnCommanderLogout = Class_ReplaceMethod("NS2Gamerules", "OnC
 			if TournamentModeSettings[teamnum].ready and (GetGamerules():GetGameState() <= kGameState.PreGame) then
 				TournamentModeSettings[teamnum].ready = false
 				CheckCancelGameStart()
-				SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
+				NSLSendTeamMessage(teamnum, "TournamentModeReadyNoComm", false)
 			end
 		end
 	end
@@ -127,18 +127,20 @@ local function AnnounceTournamentModeCountDown()
 	if TournamentModeSettings.countdownstarted and TournamentModeSettings.countdownstarttime - TournamentModeSettings.countdownstartcount < Shared.GetTime() and TournamentModeSettings.countdownstartcount ~= 0 then
 		if TournamentModeSettings.countdownstartcount > 60 then
 			if math.fmod(TournamentModeSettings.countdownstartcount, 30) == 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+				SendAllClientsMessage("TournamentModeCountdown", false, TournamentModeSettings.countdownstartcount)
 			end
 		elseif TournamentModeSettings.countdownstartcount > 15 then
 			if math.fmod(TournamentModeSettings.countdownstartcount, 15) == 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+				SendAllClientsMessage("TournamentModeCountdown", false, TournamentModeSettings.countdownstartcount)
 			end
 		elseif TournamentModeSettings.countdownstartcount > 5 then
 			if math.fmod(TournamentModeSettings.countdownstartcount, 5) == 0 then
-				SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, "s"))
+				SendAllClientsMessage("TournamentModeCountdown", false, TournamentModeSettings.countdownstartcount)
 			end
-		elseif TournamentModeSettings.countdownstartcount <= 5 then
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeCountdown"), TournamentModeSettings.countdownstartcount, TournamentModeSettings.countdownstartcount > 1 and "s" or ""), true)
+		elseif TournamentModeSettings.countdownstartcount > 1 then
+			SendAllClientsMessage("TournamentModeCountdown", true, TournamentModeSettings.countdownstartcount)
+		else
+			SendAllClientsMessage("TournamentModeFinalCountdown", true, TournamentModeSettings.countdownstartcount)
 		end
 		TournamentModeSettings.countdownstartcount = TournamentModeSettings.countdownstartcount - 1
 	end
@@ -148,10 +150,10 @@ end
 local function DisplayReadiedTeamAlertMessages(ReadiedTeamNum)
 	local notreadyteamname = GetActualTeamName((ReadiedTeamNum == 2 and 1) or 2)
 	local readyteamname = GetActualTeamName(ReadiedTeamNum)
-	SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeTeamReadyAlert"), readyteamname, notreadyteamname))
+	SendAllClientsMessage("TournamentModeTeamReadyAlert", false, readyteamname, notreadyteamname)
 	if GetNSLConfigValue("TournamentModeForfeitClock") > 0 then
 		if Shared.GetTime() - (TournamentModeSettings[ReadiedTeamNum].lastready + GetNSLConfigValue("TournamentModeForfeitClock")) > 0 then
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeGameForfeited"), notreadyteamname, GetNSLConfigValue("TournamentModeForfeitClock")))
+			SendAllClientsMessage("TournamentModeGameForfeited", false, notreadyteamname, GetNSLConfigValue("TournamentModeForfeitClock"))
 			TournamentModeSettings[ReadiedTeamNum].ready = false
 			TournamentModeSettings[ReadiedTeamNum].lastready = Shared.GetTime()
 		else
@@ -161,7 +163,7 @@ local function DisplayReadiedTeamAlertMessages(ReadiedTeamNum)
 				timeremaining = (timeremaining / 60)
 				unit = "minutes"
 			end
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeForfeitWarning"), notreadyteamname, timeremaining, unit))
+			SendAllClientsMessage("TournamentModeForfeitWarning", false, notreadyteamname, timeremaining, unit)
 		end
 	end
 end
@@ -177,7 +179,7 @@ local function MonitorCountDown()
 					DisplayReadiedTeamAlertMessages(2)
 				end
 			else
-				SendAllClientsMessage(GetNSLMessage("TournamentModeReadyAlert"))
+				SendAllClientsMessage("TournamentModeReadyAlert", false)
 			end
 			TournamentModeSettings.lastmessage = Shared.GetTime()
 		end
@@ -226,12 +228,12 @@ local function OnCommandForceStartRound(client, duration)
 		CheckGameCountdownStart()
 		TournamentModeSettings.countdownstarttime = Shared.GetTime() + duration
 		TournamentModeSettings.countdownstartcount = duration
-		ServerAdminPrint(client, "Forcing game start.")
+		SendClientServerAdminMessage(client, "FORCE_GAME_START")
 	end
 end
 
 Event.Hook("Console_sv_nslforcestart", OnCommandForceStartRound)
-RegisterNSLHelpMessageForCommand("sv_nslforcestart: <seconds> - Will force the game start countdown to start in the provided amount of seconds, or 15 if blank.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLFORCESTART", true)
 
 local function OnCommandCancelRoundStart(client)
 	if not client then return end
@@ -239,12 +241,12 @@ local function OnCommandCancelRoundStart(client)
 	if GetIsNSLRef(NS2ID) then
 		CheckCancelGameStart()
 		ClearTournamentModeState()
-		ServerAdminPrint(client, "Cancelling countdown in progress.")
+		SendClientServerAdminMessage(client, "FORCE_GAME_START_ABORT")
 	end
 end
 
 Event.Hook("Console_sv_nslcancelstart", OnCommandCancelRoundStart)
-RegisterNSLHelpMessageForCommand("sv_nslcancelstart: Will cancel a game start countdown currently in progress.", true)
+RegisterNSLHelpMessageForCommand("SV_NSLCANCELSTART", true)
 
 local function ClientReady(client)
 
@@ -267,11 +269,11 @@ local function ClientReady(client)
 			end
 		end
 		if (not team1Commander and teamnum == 1 and team1CommanderRequired) or (not team2Commander and teamnum == 2 and team2CommanderRequired) then
-			SendTeamMessage(teamnum, GetNSLMessage("TournamentModeReadyNoComm"))
+			NSLSendTeamMessage(teamnum, "TournamentModeReadyNoComm", false)
 		elseif TournamentModeSettings[teamnum].lastready + 2 < Shared.GetTime() then
 			TournamentModeSettings[teamnum].ready = not TournamentModeSettings[teamnum].ready
 			TournamentModeSettings[teamnum].lastready = Shared.GetTime()
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeTeamReady"), playername, ConditionalValue(TournamentModeSettings[teamnum].ready, "readied", "unreadied"), GetActualTeamName(teamnum)))
+			SendAllClientsMessage("TournamentModeTeamReady", false, playername, ConditionalValue(TournamentModeSettings[teamnum].ready, "readied", "unreadied"), GetActualTeamName(teamnum))
 			CheckGameCountdownStart()
 		end	
 	end
@@ -288,7 +290,10 @@ local function CheckforInProgressGameToCancel(client, gamerules)
 		local teamnum = player:GetTeamNumber()
 		if (teamnum == 1 or teamnum == 2) then
 			gamerules:SetTeamsReady(false)
-			SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeStartedGameCancelled"), playername, GetActualTeamName(teamnum)))
+			SendAllClientsMessage("TournamentModeStartedGameCancelled", false, playername, GetActualTeamName(teamnum))
+			if GetIsGamePaused() then
+				NSLTriggerUnpause()
+			end
 		end
 	end
 end
@@ -305,7 +310,7 @@ local function OnCommandReady(client)
 end
 
 Event.Hook("Console_ready", OnCommandReady)
-RegisterNSLHelpMessageForCommand("ready: Marks your team as ready to begin the game.", false)
+RegisterNSLHelpMessageForCommand("CMD_READY", false)
 gChatCommands["ready"] = OnCommandReady
 gChatCommands["!ready"] = OnCommandReady
 gChatCommands["rdy"] = OnCommandReady
@@ -318,7 +323,7 @@ local function ClientNotReady(client)
 	if (teamnum == 1 or teamnum == 2) and TournamentModeSettings[teamnum].ready then
 		TournamentModeSettings[teamnum].ready = false
 		TournamentModeSettings[teamnum].lastready = Shared.GetTime()
-		SendAllClientsMessage(string.format(GetNSLMessage("TournamentModeTeamReady"), playername, "unreadied", GetActualTeamName(teamnum)))
+		SendAllClientsMessage("TournamentModeTeamReady", false, playername, "unreadied", GetActualTeamName(teamnum))
 	end
 	if TournamentModeSettings[1].ready == false or TournamentModeSettings[2].ready == false then
 		CheckCancelGameStart()
@@ -338,13 +343,13 @@ local function OnCommandNotReady(client)
 end
 
 Event.Hook("Console_notready", OnCommandNotReady)
-RegisterNSLHelpMessageForCommand("notready: Marks your team as not ready to begin the game.", false)
+RegisterNSLHelpMessageForCommand("CMD_NOTREADY", false)
 gChatCommands["notready"] = OnCommandNotReady
 gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady
 
 local function UpdateTournamentMode(newState)
-	if newState == "PCW" or newState == "OFFICIAL" or newState == "GATHER" then
+	if not newState == kNSLPluginConfigs.DISABLED then
 		GetGamerules():OnTournamentModeEnabled()
 		GetGameInfoEntity():SetTournamentMode(true)
 	else
