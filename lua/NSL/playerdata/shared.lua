@@ -5,7 +5,6 @@
 
 local kMaxNSLNicknameLength = 70
 local kMaxNSLTeamnameLength = 70
-local kMaxNSLLeagueName = 20
 local kMaxNSLRank = 10
 
 local oldPlayerInfoEntityOnCreate
@@ -17,7 +16,6 @@ oldPlayerInfoEntityOnCreate = Class_ReplaceMethod("PlayerInfoEntity", "OnCreate"
 		self.NSL_NICK = ""
 		self.NSL_Team = ""
 		self.NSL_Rank = 0
-		self.NSL_League = ""
 	end
 )
 
@@ -52,7 +50,7 @@ function PlayerInfoEntity:GetNSLData()
 				NSL_NICK = self.NSL_NICK,
 				NSL_Team = self.NSL_Team,
 				NSL_Rank = self.NSL_Rank,
-				NSL_League = self.NSL_League
+				NSL_League = ""
 			}
 end
 
@@ -63,7 +61,6 @@ function PlayerInfoEntity:SetupNSLData(nsldata)
 		self.NSL_NICK = nsldata.NICK or ""
 		self.NSL_Team = nsldata.NSL_Team or ""
 		self.NSL_Rank = tonumber(nsldata.NSL_Rank) or 0
-		self.NSL_League = GetActiveLeague()
 	end
 end
 
@@ -72,6 +69,5 @@ Class_Reload( "PlayerInfoEntity", {
 									NSL_TID = "integer",
 									NSL_NICK = string.format("string (%d)", kMaxNSLNicknameLength ),
 									NSL_Team = string.format("string (%d)", kMaxNSLTeamnameLength ),
-									NSL_League = string.format("string (%d)", kMaxNSLLeagueName ),
 									NSL_Rank = string.format("integer (0 to %d)", kMaxNSLRank)
 									} )
