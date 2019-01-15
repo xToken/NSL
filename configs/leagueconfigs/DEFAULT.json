@@ -90,7 +90,13 @@
 																									"team":             "both",
 																									"enemyspawns":      ["Fabrication"],
 																									"weight": 1
-																								}    
+																								},
+																								{
+																									"name":             "Fabrication",
+																									"team":             "both",
+																									"enemyspawns":      ["Drone Bay"],
+																									"weight": 1
+																								}   
 																							]
 																}
 															]

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1-15-19 (Build 110)
+- Added language system, based on clients locale
+- All messages can be translated by the language system
+- Restructured configs to have 1 config per league
+- Fixed 're' during a pause leaving the game as paused after the reset.
+
 ## 1-7-19 (Build 108)
 - Changed SpectatorTechMaps to hook vanilla techmap system, this should ensure compatibility with ProGMod tech trees
 

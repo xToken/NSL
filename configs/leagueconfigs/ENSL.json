@@ -120,6 +120,12 @@
 																									"enemyspawns":      ["Data Core"],
 																									"weight": 1
 																								},
+																								{
+																									"name":             "Data Core",
+																									"team":             "both",
+																									"enemyspawns":      ["Flight Control"],
+																									"weight": 1
+																								}
 																							]
 																}
 															],
@@ -133,7 +139,13 @@
 																									"team":             "both",
 																									"enemyspawns":      ["Fabrication"],
 																									"weight": 1
-																								}    
+																								},
+																								{
+																									"name":             "Fabrication",
+																									"team":             "both",
+																									"enemyspawns":      ["Drone Bay"],
+																									"weight": 1
+																								}
 																							]
 																}
 															]
