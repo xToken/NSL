@@ -9,6 +9,7 @@ local C = { }
 local recursiveLimit = 3
 local sleepDetections = 0
 local funcNameMin = 2
+local kReportedLUAFiles
 
 --Waaaay to much is whitelisted here, really this would only pick up lazy hooks at this point, value probably doesnt justify the complexity.
 local excludeFuncs = { 	"SendKeyEvent", "UpdateGhostGuides", "OnInitLocalClient", "GetGameStarted", "GetIsPlaying", "kMinTimeBeforeConcede", "PlayerUI_GetWeaponLevel",
@@ -165,6 +166,15 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 end
 
 local function UpdateNSLMonitoredFields()
+	if not kReportedLUAFiles then
+		local entryFiles = {}
+		local luaFiles = {}
+    	Shared.GetMatchingFileNames("lua/entry/*.entry", false, entryFiles)
+    	Shared.GetMatchingFileNames("lua/*.lua", false, luaFiles)
+		Client.SendNetworkMessage("ClientFunctionReport", {detectionType = "LuaFilesPreset", detectionValue = #luaFiles}, true)
+		Client.SendNetworkMessage("ClientFunctionReport", {detectionType = "EntryFilesPreset", detectionValue = #entryFiles}, true)
+		kReportedLUAFiles = true
+	end
 end
 
 local oldScriptLoad = Script.Load
