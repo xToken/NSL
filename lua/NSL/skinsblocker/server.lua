@@ -29,3 +29,13 @@ end
 function Alien:GetIgnoreVariantModels()
     return GetNSLConfigValue("UseDefaultSkins")
 end
+
+function GameInfo:SetTeamSkin( teamIndex, skinIndex )
+	if not GetNSLConfigValue("UseDefaultSkins") then
+	    if teamIndex == kTeam1Index then
+	        self.team1Skin = skinIndex
+	    elseif teamIndex == kTeam2Index then
+	        self.team2Skin = skinIndex
+	    end
+	end
+end
