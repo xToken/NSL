@@ -41,7 +41,7 @@ if Server then
 
     function LOSMixin:PeriodicUpdate()
         self:SharedUpdate()
-        return self:GetIsAlive()
+        return self.GetIsAlive and self:GetIsAlive() or true
     end
 
     function LOSMixin:SharedUpdate()

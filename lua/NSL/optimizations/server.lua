@@ -222,8 +222,13 @@ end
 local kDetectInterval = 0.5
 local kDrifterSelfOrderTime = 2
 
-local ScanForNearbyEnemy = GetNSLUpValue(Drifter.OnUpdate, "ScanForNearbyEnemy")
-local UpdateTasks = GetNSLUpValue(Drifter.OnUpdate, "UpdateTasks")
+local DrifterOnUpdate = Drifter.OnUpdate
+if GetOldDrifterOnUpdateHook then
+    DrifterOnUpdate = GetOldDrifterOnUpdateHook()
+end
+
+local ScanForNearbyEnemy = GetNSLUpValue(DrifterOnUpdate, "ScanForNearbyEnemy")
+local UpdateTasks = GetNSLUpValue(DrifterOnUpdate, "UpdateTasks")
 local FindTask = GetNSLUpValue(UpdateTasks, "FindTask")
 local kDrifterSelfOrderRange = GetNSLUpValue(FindTask, "kDrifterSelfOrderRange")
 
@@ -250,7 +255,7 @@ originalDrifterOnCreate = Class_ReplaceMethod("Drifter", "OnCreate",
     end
 )
 
-ReplaceLocals(Drifter.OnUpdate, {ScanForNearbyEnemy = (function() end)})
+ReplaceLocals(DrifterOnUpdate, {ScanForNearbyEnemy = (function() end)})
 ReplaceLocals(UpdateTasks, {FindTask = (function() end)})
 
 function Drifter:OnOrderGiven(order)
