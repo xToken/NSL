@@ -1,6 +1,6 @@
 # Changelog
 
-## 1-15-19 (Build 112)
+## 1-28-19 (Build 112)
 - Adjusted all console commands to use default admin commands hooks - Refs are still given access to 'league' based commands.  No change in overall functionality
 - Added 'Optimizations' module which reconfigures sleep mixin to actually completely turn off entity updates - various mixin and other tweaks to support this
 - Added 'Captains' mode to NSL mod, allows for picking captains and then those captains picking teams.  Currently uses chat/console commands only!
