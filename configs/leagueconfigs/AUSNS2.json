@@ -1,5 +1,5 @@
 {
-"Version": 3.0,
+"Version": 3.1,
 "LeagueName": 							"AusNS2",
 "PlayerDataURL": 						"http://ausns2.org/league-api.php?lookup=player&steamid=",
 "PlayerDataFormat":						"AUSNS",
@@ -34,6 +34,10 @@
 "Limit6PlayerPerTeam": 					false,
 "MercsRequireApproval": 				false,
 "OverrideTeamNames": 					false,
+"CaptainsVotingDuration":				60,
+"CaptainsSelectionTimeAllowed":			30,
+"CaptainsMapVoteTimeAllowed":			60,
+"CaptainsAlertDelay":					30,
 "GATHER": 								{
 											"OverrideTeamNames": 					false
 										},

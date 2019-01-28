@@ -32,7 +32,7 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
 		
 		if Server then
 			self.nslconfig = GetNSLMode()
-			self.league = string.sub(GetActiveLeague(), 1, kMaxLeagueNameLength) 
+			self.league = string.sub(GetNSLConfigValue("LeagueName"), 1, kMaxLeagueNameLength) 
 			self.team1name = kTeam1Name
 			self.team2name = kTeam2Name
 			self.team1score = 0

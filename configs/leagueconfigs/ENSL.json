@@ -1,5 +1,5 @@
 {
-"Version": 3.0,
+"Version": 3.1,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
@@ -34,6 +34,10 @@
 "Limit6PlayerPerTeam": 					false,
 "MercsRequireApproval": 				false,
 "OverrideTeamNames": 					false,
+"CaptainsVotingDuration":				60,
+"CaptainsSelectionTimeAllowed":			30,
+"CaptainsMapVoteTimeAllowed":			60,
+"CaptainsAlertDelay":					30,
 "GATHER": 								{
 											"OverrideTeamNames": 					false
 										},
