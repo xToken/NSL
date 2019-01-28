@@ -5,19 +5,21 @@
 
 --Pause
 local gamestate = {
-serverpauseloopenabled = false,
-serverprepauseloopenabled = false,
-gamepaused = false,
-gamepausedtime = 0,
-gamepausedcountdown = 0,
-gamepausedmessagetime = 0,
-gamepausingteam = 0,
-gamepausedscoreupdate = 0,
-teampauses = { },
-team1resume = false, 
-team2resume = false,
-gamepauseddelta = 0,
-gameprepausedelta = 0
+	serverpauseloopenabled = false,
+	serverprepauseloopenabled = false,
+	gamepaused = false,
+	gamepausedtime = 0,
+	gamepausedcountdown = 0,
+	gamepausedmessagetime = 0,
+	gamepausingteam = 0,
+	gamepausedscoreupdate = 0,
+	teampauses = { },
+	team1resume = false,
+	team1lastresume = 0,
+	team2resume = false,
+	team2lastresume = 0,
+	gamepauseddelta = 0,
+	gameprepausedelta = 0
 }
 
 local function GetDamageOverTimeIsEnabled(self)
@@ -181,22 +183,24 @@ local function UpdatePausesOnGameEnd(self, winningteam)
 	if GetNSLModEnabled() then
 		gamestate.team1resume = false
 		gamestate.team2resume = false
+		gamestate.team1lastresume = 0
+		gamestate.team2lastresume = 0
 		--Check pause and copy?
 		local alienpauses = 0
 		local marinepauses = 0
-		if gamestate.teampauses["Aliens"] and gamestate.teampauses["Aliens"] > 0 then
-			alienpauses = gamestate.teampauses["Aliens"]
+		if gamestate.teampauses[kTeam2Name] and gamestate.teampauses[kTeam2Name] > 0 then
+			alienpauses = gamestate.teampauses[kTeam2Name]
 		end
-		if gamestate.teampauses["Marines"] and gamestate.teampauses["Marines"] > 0 then
-			marinepauses = gamestate.teampauses["Marines"]
+		if gamestate.teampauses[kTeam1Name] and gamestate.teampauses[kTeam1Name] > 0 then
+			marinepauses = gamestate.teampauses[kTeam1Name]
 		end
-		gamestate.teampauses["Marines"] = 0
-		gamestate.teampauses["Aliens"] = 0
+		gamestate.teampauses[kTeam1Name] = 0
+		gamestate.teampauses[kTeam2Name] = 0
 		if alienpauses > 0 then
-			gamestate.teampauses["Marines"] = alienpauses
+			gamestate.teampauses[kTeam1Name] = alienpauses
 		end
 		if marinepauses > 0 then
-			gamestate.teampauses["Aliens"] = marinepauses
+			gamestate.teampauses[kTeam2Name] = marinepauses
 		end
 	end
 end
@@ -453,6 +457,8 @@ local function OnCommandPause(client)
 				if validpause then
 					gamestate.team1resume = false
 					gamestate.team2resume = false
+					gamestate.team1lastresume = 0
+					gamestate.team2lastresume = 0
 					gamestate.gamepausedcountdown = GetNSLConfigValue("PauseStartDelay")
 					gamestate.gamepausingteam = teamnumber
 					gamestate.serverprepauseloopenabled = true
@@ -479,6 +485,8 @@ function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 			if validpause or forcePause then
 				gamestate.team1resume = false
 				gamestate.team2resume = false
+				gamestate.team1lastresume = 0
+				gamestate.team2lastresume = 0
 				gamestate.gamepausedcountdown = pauseDelay
 				gamestate.gamepausingteam = pausingTeam
 				gamestate.serverprepauseloopenabled = true
@@ -501,11 +509,14 @@ local function OnCommandUnPause(client)
 		local player = client:GetControllingPlayer()
 		if player ~= nil  and GetIsGamePaused() then
 			local teamnumber = player:GetTeamNumber()
-			if teamnumber and ValidateTeamNumber(teamnumber) then
+			local lastPause = teamnumber == 1 and gamestate.team1lastresume or gamestate.team2lastresume
+			if teamnumber and ValidateTeamNumber(teamnumber) and lastPause + 2 < Shared.GetTime() then
 				if teamnumber == 1 then
 					gamestate.team1resume = not gamestate.team1resume
+					gamestate.team1lastresume = Shared.GetTime()
 				else
 					gamestate.team2resume = not gamestate.team2resume
+					gamestate.team2lastresume = Shared.GetTime()
 				end
 				if gamestate.team2resume and not gamestate.team1resume then
 					SendAllClientsMessage("PauseTeamReadyMessage", false, player:GetName(), GetActualTeamName(2), GetActualTeamName(1))
@@ -541,6 +552,8 @@ local function OnCommandAdminPause(client)
 					gamestate.serverprepauseloopenabled = true
 					gamestate.team1resume = false
 					gamestate.team2resume = false
+					gamestate.team1lastresume = 0
+					gamestate.team2lastresume = 0
 					gamestate.gamepausedcountdown = ConditionalValue(GetIsGamePaused(), GetNSLConfigValue("PauseEndDelay"), GetNSLConfigValue("PauseStartDelay"))
 				else
 					gamestate.serverprepauseloopenabled = false
@@ -561,6 +574,8 @@ function NSLTriggerUnpause()
 			gamestate.serverprepauseloopenabled = true
 			gamestate.team1resume = false
 			gamestate.team2resume = false
+			gamestate.team1lastresume = 0
+			gamestate.team2lastresume = 0
 			gamestate.gamepausedcountdown = 1
 		end
 	end
