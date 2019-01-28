@@ -25,19 +25,29 @@ function InsightUI_GetTeam2Name()
     return gameInfo and gameInfo:GetTeam2Name() or kTeam2Name
 end
 
+function InsightUI_GetTeam1Score()
+    local gameInfo = GetGameInfoEntity()
+    return gameInfo and gameInfo:GetTeam1Score() or 0
+end
+
+function InsightUI_GetTeam2Score()
+    local gameInfo = GetGameInfoEntity()
+    return gameInfo and gameInfo:GetTeam2Score() or 0
+end
+
 local function UpdateGUIScoreboardTeamCache(gameInfo)
 	local script = ClientUI.GetScript("GUIScoreboard")
     if script then
 		if not script.cachedTeamNames then
 			script.cachedTeamNames = { }
 		end
-        script.cachedTeamNames[1] = gameInfo.team1name
-		script.cachedTeamNames[2] = gameInfo.team2name
+        script.cachedTeamNames[1] = gameInfo:GetTeam1Name()
+		script.cachedTeamNames[2] = gameInfo:GetTeam2Name()
     end
 	local topBar = GetGUIManager():GetGUIScriptSingle("GUIInsight_TopBar")
     if topBar then
-        topBar:SetTeams(gameInfo.team1name, gameInfo.team2name)
-		topBar:SetScore(gameInfo.team1score, gameInfo.team2score)
+        topBar:SetTeams(gameInfo:GetTeam1Name(), gameInfo:GetTeam2Name())
+		topBar:SetScore(gameInfo:GetTeam1Score(), gameInfo:GetTeam2Score())
     end
 end
 
