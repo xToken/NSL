@@ -34,6 +34,12 @@
 "Limit6PlayerPerTeam": 					false,
 "MercsRequireApproval": 				false,
 "OverrideTeamNames": 					true,
+"CaptainsVotingDuration":				60,
+"CaptainsVotingPercentRequired":		0.66,
+"CaptainsVotingTimeAllowed":			60,
+"CaptainsSelectionTimeAllowed":			120,
+"CaptainsMapVoteTimeAllowed":			60,
+"CaptainsAlertDelay":					25,
 "GATHER": 								{
 											"OverrideTeamNames": 					false
 										},
