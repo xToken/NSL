@@ -4,10 +4,11 @@
 -- - Dragon
 
 -- NSL shared references
-kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL'} )
+kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL', 'CAPTAINS'} )
+kNSLCaptainsStates = enum( {'REGISTRATION', 'VOTING', 'SELECTING', 'ROUND1', 'ROUND2', 'MAPVOTE'})
 
 -- For reference
-kNSLPluginBuild = 110
+kNSLPluginBuild = 112
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")
@@ -15,6 +16,7 @@ Script.Load("lua/NSL/nsl_utilities.lua")
 Script.Load("lua/NSL/handicap/shared.lua")
 Script.Load("lua/NSL/heartbeat/shared.lua")
 Script.Load("lua/NSL/gameinfo/shared.lua")
+Script.Load("lua/NSL/optimizations/shared.lua")
 Script.Load("lua/NSL/pause/shared.lua")
 Script.Load("lua/NSL/playerdata/shared.lua")
 Script.Load("lua/NSL/spectator_techtree/shared.lua")

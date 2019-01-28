@@ -16,7 +16,8 @@ local networkVars =
 	team2score = "integer (0 to 10)",
 	teamupdates = "integer (0 to 9)",
 	heartbeat = "boolean",
-	tournamentMode = "boolean"
+	tournamentMode = "boolean",
+	captainsstate = "enum kNSLCaptainsStates"
 }
 
 local function ApplyClientCFGInitialUpdate(self)
@@ -39,6 +40,7 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
 			self.teamupdates = 0
 			self.heartbeat = false
 			self.tournamentMode = GetNSLModEnabled()
+			self.captainsstate = 1 -- GetNSLCaptainsState()
 		end
 		
 		if Client then
@@ -98,6 +100,10 @@ function GameInfo:GetTournamentMode()
     return self.tournamentMode
 end
 
+function GameInfo:GetNSLCaptainsState()
+	return self.captainsstate
+end
+
 if Server then
 
 	function GameInfo:SetNSLConfig(cfg)
@@ -135,6 +141,10 @@ if Server then
 	function GameInfo:SetTournamentMode(tM)
         self.tournamentMode = tM
     end
+
+    function GameInfo:SetNSLCaptainsState(newState)
+		self.captainsstate = newState
+	end
 
 end
 

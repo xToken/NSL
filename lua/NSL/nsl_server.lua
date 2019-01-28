@@ -12,6 +12,7 @@ Script.Load("lua/NSL/config/server.lua")
 
 -- Load remaining server defs
 Script.Load("lua/NSL/admincommands/server.lua")
+Script.Load("lua/NSL/captains/server.lua")
 Script.Load("lua/NSL/coinflip/server.lua")
 --Script.Load("lua/NSL/consistencychecks/server.lua") -- Loaded by filereplace
 Script.Load("lua/NSL/customspawns/server.lua")
@@ -20,6 +21,7 @@ Script.Load("lua/NSL/firstpersonspecblock/server.lua")
 Script.Load("lua/NSL/handicap/server.lua")
 Script.Load("lua/NSL/heartbeat/server.lua")
 Script.Load("lua/NSL/messages/server.lua")
+Script.Load("lua/NSL/optimizations/server.lua")
 Script.Load("lua/NSL/pause/server.lua")
 Script.Load("lua/NSL/playerdata/server.lua")
 Script.Load("lua/NSL/serversettings/server.lua")

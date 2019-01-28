@@ -72,13 +72,16 @@ Event.Hook("Console_sv_nslhelp", OnClientCommandNSLHelp)
 
 local function UpdateNSLMode(client, mode)
 	mode = mode or ""
-	if string.lower(mode) == "gather" then
+	local currentMode = GetNSLMode()
+	if string.lower(mode) == "gather" and currentMode ~= kNSLPluginConfigs.GATHER then
 		SetNSLMode(kNSLPluginConfigs.GATHER)
-	elseif string.lower(mode) == "pcw" then
+	elseif string.lower(mode) == "pcw" and currentMode ~= kNSLPluginConfigs.PCW then
 		SetNSLMode(kNSLPluginConfigs.PCW)
-	elseif string.lower(mode) == "official" then
+	elseif string.lower(mode) == "official" and currentMode ~= kNSLPluginConfigs.OFFICIAL then
 		SetNSLMode(kNSLPluginConfigs.OFFICIAL)
-	elseif string.lower(mode) == "disabled" then
+	--elseif string.lower(mode) == "captains" and currentMode ~= kNSLPluginConfigs.CAPTAINS then
+		--SetNSLMode(kNSLPluginConfigs.CAPTAINS)
+	elseif string.lower(mode) == "disabled" and currentMode ~= kNSLPluginConfigs.DISABLED then
 		SetNSLMode(kNSLPluginConfigs.DISABLED)
 	else
 		SendClientServerAdminMessage(client, "NSL_MODE_CURRENT", EnumToString(kNSLPluginConfigs, GetNSLMode()))
@@ -126,6 +129,16 @@ local function UpdateNSLPerfConfigAccess(client)
 	end
 end
 
+local function UpdateNSLCaptainsLimit(client, limit)
+	limit = tonumber(limit)
+	if limit and limit >= 5 and limit <= 12 then
+		SetNSLCaptainsLimit(limit)
+		SendClientServerAdminMessage(client, "NSL_CAPTAINS_LIMIT_UPDATED", GetNSLCaptainsPlayerLimit())
+	else
+		SendClientServerAdminMessage(client, "NSL_CAPTAINS_LIMIT_CURRENT", GetNSLCaptainsPlayerLimit())
+	end
+end
+
 local ExecutionCache = { }
 local function ServerAdminOrNSLRefCommand(client, parameter, functor, admin)
 	local isRef
@@ -154,7 +167,7 @@ local function OnClientCommandSetMode(client, mode)
 end
 
 Event.Hook("Console_sv_nslcfg", OnClientCommandSetMode)
-CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official - Changes the configuration mode of the NSL plugin.")
+CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official,captains - Changes the configuration mode of the NSL plugin.")
 RegisterNSLHelpMessageForCommand("SV_NSLCFG", true)
 
 local function OnAdminCommandSetLeague(client, league)
@@ -204,3 +217,15 @@ end
 
 Event.Hook("Console_sv_nslpassword", OnCommandNSLPassword)
 RegisterNSLHelpMessageForCommand("SV_NSLPASSWORD", true)
+
+local function OnAdminCommandSetCaptainsLimit(client, limit)
+	ServerAdminOrNSLRefCommand(client, limit, UpdateNSLCaptainsLimit, true)
+end
+
+local function OnClientCommandSetCaptainsLimit(client, limit)
+	ServerAdminOrNSLRefCommand(client, limit, UpdateNSLCaptainsLimit, false)
+end
+
+Event.Hook("Console_sv_nslcaptainslimit", OnClientCommandSetCaptainsLimit)
+CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
+RegisterNSLHelpMessageForCommand("SV_NSLCAPTAINSLIMIT", true)

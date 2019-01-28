@@ -23,16 +23,20 @@ gLeagueChangeFunctions = { }
 gPlayerDataUpdatedFunctions = { }
 --TeamNames Updated Functions
 gTeamNamesUpdatedFunctions = { }
+--CanJoinTeam Functions
+gCanJoinTeamFunctions = { }
 --TeamJoin Functions
 gTeamJoinedFunctions = { }
 --Perf Values Loaded Functions
 gPerfLoadedFunctions = { }
 --NSL Help Messages (sv_nslhelp)
 gNSLHelpMessages = { }
+-- Captains Phase change
+gCaptainsStateChange = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
-		for i = 1, #gConnectFunctions do
+		for i = #gConnectFunctions, 1, -1 do
 			gConnectFunctions[i](client)
 		end
 	end
@@ -42,7 +46,7 @@ Event.Hook("ClientConnect", OnClientConnected)
 
 local function OnClientDisconnect(client)    
     if GetNSLModEnabled() then
-		for i = 1, #gDisconnectFunctions do
+		for i = #gDisconnectFunctions, 1, -1 do
 			gDisconnectFunctions[i](client)
 		end
 	end 
@@ -54,9 +58,32 @@ local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
 	function(self, winningTeam)
 		originalNS2GameRulesEndGame(self, winningTeam)
-		for i = 1, #gGameEndFunctions do
+		for i = #gGameEndFunctions, 1, -1 do
 			gGameEndFunctions[i](self, winningTeam)
 		end
+	end
+)
+
+local originalNS2GRJoinTeam
+originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam", 
+	function(self, player, newTeamNumber, force)
+		local success, newPlayer = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
+		if success then
+			for i = #gTeamJoinedFunctions, 1, -1 do
+				gTeamJoinedFunctions[i](self, newPlayer, newTeamNumber)
+			end
+		end
+		return success, newPlayer
+	end
+)
+
+local originalNS2GameRulesGetCanJoinTeamNumber
+originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
+	function(self, player, teamNumber)
+		for i = #gCanJoinTeamFunctions, 1, -1 do
+			if not gCanJoinTeamFunctions[i](self, player, teamNumber) then return false end
+		end
+		return originalNS2GameRulesGetCanJoinTeamNumber(self, player, teamNumber)
 	end
 )
 
@@ -79,13 +106,13 @@ function ProcessSayCommand(player, command)
 end
 
 function EstablishConfigDependantSettings(configLoaded)
-	for i = 1, #gConfigLoadedFunctions do
+	for i = #gConfigLoadedFunctions, 1, -1 do
 		gConfigLoadedFunctions[i](configLoaded)
 	end
 end
 
 function ApplyPerfDependantSettings()
-	for i = 1, #gPerfLoadedFunctions do
+	for i = #gPerfLoadedFunctions, 1, -1 do
 		gPerfLoadedFunctions[i]()
 	end
 end
@@ -120,7 +147,16 @@ end
 
 local function OnUpdateLeagueName(newLeagueName)
 	local gameInfo = GetGameInfoEntity()
-	if not gameInfo then return end
-	GetGameInfoEntity():SetLeagueName(newLeagueName)
+	if gameInfo then
+		gameInfo:SetLeagueName(newLeagueName)
+	end
 end
 table.insert(gLeagueChangeFunctions, OnUpdateLeagueName)
+
+local function OnUpdateCaptainsState(newState)
+	local gameInfo = GetGameInfoEntity()
+	if gameInfo then
+		gameInfo:SetNSLCaptainsState(newState)
+	end
+end
+table.insert(gCaptainsStateChange, OnUpdateCaptainsState)

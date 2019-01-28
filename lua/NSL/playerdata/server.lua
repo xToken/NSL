@@ -42,7 +42,6 @@ function GetNSLUserData(ns2id)
 	else
 		return NSL_ClientData[ns2id]
 	end
-	return nil
 end
 
 local function GetGameIDMatchingNS2ID(ns2id)
@@ -59,13 +58,14 @@ local function GetPlayerMatchingNS2Id(ns2id)
 	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
     for p = 1, #playerList do
         local playerClient = Server.GetOwner(playerList[p])
-        if playerClient and playerClient:GetUserId() == tonumber(ns2id) then
+        if playerClient and playerClient:GetUserId() == ns2id then
             return playerList[p]
 		end
 	end
 end
 
 local function GetPlayerMatchingGameID(gID)
+	gID = tonumber(gID)
 	local targetNS2ID = G_IDTable[gID]
 	if targetNS2ID then
 		return GetPlayerMatchingNS2Id(targetNS2ID)
@@ -75,14 +75,14 @@ end
 local function GetPlayerMatchingName(name)
 	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
     for p = 1, #playerList do
-        if playerList[p]:GetName() == name then
+        if string.lower(playerList[p]:GetName()) == string.lower(name) then
 			return playerList[p]
 		end
 	end
 end
 
-function GetPlayerMatching(id)
-    return GetPlayerMatchingGameID(gID) or GetPlayerMatchingNS2Id(id) or GetPlayerMatchingName(id)
+function NSLGetPlayerMatching(id)
+    return GetPlayerMatchingGameID(id) or GetPlayerMatchingNS2Id(id) or GetPlayerMatchingName(id)
 end
 
 local function GetRefBadgeforID(ns2id)
@@ -409,7 +409,7 @@ RegisterNSLHelpMessageForCommand("SV_NSLTSAY", true)
 local function OnClientCommandPlayerChat(client, target, ...)
 	if not client then return end
 	local NS2ID = client:GetUserId()
-	local player = GetPlayerMatching(target)
+	local player = NSLGetPlayerMatching(target)
 	if GetIsNSLRef(NS2ID) and player then
 		local ns2data = GetNSLUserData(NS2ID)
 		local message = ""
@@ -448,7 +448,7 @@ local function OnClientCommandShowFunctionData(client, target)
 	local NS2ID = client:GetUserId()
 	local heading = false
 	if GetIsNSLAdmin(NS2ID) then
-		local targetPlayer = GetPlayerMatching(target)
+		local targetPlayer = NSLGetPlayerMatching(target)
 		local targetClient
 		if targetPlayer then
 			targetClient = Server.GetOwner(targetPlayer)

@@ -23,6 +23,7 @@ local NSL_ServerCommands = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
 local NSL_DefaultPerfCaptured = false
+local NSL_CaptainsPlayerLimit = 6
 local kNSLMaxConfigRetries = 2
 local cachedScoresValidFor = 10 * 60
 local queryLeague = { "DEFAULT" }
@@ -55,17 +56,21 @@ function GetNSLPerfConfigsBlocked()
 	return NSL_PerfConfigsBlocked
 end
 
+function GetNSLCaptainsPlayerLimit()
+	return NSL_CaptainsPlayerLimit
+end
+
 function RegisterNSLServerCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed, nslAdminCommand)
 	NSL_ServerCommands[string.gsub(commandName, "Console_", "")] = nslAdminCommand or false
 	CreateServerAdminCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed)
 end
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked, captainsplayerlimit = NSL_CaptainsPlayerLimit })
 end
 
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "ENSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false }
+	local defaultConfig = { mode = "PCW", league = "ENSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false, captainsplayerlimit = 6 }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = type(config.mode) == "number" and config.mode or kNSLPluginConfigs.PCW
@@ -78,6 +83,7 @@ local function LoadConfig()
 	NSL_PerfLevel = config.perf or "DEFAULT"
 	NSL_LeagueAdminsAccess = config.adminaccess or false
 	NSL_PerfConfigsBlocked = config.perfconfigsblocked or false
+	NSL_CaptainsPlayerLimit = config.captainsplayerlimit or 6
 	local loadedScores = config.recentgames or { }
 	local updated = false
 	for t, s in pairs(loadedScores) do
@@ -142,6 +148,13 @@ function SetNSLPerfConfigAccess(state)
 	end
 	if NSL_PerfConfigsBlocked then
 		SetPerfLevel("DEFAULT")
+	end
+end
+
+function SetNSLCaptainsLimit(limit)
+	if NSL_CaptainsPlayerLimit ~= limit then
+		NSL_CaptainsPlayerLimit = limit
+		SavePluginConfig()
 	end
 end
 
