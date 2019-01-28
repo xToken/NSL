@@ -228,7 +228,7 @@ local function SetTeamSpawns(client, ...)
 				local team1Spawn = spawns[1]
 				local team2Spawn = spawns[2]
 					
-				if string.find(ToString(spawns), ",") then
+				if string.find(ToString(spawns), ",") and team2Spawn and team2Spawn ~= "" then
 					team2Spawn = StringTrim(team2Spawn)
 				end
 				
