@@ -134,8 +134,6 @@ if Client then
 				self._renderModel = Client.CreateRenderModel(RenderScene.Zone_Default)
 				self._renderMaterial = Client.CreateRenderMaterial()
 				self._renderModel:SetModel(kNSLDecalModel)
-				Print(ToString(GetDecalNameforTeamId(self.decal_name)))
-				Print(self.decal_name)
 				self._renderMaterial:SetMaterial(GetDecalNameforTeamId(self.decal_name))
 				self._renderModel:AddMaterial(self._renderMaterial)
 				local coords = self:GetCoords()
