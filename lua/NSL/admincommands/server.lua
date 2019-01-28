@@ -68,7 +68,7 @@ local function OnClientCommandNSLHelp(client)
 	end
 end
 
-Event.Hook("Console_sv_nslhelp", OnClientCommandNSLHelp)
+RegisterNSLConsoleCommand("sv_nslhelp", OnClientCommandNSLHelp, "SV_NSLHELP", true)
 
 local function UpdateNSLMode(client, mode)
 	mode = mode or ""
@@ -79,8 +79,8 @@ local function UpdateNSLMode(client, mode)
 		SetNSLMode(kNSLPluginConfigs.PCW)
 	elseif string.lower(mode) == "official" and currentMode ~= kNSLPluginConfigs.OFFICIAL then
 		SetNSLMode(kNSLPluginConfigs.OFFICIAL)
-	--elseif string.lower(mode) == "captains" and currentMode ~= kNSLPluginConfigs.CAPTAINS then
-		--SetNSLMode(kNSLPluginConfigs.CAPTAINS)
+	elseif string.lower(mode) == "captains" and currentMode ~= kNSLPluginConfigs.CAPTAINS then
+		SetNSLMode(kNSLPluginConfigs.CAPTAINS)
 	elseif string.lower(mode) == "disabled" and currentMode ~= kNSLPluginConfigs.DISABLED then
 		SetNSLMode(kNSLPluginConfigs.DISABLED)
 	else
@@ -90,6 +90,10 @@ local function UpdateNSLMode(client, mode)
 	SendClientServerAdminMessage(client, "NSL_MODE_UPDATED", EnumToString(kNSLPluginConfigs, GetNSLMode()))
 	SendClientServerAdminMessage(client, "NSL_MODE_UPDATED_SEASONS_NOTE")
 end
+
+RegisterNSLConsoleCommand("sv_nslcfg", UpdateNSLMode, "SV_NSLCFG")
+RegisterNSLHelpMessageForCommand("SV_NSLCFG", true)
+--CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official,captains - Changes the configuration mode of the NSL plugin.")
 
 local function UpdateNSLLeague(client, league)
 	league = string.upper(league or "")
@@ -101,6 +105,10 @@ local function UpdateNSLLeague(client, league)
 	end
 end
 
+CreateServerAdminCommand("Console_sv_nslconfig", UpdateNSLLeague, "Changes the league configuration used by the NSL mod.")
+--RegisterNSLConsoleCommand("sv_nslconfig", OnClientCommandSetLeague, "SV_NSLCONFIG")
+--RegisterNSLHelpMessageForCommand("SV_NSLCONFIG", true)
+
 local function UpdateNSLPerfConfig(client, perfcfg)
 	perfcfg = string.upper(perfcfg or "")
 	if GetPerfLevelValid(perfcfg) and not GetNSLPerfConfigsBlocked() then
@@ -111,6 +119,10 @@ local function UpdateNSLPerfConfig(client, perfcfg)
 	end
 end
 
+RegisterNSLConsoleCommand("sv_nslperfconfig", UpdateNSLPerfConfig, "SV_NSLPERFCONFIG")
+RegisterNSLHelpMessageForCommand("SV_NSLPERFCONFIG", true)
+--CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
+
 local function UpdateNSLLeagueAccess(client)
 	SetNSLAdminAccess(not GetNSLLeagueAdminsAccess())
 	if GetNSLLeagueAdminsAccess() then
@@ -120,6 +132,8 @@ local function UpdateNSLLeagueAccess(client)
 	end
 end
 
+CreateServerAdminCommand("Console_sv_nslleagueadmins", UpdateNSLLeagueAccess, "Toggles league staff having access to administrative commands on server.")
+
 local function UpdateNSLPerfConfigAccess(client)
 	SetNSLPerfConfigAccess(not GetNSLPerfConfigsBlocked())
 	if GetNSLPerfConfigsBlocked() then
@@ -128,6 +142,8 @@ local function UpdateNSLPerfConfigAccess(client)
 		SendClientServerAdminMessage(client, "NSL_PERF_CONFIGS_ALLOWED")
 	end
 end
+
+CreateServerAdminCommand("Console_sv_nslallowperfconfigs", UpdateNSLPerfConfigAccess, "Toggles league staff having access set performance configs.")
 
 local function UpdateNSLCaptainsLimit(client, limit)
 	limit = tonumber(limit)
@@ -139,72 +155,9 @@ local function UpdateNSLCaptainsLimit(client, limit)
 	end
 end
 
-local ExecutionCache = { }
-local function ServerAdminOrNSLRefCommand(client, parameter, functor, admin)
-	local isRef
-	local NS2ID = 0
-	if client then
-		NS2ID = client:GetUserId()
-		isRef = GetIsNSLRef(NS2ID)
-	end
-	if isRef or admin then
-		if not ExecutionCache[NS2ID] then
-			ExecutionCache[NS2ID] = { }
-		end
-		if (ExecutionCache[NS2ID][functor] and ExecutionCache[NS2ID][functor] or 0) < Shared.GetTime() then
-			functor(client, parameter)
-			ExecutionCache[NS2ID][functor] = Shared.GetTime() + 0.03
-		end
-	end
-end
-
-local function OnAdminCommandSetMode(client, mode)
-	ServerAdminOrNSLRefCommand(client, mode, UpdateNSLMode, true)
-end
-
-local function OnClientCommandSetMode(client, mode)
-	ServerAdminOrNSLRefCommand(client, mode, UpdateNSLMode, false)
-end
-
-Event.Hook("Console_sv_nslcfg", OnClientCommandSetMode)
-CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official,captains - Changes the configuration mode of the NSL plugin.")
-RegisterNSLHelpMessageForCommand("SV_NSLCFG", true)
-
-local function OnAdminCommandSetLeague(client, league)
-	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, true)
-end
-
-local function OnClientCommandSetLeague(client, league)
-	ServerAdminOrNSLRefCommand(client, league, UpdateNSLLeague, false)
-end
-
-Event.Hook("Console_sv_nslconfig", OnClientCommandSetLeague)
-CreateServerAdminCommand("Console_sv_nslconfig", OnAdminCommandSetLeague, "<league> - Changes the league configuration used by the NSL mod.")
-RegisterNSLHelpMessageForCommand("SV_NSLCONFIG", true)
-
-local function OnAdminCommandSetPerfConfig(client, perfcfg)
-	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, true)
-end
-
-local function OnClientCommandSetPerfConfig(client, perfcfg)
-	ServerAdminOrNSLRefCommand(client, perfcfg, UpdateNSLPerfConfig, false)
-end
-
-Event.Hook("Console_sv_nslperfconfig", OnClientCommandSetPerfConfig)
-CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
-RegisterNSLHelpMessageForCommand("SV_NSLPERFCONFIG", true)
-
-local function OnAdminCommandSetLeagueAccess(client)
-	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLLeagueAccess, true)
-end
-
-CreateServerAdminCommand("Console_sv_nslleagueadmins", OnAdminCommandSetLeagueAccess, "Toggles league staff having access to administrative commands on server.")
-
-local function OnAdminCommandSetPerfConfigAccess(client)
-	ServerAdminOrNSLRefCommand(client, nil, UpdateNSLPerfConfigAccess, true)
-end
-
-CreateServerAdminCommand("Console_sv_nslallowperfconfigs", OnAdminCommandSetPerfConfigAccess, "Toggles league staff having access set performance configs.")
+RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT")
+RegisterNSLHelpMessageForCommand("SV_NSLCAPTAINSLIMIT", true)
+--CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
 
 local function OnCommandNSLPassword(client, password)
 	if not client then return end
@@ -215,17 +168,5 @@ local function OnCommandNSLPassword(client, password)
 	end
 end
 
-Event.Hook("Console_sv_nslpassword", OnCommandNSLPassword)
+RegisterNSLConsoleCommand("sv_nslpassword", OnCommandNSLPassword, "SV_NSLPASSWORD")
 RegisterNSLHelpMessageForCommand("SV_NSLPASSWORD", true)
-
-local function OnAdminCommandSetCaptainsLimit(client, limit)
-	ServerAdminOrNSLRefCommand(client, limit, UpdateNSLCaptainsLimit, true)
-end
-
-local function OnClientCommandSetCaptainsLimit(client, limit)
-	ServerAdminOrNSLRefCommand(client, limit, UpdateNSLCaptainsLimit, false)
-end
-
-Event.Hook("Console_sv_nslcaptainslimit", OnClientCommandSetCaptainsLimit)
-CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
-RegisterNSLHelpMessageForCommand("SV_NSLCAPTAINSLIMIT", true)

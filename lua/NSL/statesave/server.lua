@@ -200,7 +200,7 @@ local function OnClientCommandEnablePauseTesting(client)
 	end
 end
 
-Event.Hook("Console_sv_nslpausedisconnect", OnClientCommandEnablePauseTesting)
+RegisterNSLConsoleCommand("sv_nslpausedisconnect", OnClientCommandEnablePauseTesting, "SV_NSLPAUSEDISCONNECT")
 RegisterNSLHelpMessageForCommand("SV_NSLPAUSEDISCONNECT", true)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
@@ -233,7 +233,7 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	end
 end
 
-Event.Hook("Console_sv_nslreplaceplayer", OnClientCommandForceReplacement)
+RegisterNSLConsoleCommand("sv_nslreplaceplayer", OnClientCommandForceReplacement, "SV_NSLREPLACEPLAYER")
 RegisterNSLHelpMessageForCommand("SV_NSLREPLACEPLAYER", true)
 
 local function OnClientCommandListCachedPlayers(client)
@@ -248,7 +248,7 @@ local function OnClientCommandListCachedPlayers(client)
 	end
 end
 
-Event.Hook("Console_sv_nsllistcachedplayers", OnClientCommandListCachedPlayers)
+RegisterNSLConsoleCommand("sv_nsllistcachedplayers", OnClientCommandListCachedPlayers, "SV_NSLLISTCACHEDPLAYERS")
 RegisterNSLHelpMessageForCommand("SV_NSLLISTCACHEDPLAYERS", true)
 
 Class_Reload( "Player" )

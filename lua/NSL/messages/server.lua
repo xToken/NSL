@@ -6,6 +6,7 @@
 Script.Load("lua/dkjson.lua")
 
 local kNSLMessageIDs = { }
+local kNSLMessageDefaults = { }
 
 local function BuildNSLMessageTable()
 
@@ -17,6 +18,7 @@ local function BuildNSLMessageTable()
         io.close(openedFile)
         for k, v in pairs(parsedFile) do
             kNSLMessageIDs[k] = counter
+            kNSLMessageDefaults[k] = v
             counter = counter + 1
         end
     end
@@ -27,4 +29,8 @@ BuildNSLMessageTable()
 
 function GetNSLMessageID(messageName)
     return kNSLMessageIDs[messageName] or 0
+end
+
+function GetNSLMessageDefaultText(messageName)
+    return kNSLMessageDefaults[messageName] or ""
 end

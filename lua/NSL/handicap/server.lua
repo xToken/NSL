@@ -31,5 +31,5 @@ local function OnClientHandicap( client, value )
 	SendClientServerAdminMessage(client, "NSL_HANDICAP_SET", player:GetName(true), ( 1 - player:GetHandicap() ) * 100 )
 end
 
-Event.Hook("Console_sv_nslhandicap", OnClientHandicap)
+RegisterNSLConsoleCommand("sv_nslhandicap", OnClientHandicap, "SV_NSLHANDICAP", true)
 RegisterNSLHelpMessageForCommand("SV_NSLHANDICAP", false)

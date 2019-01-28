@@ -192,7 +192,7 @@ local function OnCommandOverrideTeamnames(client, team1name, team2name)
 	end
 end
 
-Event.Hook("Console_sv_nslsetteamnames", OnCommandOverrideTeamnames)
+RegisterNSLConsoleCommand("sv_nslsetteamnames", OnCommandOverrideTeamnames, "SV_NSLSETTEAMNAMES")
 RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMNAMES", true)
 
 local function OnCommandSwitchTeamNames(client)
@@ -208,7 +208,7 @@ local function OnCommandSwitchTeamNames(client)
 	end
 end
 
-Event.Hook("Console_sv_nslswitchteams", OnCommandSwitchTeamNames)
+RegisterNSLConsoleCommand("sv_nslswitchteams", OnCommandSwitchTeamNames, "SV_NSLSWITCHTEAMS")
 RegisterNSLHelpMessageForCommand("SV_NSLSWITCHTEAMS", true)
 
 local function OnCommandSetTeamScores(client, team1score, team2score)
@@ -228,7 +228,7 @@ local function OnCommandSetTeamScores(client, team1score, team2score)
 	end
 end
 
-Event.Hook("Console_sv_nslsetteamscores", OnCommandSetTeamScores)
+RegisterNSLConsoleCommand("sv_nslsetteamscores", OnCommandSetTeamScores, "SV_NSLSETTEAMSCORES")
 RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMSCORES", true)
 
 local function OnCommandSetTeamIDs(client, team1id, team2id)
@@ -248,7 +248,7 @@ local function OnCommandSetTeamIDs(client, team1id, team2id)
 	end
 end
 
-Event.Hook("Console_sv_nslsetteamids", OnCommandSetTeamIDs)
+RegisterNSLConsoleCommand("sv_nslsetteamids", OnCommandSetTeamIDs, "SV_NSLSETTEAMIDS")
 RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMIDS", true)
 
 local function ApproveMercs(teamnum, playerid)
@@ -287,8 +287,8 @@ local function OnCommandApproveMercs(client, target)
 	end
 end
 
-Event.Hook("Console_mercsok", OnCommandApproveMercs)
-Event.Hook("Console_approvemercs", OnCommandApproveMercs)
+RegisterNSLConsoleCommand("mercsok", OnCommandApproveMercs, "MERCSHELP_4", true)
+RegisterNSLConsoleCommand("approvemercs", OnCommandApproveMercs, "MERCSHELP_5", true)
 gArgumentedChatCommands["/mercsok"] = OnCommandApproveMercs
 gArgumentedChatCommands["mercsok"] = OnCommandApproveMercs
 gArgumentedChatCommands["approvemercs"] = OnCommandApproveMercs
@@ -311,7 +311,7 @@ local function OnClientCommandApproveMercs(client, team, target)
 	end
 end
 
-Event.Hook("Console_sv_nslapprovemercs", OnClientCommandApproveMercs)
+RegisterNSLConsoleCommand("sv_nslapprovemercs", OnClientCommandApproveMercs, "SV_NSLAPPROVEMERCS")
 RegisterNSLHelpMessageForCommand("SV_NSLAPPROVEMERCS", true)
 
 local function ClearMercs(teamnum)
@@ -335,7 +335,7 @@ local function OnCommandClearMercs(client)
 	end
 end
 
-Event.Hook("Console_clearmercs", OnCommandClearMercs)
+RegisterNSLConsoleCommand("clearmercs", OnCommandClearMercs, "MERCSHELP_2", true)
 gChatCommands["rejectmercs"] = OnCommandClearMercs
 gChatCommands["clearmercs"] = OnCommandClearMercs
 
@@ -349,7 +349,7 @@ local function OnClientCommandClearMercs(client, team)
 	end
 end
 
-Event.Hook("Console_sv_nslclearmercs", OnClientCommandClearMercs)
+RegisterNSLConsoleCommand("sv_nslclearmercs", OnClientCommandClearMercs, "SV_NSLCLEARMERCS")
 RegisterNSLHelpMessageForCommand("SV_NSLCLEARMERCS", true)
 
 local function OnClientCommandMercHelp(client)
@@ -365,5 +365,5 @@ local function OnClientCommandMercHelp(client)
 	end
 end
 
-Event.Hook("Console_sv_nslmerchelp", OnClientCommandMercHelp)
+RegisterNSLConsoleCommand("sv_nslmerchelp", OnClientCommandMercHelp, "SV_NSLMERCHELP", true)
 RegisterNSLHelpMessageForCommand("SV_NSLMERCHELP", false)

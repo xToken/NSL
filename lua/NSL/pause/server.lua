@@ -498,7 +498,7 @@ function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 	end
 end
 
-Event.Hook("Console_gpause", OnCommandPause)
+RegisterNSLConsoleCommand("gpause", OnCommandPause, "CMD_GPAUSE", true)
 RegisterNSLHelpMessageForCommand("CMD_GPAUSE", false)
 gChatCommands["pause"] = OnCommandPause
 gChatCommands["!pause"] = OnCommandPause
@@ -535,7 +535,7 @@ local function OnCommandUnPause(client)
 	
 end
 
-Event.Hook("Console_unpause", OnCommandUnPause)
+RegisterNSLConsoleCommand("unpause", OnCommandUnPause, "CMD_UNPAUSE", true)
 RegisterNSLHelpMessageForCommand("CMD_UNPAUSE", false)
 gChatCommands["unpause"] = OnCommandUnPause
 gChatCommands["!unpause"] = OnCommandUnPause
@@ -581,7 +581,7 @@ function NSLTriggerUnpause()
 	end
 end
 
-Event.Hook("Console_sv_nslpause", OnCommandAdminPause)
+RegisterNSLConsoleCommand("sv_nslpause", OnCommandAdminPause, "SV_NSLPAUSE")
 RegisterNSLHelpMessageForCommand("SV_NSLPAUSE", true)
 
 local function OnCommandAdminSetPauses(client, teamnum, pauses)
@@ -599,5 +599,5 @@ local function OnCommandAdminSetPauses(client, teamnum, pauses)
 	
 end
 
-Event.Hook("Console_sv_nslsetpauses", OnCommandAdminSetPauses)
+RegisterNSLConsoleCommand("sv_nslsetpauses", OnCommandAdminSetPauses, "SV_NSLSETPAUSES")
 RegisterNSLHelpMessageForCommand("SV_NSLSETPAUSES", true)

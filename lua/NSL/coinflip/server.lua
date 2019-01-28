@@ -22,7 +22,7 @@ local function OnCommandCoinFlip(client)
 	end
 end
 
-Event.Hook("Console_coinflip", OnCommandCoinFlip)
+RegisterNSLConsoleCommand("coinflip", OnCommandCoinFlip, "CMD_COINFLIP", true)
 gChatCommands["coinflip"] = OnCommandCoinFlip
 gChatCommands["!coinflip"] = OnCommandCoinFlip
 gChatCommands["!flip"] = OnCommandCoinFlip

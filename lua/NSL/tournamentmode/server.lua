@@ -31,6 +31,7 @@ local originalNS2GRSetGameState
 originalNS2GRSetGameState = Class_ReplaceMethod("NS2Gamerules", "SetGameState", 
 	function(self, state)
 		if self.gameState ~= kGameState.Started and state == kGameState.Started then
+			-- Before we set state to started, clear ready flag - so we have to re-ready if game ends
 			GetGamerules():SetTeamsReady(false)
 		end
 		originalNS2GRSetGameState(self, state)
@@ -234,7 +235,7 @@ local function OnCommandForceStartRound(client, duration)
 	end
 end
 
-Event.Hook("Console_sv_nslforcestart", OnCommandForceStartRound)
+RegisterNSLConsoleCommand("sv_nslforcestart", OnCommandForceStartRound, "SV_NSLFORCESTART")
 RegisterNSLHelpMessageForCommand("SV_NSLFORCESTART", true)
 
 local function OnCommandCancelRoundStart(client)
@@ -247,7 +248,7 @@ local function OnCommandCancelRoundStart(client)
 	end
 end
 
-Event.Hook("Console_sv_nslcancelstart", OnCommandCancelRoundStart)
+RegisterNSLConsoleCommand("sv_nslcancelstart", OnCommandCancelRoundStart, "SV_NSLCANCELSTART")
 RegisterNSLHelpMessageForCommand("SV_NSLCANCELSTART", true)
 
 local function ClientReady(client)
@@ -311,7 +312,7 @@ local function OnCommandReady(client)
 	end
 end
 
-Event.Hook("Console_ready", OnCommandReady)
+RegisterNSLConsoleCommand("ready", OnCommandReady, "CMD_READY", true)
 RegisterNSLHelpMessageForCommand("CMD_READY", false)
 gChatCommands["ready"] = OnCommandReady
 gChatCommands["!ready"] = OnCommandReady
@@ -344,7 +345,7 @@ local function OnCommandNotReady(client)
 	end
 end
 
-Event.Hook("Console_notready", OnCommandNotReady)
+RegisterNSLConsoleCommand("notready", OnCommandNotReady, "CMD_NOTREADY", true)
 RegisterNSLHelpMessageForCommand("CMD_NOTREADY", false)
 gChatCommands["notready"] = OnCommandNotReady
 gChatCommands["!notready"] = OnCommandNotReady

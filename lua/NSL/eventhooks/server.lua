@@ -31,6 +31,8 @@ gTeamJoinedFunctions = { }
 gPerfLoadedFunctions = { }
 --NSL Help Messages (sv_nslhelp)
 gNSLHelpMessages = { }
+--NSL Console Commands
+gNSLConsoleCommands = { }
 -- Captains Phase change
 gCaptainsStateChange = { }
 
@@ -145,13 +147,22 @@ function RegisterNSLHelpMessageForCommand(message, refOnly)
 	end
 end
 
-local function OnUpdateLeagueName(newLeagueName)
-	local gameInfo = GetGameInfoEntity()
-	if gameInfo then
-		gameInfo:SetLeagueName(newLeagueName)
+function RegisterNSLConsoleCommand(command, callback, helper, allPlayers)
+	if command and callback then
+		table.insert(gNSLConsoleCommands, {command = command, callback = callback, helper = helper, open = allPlayers == true})
 	end
 end
+
+local function OnUpdateLeagueName(_)
+	-- Grab 'friendly' league name from config
+	local gameInfo = GetGameInfoEntity()
+	if gameInfo then
+		gameInfo:SetLeagueName(GetNSLConfigValue("LeagueName"))
+	end
+end
+
 table.insert(gLeagueChangeFunctions, OnUpdateLeagueName)
+table.insert(gConfigLoadedFunctions, OnUpdateLeagueName)
 
 local function OnUpdateCaptainsState(newState)
 	local gameInfo = GetGameInfoEntity()
@@ -159,4 +170,24 @@ local function OnUpdateCaptainsState(newState)
 		gameInfo:SetNSLCaptainsState(newState)
 	end
 end
+
 table.insert(gCaptainsStateChange, OnUpdateCaptainsState)
+
+local function FinalizeNSLConsoleCommands()
+	-- Only run if stuff to register
+	if #gNSLConsoleCommands > 0 then
+		local HookTable = debug.getregistry()["Event.HookTable"]
+		for i = #gNSLConsoleCommands, 1, -1 do
+			local cc = gNSLConsoleCommands[i]
+			local command = "Console_"..cc.command
+			if not rawget(HookTable, command) then
+				RegisterNSLServerCommand(command, cc.callback, string.gsub(GetNSLMessageDefaultText(cc.helper), command..": ", ""), cc.open)
+			else
+				--Print(string.format("Skipping already registered event %s!",cc.command))
+			end
+			table.remove(gNSLConsoleCommands, i)
+		end
+	end
+end
+
+table.insert(gConfigLoadedFunctions, FinalizeNSLConsoleCommands)

@@ -144,7 +144,7 @@ local function UpdateCallbacksWithNSLData(player, nslData)
 		if player.playerInfo then
 			player.playerInfo:SetupNSLData(nslData) 
 		end
-		SendClientServerAdminMessage(Server.GetOwner(player), "NSL_USERNAME_VERIFIED", GetActiveLeague(), nslData.NICK)
+		SendClientServerAdminMessage(Server.GetOwner(player), "NSL_USERNAME_VERIFIED", GetNSLConfigValue("LeagueName"), nslData.NICK)
 	end
 end
 
@@ -256,7 +256,7 @@ function UpdateNSLPlayerData(RefTable)
 			end
 		else
 			Shared.Message(string.format("NSL - Failed to get valid response from %s site for ns2id %s.", 
-														GetActiveLeague(), tostring(RefTable.id)))
+														GetNSLConfigValue("LeagueName"), tostring(RefTable.id)))
 			RefTable = nil
 		end
 	else
@@ -271,7 +271,7 @@ end
 
 local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
-	if GetNSLModEnabled() and NS2ID > 0 then
+	if GetNSLModEnabled() and NS2ID > 0 and GetNSLConfigValue("PlayerDataFormat") ~= "N/A" then
 		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
 	end
 	if not table.contains(G_IDTable, NS2ID) then
@@ -342,7 +342,7 @@ local function OnClientCommandViewNSLInfo(client, team)
 	end
 end
 
-Event.Hook("Console_sv_nslinfo", OnClientCommandViewNSLInfo)
+RegisterNSLConsoleCommand("sv_nslinfo", OnClientCommandViewNSLInfo, "SV_NSLINFO", true)
 RegisterNSLHelpMessageForCommand("SV_NSLINFO", false)
 
 local function MakeNSLMessage(message, header)
@@ -385,7 +385,7 @@ local function OnClientCommandChat(client, ...)
 	end
 end
 
-Event.Hook("Console_sv_nslsay", OnClientCommandChat)
+RegisterNSLConsoleCommand("sv_nslsay", OnClientCommandChat, "SV_NSLSAY")
 RegisterNSLHelpMessageForCommand("SV_NSLSAY", true)
 
 local function OnClientCommandTeamChat(client, team, ...)
@@ -403,7 +403,7 @@ local function OnClientCommandTeamChat(client, team, ...)
 	end
 end
 
-Event.Hook("Console_sv_nsltsay", OnClientCommandTeamChat)
+RegisterNSLConsoleCommand("sv_nsltsay", OnClientCommandTeamChat, "SV_NSLTSAY")
 RegisterNSLHelpMessageForCommand("SV_NSLTSAY", true)
 
 local function OnClientCommandPlayerChat(client, target, ...)
@@ -421,7 +421,7 @@ local function OnClientCommandPlayerChat(client, target, ...)
 	end
 end
 
-Event.Hook("Console_sv_nslpsay", OnClientCommandPlayerChat)
+RegisterNSLConsoleCommand("sv_nslpsay", OnClientCommandPlayerChat, "SV_NSLPSAY")
 RegisterNSLHelpMessageForCommand("SV_NSLPSAY", true)
 
 local function OnRecievedFunction(client, message)
@@ -485,5 +485,5 @@ local function OnClientCommandShowFunctionData(client, target)
 	end
 end
 
-Event.Hook("Console_sv_nslfunctiondata", OnClientCommandShowFunctionData)
+RegisterNSLConsoleCommand("sv_nslfunctiondata", OnClientCommandShowFunctionData, "SV_NSLFUNCTIONDATA")
 RegisterNSLHelpMessageForCommand("SV_NSLFUNCTIONDATA", true)

@@ -137,5 +137,5 @@ local function OnClientCommandNSLFPS(client)
 	end
 end
 
-Event.Hook("Console_sv_nslfirstpersonspectate", OnClientCommandNSLFPS)
+RegisterNSLConsoleCommand("sv_nslfirstpersonspectate", OnClientCommandNSLFPS, "SV_NSLFIRSTPERSONSPECTATE")
 RegisterNSLHelpMessageForCommand("SV_NSLFIRSTPERSONSPECTATE", true)

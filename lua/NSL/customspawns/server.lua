@@ -251,5 +251,5 @@ local function SetTeamSpawns(client, ...)
 	
 end
 
-Event.Hook("Console_sv_nslsetteamspawns", SetTeamSpawns)
+RegisterNSLConsoleCommand("sv_nslsetteamspawns", SetTeamSpawns, "SV_NSLSETTEAMSPAWNS")
 RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMSPAWNS", true)

@@ -11,11 +11,11 @@ local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
 								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.0, leaguesConfigComplete = false,
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.0, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.1, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
 							}
 local NSL_Mode = kNSLPluginConfigs.DISABLED
-local NSL_League = "ENSL"
+local NSL_League = "DEFAULT"
 local NSL_PerfLevel = "DEFAULT"
 local NSL_CachedScores = { }
 local NSL_Scores = { }
@@ -61,7 +61,7 @@ function GetNSLCaptainsPlayerLimit()
 end
 
 function RegisterNSLServerCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed, nslAdminCommand)
-	NSL_ServerCommands[string.gsub(commandName, "Console_", "")] = nslAdminCommand or false
+	NSL_ServerCommands[string.gsub(commandName, "Console_", "")] = true
 	CreateServerAdminCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed)
 end
 
@@ -70,16 +70,11 @@ local function SavePluginConfig()
 end
 
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "ENSL", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false, captainsplayerlimit = 6 }
+	local defaultConfig = { mode = "PCW", league = "DEFAULT", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false, captainsplayerlimit = 6 }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = type(config.mode) == "number" and config.mode or kNSLPluginConfigs.PCW
-	NSL_League = config.league or "ENSL"
-	-- temp hack for league rename
-	if NSL_League == "NSL" then 
-		NSL_League = "ENSL"
-		SavePluginConfig()
-	end
+	NSL_League = config.league or "DEFAULT"
 	NSL_PerfLevel = config.perf or "DEFAULT"
 	NSL_LeagueAdminsAccess = config.adminaccess or false
 	NSL_PerfConfigsBlocked = config.perfconfigsblocked or false
@@ -187,12 +182,12 @@ local function ValidateResponse(response, request, additionalparam)
 				configRequestTracking[request .. "ConfigRetries"] = configRequestTracking[request .. "ConfigRetries"] + 1
 				responseTable = nil
 			else
-				Shared.Message(string.format("NSL - Failed getting %s config from GitHub, using local copy.", request))
+				Shared.Message(string.format("NSL - Failed getting %s config from GitHub, using local copy.", (additionalparam and additionalparam.." " or "")..request))
 				responseTable = OnLoadLocalConfig(string.format(configRequestTracking[request .. "LocalConfig"], additionalparam))
 			end
 		elseif responseTable.Version < configRequestTracking[request .. "ExpectedVersion"] then
 			--Old version still on github, use local cache
-			Shared.Message(string.format("NSL - Old copy of %s config on GitHub, using local copy.", request))
+			Shared.Message(string.format("NSL - Old copy of %s config on GitHub, using local copy.", (additionalparam and additionalparam.." " or "")..request))
 			responseTable = OnLoadLocalConfig(string.format(configRequestTracking[request .. "LocalConfig"], additionalparam))
 		end
 		if responseTable then
@@ -404,7 +399,7 @@ function GetClientCanRunCommand(client, commandName, printWarning)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local canRun = false
-	if NSL_ServerCommands[commandName] ~=nil and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
+	if NSL_ServerCommands[commandName] and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
 		--Check if cmd is an NSL command, check perms
 		return true
 	elseif NSL_LeagueAdminsAccess and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
