@@ -207,7 +207,7 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
 		local NS2ID = client:GetUserId()	
 		if GetIsNSLRef(NS2ID) then
-			local replacePlayer = GetPlayerMatching(newPlayer)
+			local replacePlayer = NSLGetPlayerMatching(newPlayer)
 			if replacePlayer then
 				local replaceClient = Server.GetOwner(replacePlayer)
 				--Found new replacement, find cached player
