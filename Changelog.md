@@ -1,5 +1,14 @@
 # Changelog
 
+## 1-15-19 (Build 112)
+- Adjusted all console commands to use default admin commands hooks - Refs are still given access to 'league' based commands.  No change in overall functionality
+- Added 'Optimizations' module which reconfigures sleep mixin to actually completely turn off entity updates - various mixin and other tweaks to support this
+- Added 'Captains' mode to NSL mod, allows for picking captains and then those captains picking teams.  Currently uses chat/console commands only!
+- Added small rate limit to resume to prevent multiple people from typing it at the same time (like the limiter on ready)
+- Added checks on sv_nslsetteamspawns command to prevent asserts
+- Added additional insight hooks to ensure team scores get updated if you join spectate after the sync
+- Removed some debug prints from the team decal system
+
 ## 1-15-19 (Build 110)
 - Added language system, based on clients locale
 - All messages can be translated by the language system
