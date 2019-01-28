@@ -290,10 +290,11 @@ Event.Hook("UpdateServer", OnServerUpdated)
 
 function GetNSLConfigValue(value)
 	--Check League config
+	local NSL_Mode_Value = EnumToString(kNSLPluginConfigs, NSL_Mode)
 	if Configs[NSL_League] then
 		--Check League/Mode Specific config
-		if Configs[NSL_League][NSL_Mode] and Configs[NSL_League][NSL_Mode][value] then
-			return Configs[NSL_League][NSL_Mode][value]
+		if Configs[NSL_League][NSL_Mode_Value] and Configs[NSL_League][NSL_Mode_Value][value] then
+			return Configs[NSL_League][NSL_Mode_Value][value]
 		end
 		--Check League Specific config
 		if Configs[NSL_League][value] then
