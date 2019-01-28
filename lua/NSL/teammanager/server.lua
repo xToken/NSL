@@ -121,46 +121,39 @@ function ResetNSLTeamNames()
 end
 
 local function UpdateTeamNamesOnActivation(newState)
-	if newState == kNSLPluginConfigs.GATHER or newState == kNSLPluginConfigs.DISABLED then
+	if not GetNSLConfigValue("OverrideTeamNames") or newState == kNSLPluginConfigs.DISABLED then
 		ResetNSLTeamNames()
 	end
 end
 
 table.insert(gPluginStateChange, UpdateTeamNamesOnActivation)
 
-local function UpdateOnSuccessfulTeamJoin(player, newTeamNumber)
-	for i = 1, #gTeamJoinedFunctions do
-		gTeamJoinedFunctions[i](player, newTeamNumber)
+local function UpdateOnTeamJoin(gameRules, player, newTeamNumber)
+	if not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
+		--Joined team, update
+		local teamName, teamId = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
+		if newTeamNumber == 1 and teamName ~= teamData[1].name then
+			teamData[1].name = teamName
+			teamData[1].id = teamId
+			UpdateCallbacksWithNewTeamData(teamData, teamScore)
+		elseif newTeamNumber == 2 and teamName ~= teamData[2].name then
+			teamData[2].name = teamName
+			teamData[2].id = teamId
+			UpdateCallbacksWithNewTeamData(teamData, teamScore)
+		end
 	end
 end
 
---Detect team changes
-local originalNS2GRJoinTeam
-originalNS2GRJoinTeam = Class_ReplaceMethod("NS2Gamerules", "JoinTeam", 
-	function(self, player, newTeamNumber, force)
-		if GetNSLModEnabled() and GetNSLConfigValue("MercsRequireApproval") and not CheckMercTeamJoin(player, newTeamNumber) then
-			return false, player
-		end
-		local success, player = originalNS2GRJoinTeam(self, player, newTeamNumber, force)
-		if success then
-			if not overridenames and (newTeamNumber == 1 or newTeamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("OverrideTeamNames") then
-				--Joined team, update
-				local teamName, teamId = GetPrimaryTeam(newTeamNumber, GetTeamNameCount(newTeamNumber))
-				if newTeamNumber == 1 and teamName ~= teamData[1].name then
-					teamData[1].name = teamName
-					teamData[1].id = teamId
-					UpdateCallbacksWithNewTeamData(teamData, teamScore)
-				elseif newTeamNumber == 2 and teamName ~= teamData[2].name then
-					teamData[2].name = teamName
-					teamData[2].id = teamId
-					UpdateCallbacksWithNewTeamData(teamData, teamScore)
-				end
-			end
-			UpdateOnSuccessfulTeamJoin(player, newTeamNumber)
-		end
-		return success, player
+table.insert(gTeamJoinedFunctions, UpdateOnTeamJoin)
+
+local function CheckCanJoinTeam(gameRules, player, teamNumber)
+	if GetNSLModEnabled() and GetNSLConfigValue("MercsRequireApproval") and not CheckMercTeamJoin(player, teamNumber) then
+		return false
 	end
-)
+	return true
+end
+
+table.insert(gCanJoinTeamFunctions, CheckCanJoinTeam)
 
 local function UpdateTeamDataOnGameEnd(gameRules, winningteam)
 	if GetNSLModEnabled() then
@@ -280,7 +273,7 @@ local function OnCommandApproveMercs(client, target)
 	if not client then return end
 	local ns2id = client:GetUserId()
 	local player = client:GetControllingPlayer()
-	local tplayer = GetPlayerMatching(target)
+	local tplayer = NSLGetPlayerMatching(target)
 	if player then
 		local tns2id
 		if tplayer then
@@ -302,7 +295,7 @@ gArgumentedChatCommands["approvemercs"] = OnCommandApproveMercs
 
 local function OnClientCommandApproveMercs(client, team, target)
 	team = tonumber(team)
-	local player = GetPlayerMatching(target)
+	local player = NSLGetPlayerMatching(target)
 	if client and team and (team == 1 or team == 2) then
 		local NS2ID = client:GetUserId()
 		local tns2id

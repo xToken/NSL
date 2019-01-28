@@ -60,26 +60,24 @@ local function GetRealPlayerCountPerTeam(teamNumber)
 	return c
 end
 
---Allow imbalanced teams, but also dont allow more than 6 players per team in an in-progress game.
-local originalNS2GameRulesGetCanJoinTeamNumber
-originalNS2GameRulesGetCanJoinTeamNumber = Class_ReplaceMethod("NS2Gamerules", "GetCanJoinTeamNumber", 
-	function(self, player, teamNumber)
-		if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
-			if self:GetGameState() == kGameState.Started then
-				local team1Players = GetRealPlayerCountPerTeam(1)
-				local team2Players = GetRealPlayerCountPerTeam(2)
-				if (teamNumber == 1 and team1Players >= 6) or (teamNumber == 2 and team2Players >= 6) then
-					return false
-				end
+local function CheckCanJoinTeam(gameRules, player, teamNumber)
+	if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
+		if gameRules:GetGameState() == kGameState.Started then
+			local team1Players = GetRealPlayerCountPerTeam(1)
+			local team2Players = GetRealPlayerCountPerTeam(2)
+			if (teamNumber == 1 and team1Players >= 6) or (teamNumber == 2 and team2Players >= 6) then
+				return false
 			end
 		end
-		--block leaving a team for aliens/marines during countdown
-		if self:GetCountingDown() and (teamNumber == kTeamReadyRoom or teamNumber == kSpectatorIndex) and (player:GetTeamNumber() == 1 or player:GetTeamNumber() == 2) then
-			return false
-		end
-		return originalNS2GameRulesGetCanJoinTeamNumber(self, player, teamNumber)
 	end
-)
+	--block leaving a team for aliens/marines during countdown
+	if gameRules:GetCountingDown() and (teamNumber == kTeamReadyRoom or teamNumber == kSpectatorIndex) and (player:GetTeamNumber() == 1 or player:GetTeamNumber() == 2) then
+		return false
+	end
+	return true
+end
+
+table.insert(gCanJoinTeamFunctions, CheckCanJoinTeam)
 
 local function ClearTournamentModeState()
 	TournamentModeSettings[1] = {ready = false, lastready = 0}
@@ -194,7 +192,11 @@ local originalNS2GamerulesUpdatePregame
 originalNS2GamerulesUpdatePregame = Class_ReplaceMethod("NS2Gamerules", "UpdatePregame", 
 	function(self, timePassed)
 		if self:GetGameState() <= kGameState.PreGame and not self.teamsReady and GetNSLModEnabled() then
-			MonitorCountDown()
+			if GetNSLMode() == kNSLPluginConfigs.CAPTAINS and not GetNSLCaptainsGameStartReady() then
+				MonitorCaptainsPreGameCountDown()
+			else
+				MonitorCountDown()
+			end
 		else
 			originalNS2GamerulesUpdatePregame(self, timePassed)
 		end
@@ -349,12 +351,12 @@ gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady
 
 local function UpdateTournamentMode(newState)
-	if not newState == kNSLPluginConfigs.DISABLED then
-		GetGamerules():OnTournamentModeEnabled()
-		GetGameInfoEntity():SetTournamentMode(true)
-	else
+	if newState == kNSLPluginConfigs.DISABLED then
 		GetGamerules():OnTournamentModeDisabled()
 		GetGameInfoEntity():SetTournamentMode(false)
+	else
+		GetGamerules():OnTournamentModeEnabled()
+		GetGameInfoEntity():SetTournamentMode(true)		
 	end
 end
 
