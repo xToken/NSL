@@ -164,11 +164,7 @@ end
 function CatalystMixin:CopyPlayerDataFrom(player)
 
     if player.isCatalysted then
-        self.isCatalysted = player.isCatalysted
-    end
-
-    if player.timeUntilCatalystEnd then
-        self.timeUntilCatalystEnd = player.timeUntilCatalystEnd
+        self:TriggerCatalyst(math.max(player.timeCatalystEnds - Shared.GetTime(), 1))
     end
 
 end
