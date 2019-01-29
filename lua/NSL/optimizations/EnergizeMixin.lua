@@ -97,3 +97,11 @@ end
 function EnergizeMixin:GetEnergizeLevel()
     return self.energized and 1 or 0
 end
+
+function EnergizeMixin:CopyPlayerDataFrom(player)
+
+    if player.energized then
+        self:AddTimedCallback(UpdateEnergizedState, kEnergizeUpdateRate)
+    end
+
+end
