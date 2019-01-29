@@ -357,7 +357,7 @@ originalWeaponOnInitialized = Class_ReplaceMethod("Weapon", "OnInitialized",
 )
 
 function Weapon:GetCanSleep()
-	return self:GetWeaponWorldState()
+	return not self:GetWeaponWorldState()
 end
 
 local originalWeaponSetWeaponWorldState
