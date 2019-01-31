@@ -166,7 +166,7 @@ local function NewServerAgeCheck(self)
 			oldMapCycle_CycleMap()
 		end
 	else
-		if self.gameState ~= kGameState.Started and Shared.GetTime() > 360000 and Server.GetNumPlayers() == 0 then
+		if self.gameState ~= kGameState.Started and Shared.GetTime() > 36000 and Server.GetNumPlayers() == 0 then
 			oldMapCycle_CycleMap()
 		end
 	end
