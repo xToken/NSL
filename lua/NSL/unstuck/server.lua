@@ -92,7 +92,6 @@ gChatCommands["unstuck"] = RegisterClientStuck
 
 RegisterNSLConsoleCommand("stuck", RegisterClientStuck, "CMD_UNSTUCK", true)
 RegisterNSLConsoleCommand("unstuck", RegisterClientStuck, "CMD_UNSTUCK", true)
-RegisterNSLHelpMessageForCommand("CMD_UNSTUCK", false)
 
 -- Tap into Shines unstuck also to prevent if paused
 local function CheckShineUnstuckHook()

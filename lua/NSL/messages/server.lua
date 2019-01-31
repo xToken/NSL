@@ -32,5 +32,5 @@ function GetNSLMessageID(messageName)
 end
 
 function GetNSLMessageDefaultText(messageName)
-    return kNSLMessageDefaults[messageName] or ""
+    return kNSLMessageDefaults[messageName] and string.format(kNSLMessageDefaults[messageName], "") or ""
 end

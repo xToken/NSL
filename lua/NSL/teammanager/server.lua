@@ -192,8 +192,9 @@ local function OnCommandOverrideTeamnames(client, team1name, team2name)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslsetteamnames", OnCommandOverrideTeamnames, "SV_NSLSETTEAMNAMES")
-RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMNAMES", true)
+RegisterNSLConsoleCommand("sv_nslsetteamnames", OnCommandOverrideTeamnames, "SV_NSLSETTEAMNAMES", false,
+	{{ Type = "string", Error = "Please provide team 1 name."},
+	{ Type = "string", TakeRestOfLine = true, Error = "Please provide team 2 name."}})
 
 local function OnCommandSwitchTeamNames(client)
 	if client then
@@ -209,7 +210,6 @@ local function OnCommandSwitchTeamNames(client)
 end
 
 RegisterNSLConsoleCommand("sv_nslswitchteams", OnCommandSwitchTeamNames, "SV_NSLSWITCHTEAMS")
-RegisterNSLHelpMessageForCommand("SV_NSLSWITCHTEAMS", true)
 
 local function OnCommandSetTeamScores(client, team1score, team2score)
 	team1score = tonumber(team1score)
@@ -228,8 +228,9 @@ local function OnCommandSetTeamScores(client, team1score, team2score)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslsetteamscores", OnCommandSetTeamScores, "SV_NSLSETTEAMSCORES")
-RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMSCORES", true)
+RegisterNSLConsoleCommand("sv_nslsetteamscores", OnCommandSetTeamScores, "SV_NSLSETTEAMSCORES", false,
+	{{ Type = "string", Error = "Please provide team 1 score."},
+	{ Type = "string", Optional = true}})
 
 local function OnCommandSetTeamIDs(client, team1id, team2id)
 	team1id = tonumber(team1id)
@@ -248,8 +249,9 @@ local function OnCommandSetTeamIDs(client, team1id, team2id)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslsetteamids", OnCommandSetTeamIDs, "SV_NSLSETTEAMIDS")
-RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMIDS", true)
+RegisterNSLConsoleCommand("sv_nslsetteamids", OnCommandSetTeamIDs, "SV_NSLSETTEAMIDS", false,
+	{{ Type = "string", Error = "Please provide team 1 score."},
+	{ Type = "string", Optional = true}})
 
 local function ApproveMercs(teamnum, playerid)
 	local enemyteam = GetEnemyTeamNumber(teamnum)
@@ -311,8 +313,9 @@ local function OnClientCommandApproveMercs(client, team, target)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslapprovemercs", OnClientCommandApproveMercs, "SV_NSLAPPROVEMERCS")
-RegisterNSLHelpMessageForCommand("SV_NSLAPPROVEMERCS", true)
+RegisterNSLConsoleCommand("sv_nslapprovemercs", OnClientCommandApproveMercs, "SV_NSLAPPROVEMERCS", false,
+	{{ Type = "string", Error = "Please provide target team number."},
+	{ Type = "string", Optional = true}})
 
 local function ClearMercs(teamnum)
 	local enemyteam = GetEnemyTeamNumber(teamnum)
@@ -349,16 +352,16 @@ local function OnClientCommandClearMercs(client, team)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslclearmercs", OnClientCommandClearMercs, "SV_NSLCLEARMERCS")
-RegisterNSLHelpMessageForCommand("SV_NSLCLEARMERCS", true)
+RegisterNSLConsoleCommand("sv_nslclearmercs", OnClientCommandClearMercs, "SV_NSLCLEARMERCS", false,
+	{{ Type = "string", Error = "Please provide target team number."}})
 
 local function OnClientCommandMercHelp(client)
 	if client then
-		SendClientServerAdminMessage(client, "MERCSHELP_1")
-		SendClientServerAdminMessage(client, "MERCSHELP_2")
-		SendClientServerAdminMessage(client, "MERCSHELP_3")
-		SendClientServerAdminMessage(client, "MERCSHELP_4")
-		SendClientServerAdminMessage(client, "MERCSHELP_5")
+		SendClientServerAdminMessage(client, "MERCSHELP_1", "rejectmercs: ")
+		SendClientServerAdminMessage(client, "MERCSHELP_2", "clearmercs: ")
+		SendClientServerAdminMessage(client, "MERCSHELP_3", "/mercsok: ")
+		SendClientServerAdminMessage(client, "MERCSHELP_4", "mercsok: ")
+		SendClientServerAdminMessage(client, "MERCSHELP_5", "approvemercs: ")
 		SendClientServerAdminMessage(client, "MERCSHELP_6")
 		SendClientServerAdminMessage(client, "MERCSHELP_7")
 		SendClientServerAdminMessage(client, "MERCSHELP_8")
@@ -366,4 +369,3 @@ local function OnClientCommandMercHelp(client)
 end
 
 RegisterNSLConsoleCommand("sv_nslmerchelp", OnClientCommandMercHelp, "SV_NSLMERCHELP", true)
-RegisterNSLHelpMessageForCommand("SV_NSLMERCHELP", false)

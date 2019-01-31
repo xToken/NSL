@@ -60,9 +60,9 @@ local function OnClientCommandNSLHelp(client)
 		local ref = GetIsNSLRef(NS2ID)
 		for _, t in ipairs(gNSLHelpMessages) do
 			if t.refOnly and ref then
-				SendClientServerAdminMessage(client, t.message)
+				SendClientServerAdminMessage(client, t.message, t.command..": ")
 			elseif not t.refOnly then
-				SendClientServerAdminMessage(client, t.message)
+				SendClientServerAdminMessage(client, t.message, t.command..": ")
 			end
 		end
 	end
@@ -71,6 +71,7 @@ end
 RegisterNSLConsoleCommand("sv_nslhelp", OnClientCommandNSLHelp, "SV_NSLHELP", true)
 
 local function UpdateNSLMode(client, mode)
+	Print(ToString(mode))
 	mode = mode or ""
 	local currentMode = GetNSLMode()
 	if string.lower(mode) == "gather" and currentMode ~= kNSLPluginConfigs.GATHER then
@@ -88,11 +89,12 @@ local function UpdateNSLMode(client, mode)
 		return
 	end
 	SendClientServerAdminMessage(client, "NSL_MODE_UPDATED", EnumToString(kNSLPluginConfigs, GetNSLMode()))
-	SendClientServerAdminMessage(client, "NSL_MODE_UPDATED_SEASONS_NOTE")
+	if currentMode == kNSLPluginConfigs.DISABLED or GetNSLMode() == kNSLPluginConfigs.DISABLED then
+		SendClientServerAdminMessage(client, "NSL_MODE_UPDATED_SEASONS_NOTE")
+	end
 end
 
-RegisterNSLConsoleCommand("sv_nslcfg", UpdateNSLMode, "SV_NSLCFG")
-RegisterNSLHelpMessageForCommand("SV_NSLCFG", true)
+RegisterNSLConsoleCommand("sv_nslcfg", UpdateNSLMode, "SV_NSLCFG", false, {{ Type = "string", Optional = true}})
 --CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official,captains - Changes the configuration mode of the NSL plugin.")
 
 local function UpdateNSLLeague(client, league)
@@ -105,9 +107,8 @@ local function UpdateNSLLeague(client, league)
 	end
 end
 
-CreateServerAdminCommand("Console_sv_nslconfig", UpdateNSLLeague, "Changes the league configuration used by the NSL mod.")
+CreateNSLServerAdminCommand("sv_nslconfig", UpdateNSLLeague, "SV_NSLCONFIG", {{ Type = "string", Optional = true}})
 --RegisterNSLConsoleCommand("sv_nslconfig", OnClientCommandSetLeague, "SV_NSLCONFIG")
---RegisterNSLHelpMessageForCommand("SV_NSLCONFIG", true)
 
 local function UpdateNSLPerfConfig(client, perfcfg)
 	perfcfg = string.upper(perfcfg or "")
@@ -119,8 +120,7 @@ local function UpdateNSLPerfConfig(client, perfcfg)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslperfconfig", UpdateNSLPerfConfig, "SV_NSLPERFCONFIG")
-RegisterNSLHelpMessageForCommand("SV_NSLPERFCONFIG", true)
+RegisterNSLConsoleCommand("sv_nslperfconfig", UpdateNSLPerfConfig, "SV_NSLPERFCONFIG", false, {{ Type = "string", Optional = true}})
 --CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
 local function UpdateNSLLeagueAccess(client)
@@ -132,7 +132,7 @@ local function UpdateNSLLeagueAccess(client)
 	end
 end
 
-CreateServerAdminCommand("Console_sv_nslleagueadmins", UpdateNSLLeagueAccess, "Toggles league staff having access to administrative commands on server.")
+CreateNSLServerAdminCommand("sv_nslleagueadmins", UpdateNSLLeagueAccess, "SV_NSLLEAGUEADMINS")
 
 local function UpdateNSLPerfConfigAccess(client)
 	SetNSLPerfConfigAccess(not GetNSLPerfConfigsBlocked())
@@ -143,7 +143,7 @@ local function UpdateNSLPerfConfigAccess(client)
 	end
 end
 
-CreateServerAdminCommand("Console_sv_nslallowperfconfigs", UpdateNSLPerfConfigAccess, "Toggles league staff having access set performance configs.")
+CreateNSLServerAdminCommand("sv_nslallowperfconfigs", UpdateNSLPerfConfigAccess, "SV_NSLLEAGUEPERACCESS")
 
 local function UpdateNSLCaptainsLimit(client, limit)
 	limit = tonumber(limit)
@@ -155,8 +155,7 @@ local function UpdateNSLCaptainsLimit(client, limit)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT")
-RegisterNSLHelpMessageForCommand("SV_NSLCAPTAINSLIMIT", true)
+RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT", false, {{ Type = "string", Optional = true}})
 --CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
 
 local function OnCommandNSLPassword(client, password)
@@ -168,5 +167,4 @@ local function OnCommandNSLPassword(client, password)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslpassword", OnCommandNSLPassword, "SV_NSLPASSWORD")
-RegisterNSLHelpMessageForCommand("SV_NSLPASSWORD", true)
+RegisterNSLConsoleCommand("sv_nslpassword", OnCommandNSLPassword, "SV_NSLPASSWORD", false, {{ Type = "string", Optional = true}})

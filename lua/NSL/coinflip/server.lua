@@ -26,5 +26,3 @@ RegisterNSLConsoleCommand("coinflip", OnCommandCoinFlip, "CMD_COINFLIP", true)
 gChatCommands["coinflip"] = OnCommandCoinFlip
 gChatCommands["!coinflip"] = OnCommandCoinFlip
 gChatCommands["!flip"] = OnCommandCoinFlip
-
-RegisterNSLHelpMessageForCommand("CMD_COINFLIP", false)

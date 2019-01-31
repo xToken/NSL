@@ -138,4 +138,3 @@ local function OnClientCommandNSLFPS(client)
 end
 
 RegisterNSLConsoleCommand("sv_nslfirstpersonspectate", OnClientCommandNSLFPS, "SV_NSLFIRSTPERSONSPECTATE")
-RegisterNSLHelpMessageForCommand("SV_NSLFIRSTPERSONSPECTATE", true)

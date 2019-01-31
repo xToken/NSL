@@ -251,5 +251,6 @@ local function SetTeamSpawns(client, ...)
 	
 end
 
-RegisterNSLConsoleCommand("sv_nslsetteamspawns", SetTeamSpawns, "SV_NSLSETTEAMSPAWNS")
-RegisterNSLHelpMessageForCommand("SV_NSLSETTEAMSPAWNS", true)
+RegisterNSLConsoleCommand("sv_nslsetteamspawns", SetTeamSpawns, "SV_NSLSETTEAMSPAWNS", false,
+	{{ Type = "string", Error = "Please provide location name for marine spawn."},
+	{ Type = "string", TakeRestOfLine = true, Error = "Please provide location name for alien spawn."}})

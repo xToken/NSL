@@ -115,8 +115,7 @@ local function OnCommandJoinGame(client)
 	end
 end
 
-RegisterNSLConsoleCommand("joingame", OnCommandJoinGame, "CMD_JOINAME", true)
-RegisterNSLHelpMessageForCommand("CMD_JOINGAME", false)
+RegisterNSLConsoleCommand("joingame", OnCommandJoinGame, "CMD_JOINGAME", true)
 gChatCommands["joingame"] = OnCommandJoinGame
 gChatCommands["!join"] = OnCommandJoinGame
 
@@ -136,7 +135,6 @@ local function OnCommandLeaveGame(client)
 end
 
 RegisterNSLConsoleCommand("leavegame", OnCommandLeaveGame, "CMD_LEAVEGAME", true)
-RegisterNSLHelpMessageForCommand("CMD_LEAVEGAME", false)
 gChatCommands["leavegame"] = OnCommandLeaveGame
 gChatCommands["!leave"] = OnCommandLeaveGame
 
@@ -250,7 +248,6 @@ local function OnCommandVoteCaptain(client, captain)
 end
 
 RegisterNSLConsoleCommand("votecaptain", OnCommandVoteCaptain, "CMD_VOTECAPTAIN", true)
-RegisterNSLHelpMessageForCommand("CMD_VOTECAPTAIN", false)
 gArgumentedChatCommands["votecaptain"] = OnCommandVoteCaptain
 
 local function OnCommandSelectPlayer(client, player)
@@ -317,7 +314,6 @@ local function RandomlySelectPlayer()
 end
 
 RegisterNSLConsoleCommand("selectplayer", OnCommandSelectPlayer, "CMD_SELECTPLAYER", true)
-RegisterNSLHelpMessageForCommand("CMD_SELECTPLAYER", false)
 gArgumentedChatCommands["selectplayer"] = OnCommandSelectPlayer
 
 local mapCycle
@@ -362,7 +358,6 @@ local function OnCommandSelectMap(client, map)
 end
 
 RegisterNSLConsoleCommand("selectmap", OnCommandSelectMap, "CMD_SELECTMAP", true)
-RegisterNSLHelpMessageForCommand("CMD_SELECTMAP", false)
 gArgumentedChatCommands["selectmap"] = OnCommandSelectMap
 
 -- Callback from ns2gamerules when we are in pregame mode, and not ready to start
@@ -450,9 +445,16 @@ function MonitorCaptainsPreGameCountDown()
 end
 
 local function CheckAndStartBestMapVote()
+	local startedShineVote = false
 	if Shine then
 		-- somehow check and start shine mapvote?
-	else
+		local mapvote = Shine.Plugins["mapvote"]
+		if mapvote then
+			mapvote:StartVote(nil, true)
+			startedShineVote = true
+		end
+	end
+	if not startedShineVote then
 		-- booo
 		SendAllClientsMessage("NSL_CAPTAINS_MAP_VOTE_STARTED", false, GetNSLConfigValue("CaptainsMapVoteTimeAllowed"))
 		kCaptainsBasicMapVote = true
@@ -506,7 +508,7 @@ local function CaptainDebug(client, command, arg1, arg2)
 	end
 end
 
-RegisterNSLConsoleCommand("captdebug", CaptainDebug, "", false)
+--[[RegisterNSLConsoleCommand("captdebug", CaptainDebug, "", false)
 
 local oldServerClientGetUserId = ServerClient.GetUserId
 function ServerClient:GetUserId()
@@ -515,3 +517,4 @@ function ServerClient:GetUserId()
 	end
     return oldServerClientGetUserId(self)
 end
+--]]

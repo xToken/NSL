@@ -343,7 +343,6 @@ local function OnClientCommandViewNSLInfo(client, team)
 end
 
 RegisterNSLConsoleCommand("sv_nslinfo", OnClientCommandViewNSLInfo, "SV_NSLINFO", true)
-RegisterNSLHelpMessageForCommand("SV_NSLINFO", false)
 
 local function MakeNSLMessage(message, header)
 	local m = { }
@@ -385,8 +384,8 @@ local function OnClientCommandChat(client, ...)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslsay", OnClientCommandChat, "SV_NSLSAY")
-RegisterNSLHelpMessageForCommand("SV_NSLSAY", true)
+RegisterNSLConsoleCommand("sv_nslsay", OnClientCommandChat, "SV_NSLSAY", false,
+	{{ Type = "string", TakeRestOfLine = true, Error = "Please provide message."}})
 
 local function OnClientCommandTeamChat(client, team, ...)
 	if not client then return end
@@ -403,8 +402,9 @@ local function OnClientCommandTeamChat(client, team, ...)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nsltsay", OnClientCommandTeamChat, "SV_NSLTSAY")
-RegisterNSLHelpMessageForCommand("SV_NSLTSAY", true)
+RegisterNSLConsoleCommand("sv_nsltsay", OnClientCommandTeamChat, "SV_NSLTSAY", false,
+	{{ Type = "string", Error = "Please provide target team number."},
+	{ Type = "string", TakeRestOfLine = true, Error = "Please provide message."}})
 
 local function OnClientCommandPlayerChat(client, target, ...)
 	if not client then return end
@@ -421,8 +421,9 @@ local function OnClientCommandPlayerChat(client, target, ...)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslpsay", OnClientCommandPlayerChat, "SV_NSLPSAY")
-RegisterNSLHelpMessageForCommand("SV_NSLPSAY", true)
+RegisterNSLConsoleCommand("sv_nslpsay", OnClientCommandPlayerChat, "SV_NSLPSAY", false,
+	{{ Type = "string", Error = "Please provide target player."},
+	{ Type = "string", TakeRestOfLine = true, Error = "Please provide message."}})
 
 local function OnRecievedFunction(client, message)
 
@@ -485,5 +486,5 @@ local function OnClientCommandShowFunctionData(client, target)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslfunctiondata", OnClientCommandShowFunctionData, "SV_NSLFUNCTIONDATA")
-RegisterNSLHelpMessageForCommand("SV_NSLFUNCTIONDATA", true)
+RegisterNSLConsoleCommand("sv_nslfunctiondata", OnClientCommandShowFunctionData, "SV_NSLFUNCTIONDATA", false,
+	{{ Type = "string", Optional = true}})

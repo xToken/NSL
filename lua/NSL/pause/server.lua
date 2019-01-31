@@ -499,7 +499,6 @@ function TriggerDisconnectNSLPause(name, pausingTeam, pauseDelay, forcePause)
 end
 
 RegisterNSLConsoleCommand("gpause", OnCommandPause, "CMD_GPAUSE", true)
-RegisterNSLHelpMessageForCommand("CMD_GPAUSE", false)
 gChatCommands["pause"] = OnCommandPause
 gChatCommands["!pause"] = OnCommandPause
 
@@ -536,7 +535,6 @@ local function OnCommandUnPause(client)
 end
 
 RegisterNSLConsoleCommand("unpause", OnCommandUnPause, "CMD_UNPAUSE", true)
-RegisterNSLHelpMessageForCommand("CMD_UNPAUSE", false)
 gChatCommands["unpause"] = OnCommandUnPause
 gChatCommands["!unpause"] = OnCommandUnPause
 gChatCommands["resume"] = OnCommandUnPause
@@ -582,7 +580,6 @@ function NSLTriggerUnpause()
 end
 
 RegisterNSLConsoleCommand("sv_nslpause", OnCommandAdminPause, "SV_NSLPAUSE")
-RegisterNSLHelpMessageForCommand("SV_NSLPAUSE", true)
 
 local function OnCommandAdminSetPauses(client, teamnum, pauses)
 	
@@ -599,5 +596,6 @@ local function OnCommandAdminSetPauses(client, teamnum, pauses)
 	
 end
 
-RegisterNSLConsoleCommand("sv_nslsetpauses", OnCommandAdminSetPauses, "SV_NSLSETPAUSES")
-RegisterNSLHelpMessageForCommand("SV_NSLSETPAUSES", true)
+RegisterNSLConsoleCommand("sv_nslsetpauses", OnCommandAdminSetPauses, "SV_NSLSETPAUSES", false,
+	{{ Type = "string", Error = "Please provide team number."},
+	{ Type = "string", Error = "Please provide number of pauses."}})

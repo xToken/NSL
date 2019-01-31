@@ -72,7 +72,6 @@ local function OnCommandOverrideHeartbeat(client)
 end
 
 RegisterNSLConsoleCommand("heartbeat", OnCommandOverrideHeartbeat, "CMD_HEARTBEAT", true)
-RegisterNSLHelpMessageForCommand("CMD_HEARTBEAT", false)
 
 local function SetupServerConfig(config)
 	if (config == "complete" or config == "reload") and GetNSLModEnabled() then

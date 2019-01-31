@@ -201,7 +201,6 @@ local function OnClientCommandEnablePauseTesting(client)
 end
 
 RegisterNSLConsoleCommand("sv_nslpausedisconnect", OnClientCommandEnablePauseTesting, "SV_NSLPAUSEDISCONNECT")
-RegisterNSLHelpMessageForCommand("SV_NSLPAUSEDISCONNECT", true)
 
 local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	if client then
@@ -233,8 +232,9 @@ local function OnClientCommandForceReplacement(client, newPlayer, oldPlayer)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslreplaceplayer", OnClientCommandForceReplacement, "SV_NSLREPLACEPLAYER")
-RegisterNSLHelpMessageForCommand("SV_NSLREPLACEPLAYER", true)
+RegisterNSLConsoleCommand("sv_nslreplaceplayer", OnClientCommandForceReplacement, "SV_NSLREPLACEPLAYER", false,
+	{{ Type = "string", Error = "Please provide target player."},
+	{ Type = "string", Error = "Please provide old cached player."}})
 
 local function OnClientCommandListCachedPlayers(client)
 	if client then
@@ -249,7 +249,6 @@ local function OnClientCommandListCachedPlayers(client)
 end
 
 RegisterNSLConsoleCommand("sv_nsllistcachedplayers", OnClientCommandListCachedPlayers, "SV_NSLLISTCACHEDPLAYERS")
-RegisterNSLHelpMessageForCommand("SV_NSLLISTCACHEDPLAYERS", true)
 
 Class_Reload( "Player" )
 

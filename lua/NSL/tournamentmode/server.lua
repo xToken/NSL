@@ -235,8 +235,8 @@ local function OnCommandForceStartRound(client, duration)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslforcestart", OnCommandForceStartRound, "SV_NSLFORCESTART")
-RegisterNSLHelpMessageForCommand("SV_NSLFORCESTART", true)
+RegisterNSLConsoleCommand("sv_nslforcestart", OnCommandForceStartRound, "SV_NSLFORCESTART", false,
+	{{ Type = "string", Optional = true}})
 
 local function OnCommandCancelRoundStart(client)
 	if not client then return end
@@ -249,7 +249,6 @@ local function OnCommandCancelRoundStart(client)
 end
 
 RegisterNSLConsoleCommand("sv_nslcancelstart", OnCommandCancelRoundStart, "SV_NSLCANCELSTART")
-RegisterNSLHelpMessageForCommand("SV_NSLCANCELSTART", true)
 
 local function ClientReady(client)
 
@@ -313,7 +312,6 @@ local function OnCommandReady(client)
 end
 
 RegisterNSLConsoleCommand("ready", OnCommandReady, "CMD_READY", true)
-RegisterNSLHelpMessageForCommand("CMD_READY", false)
 gChatCommands["ready"] = OnCommandReady
 gChatCommands["!ready"] = OnCommandReady
 gChatCommands["rdy"] = OnCommandReady
@@ -346,7 +344,6 @@ local function OnCommandNotReady(client)
 end
 
 RegisterNSLConsoleCommand("notready", OnCommandNotReady, "CMD_NOTREADY", true)
-RegisterNSLHelpMessageForCommand("CMD_NOTREADY", false)
 gChatCommands["notready"] = OnCommandNotReady
 gChatCommands["!notready"] = OnCommandNotReady
 gChatCommands["notrdy"] = OnCommandNotReady

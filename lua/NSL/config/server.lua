@@ -60,9 +60,8 @@ function GetNSLCaptainsPlayerLimit()
 	return NSL_CaptainsPlayerLimit
 end
 
-function RegisterNSLServerCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed, nslAdminCommand)
+function RegisterNSLServerCommand(commandName)
 	NSL_ServerCommands[string.gsub(commandName, "Console_", "")] = true
-	CreateServerAdminCommand(commandName, commandFunction, helpText, optionalAlwaysAllowed)
 end
 
 local function SavePluginConfig()
@@ -380,6 +379,11 @@ local function GetGroupCanRunCommand(groupData, commandName)
 end
 
 function GetCanRunCommandviaNSL(ns2id, commandName)
+	-- Check for access to NSL commands
+	if NSL_ServerCommands[commandName] and GetNSLModEnabled() and GetIsNSLRef(ns2id) then
+		return true
+	end
+	-- Check for access to vanilla/shine style commands
 	if NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
@@ -400,11 +404,7 @@ function GetClientCanRunCommand(client, commandName, printWarning)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local canRun = false
-	if NSL_ServerCommands[commandName] and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
-		--Check if cmd is an NSL command, check perms
-		return true
-	elseif NSL_LeagueAdminsAccess and GetNSLModEnabled() and GetIsNSLRef(NS2ID) then
-		--Check if cmd is vanilla and leagueadminaccess is enabled
+	if GetIsNSLRef(NS2ID) then
 		canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
 	end
 	if not canRun then

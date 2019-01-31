@@ -32,4 +32,3 @@ local function OnClientHandicap( client, value )
 end
 
 RegisterNSLConsoleCommand("sv_nslhandicap", OnClientHandicap, "SV_NSLHANDICAP", true)
-RegisterNSLHelpMessageForCommand("SV_NSLHANDICAP", false)
