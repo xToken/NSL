@@ -14,7 +14,7 @@ originalCragOnCreate = Class_ReplaceMethod("Crag", "OnCreate",
 
 function Crag:TriggerClientSideHealingEffects()
 
-	if self.healWaveActive or self.healingActive then
+	if (self.healWaveActive or self.healingActive) and self:GetIsAlive() then
          
         local localPlayer = Client.GetLocalPlayer()
         local showHeal = not HasMixin(self, "Cloakable") or not self:GetIsCloaked() or not GetAreEnemies(self, localPlayer)
@@ -85,3 +85,42 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
     end
 )
 -- END GAMEINFO
+
+-- ARMORY
+local originalArmoryOnInitialized
+originalArmoryOnInitialized = Class_ReplaceMethod("Armory", "OnInitialized",
+    function(self)
+        originalArmoryOnInitialized(self)
+        self.lastArmoryAnimUpdate = Client.GetTime()
+    end
+)
+
+local UpdateArmoryAnim = GetNSLUpValue(Armory.OnUpdate, "UpdateArmoryAnim")
+
+function Armory:OnUpdateClientAnims(deltaTime)
+
+    self:UpdateArmoryWarmUp()
+
+    if GetIsUnitActive(self) and self.deployed then
+
+        -- Set pose parameters according to if we're logged in or not
+        UpdateArmoryAnim(self, "e", self.loggedInEast, self.timeScannedEast, deltaTime)
+        UpdateArmoryAnim(self, "n", self.loggedInNorth, self.timeScannedNorth, deltaTime)
+        UpdateArmoryAnim(self, "w", self.loggedInWest, self.timeScannedWest, deltaTime)
+        UpdateArmoryAnim(self, "s", self.loggedInSouth, self.timeScannedSouth, deltaTime)
+
+    end
+
+end
+
+Armory.OnUpdate = nil
+
+local originalArmoryOnUpdateRender
+originalArmoryOnUpdateRender = Class_ReplaceMethod("Armory", "OnUpdateRender",
+    function(self)
+        originalArmoryOnUpdateRender(self)
+        self:OnUpdateClientAnims(Clamp(Client.GetTime() - self.lastArmoryAnimUpdate, 0, 0.25))
+        self.lastArmoryAnimUpdate = Client.GetTime()
+    end
+)
+-- END ARMORY
