@@ -306,7 +306,7 @@ originalPhaseGateOnInitialized = Class_ReplaceMethod("PhaseGate", "OnInitialized
 )
 
 function PhaseGate:GetCanSleep()
-    return self:GetIsBuilt()
+    return self:GetIsBuilt() and self.deployed
 end
 -- END PHASEGATES
 
