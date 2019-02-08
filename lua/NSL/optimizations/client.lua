@@ -34,6 +34,16 @@ function Crag:TriggerClientSideHealingEffects()
     return self:GetIsAlive()
 
 end
+
+function Crag:OnUpdate(deltaTime)
+
+    PROFILE("Crag:OnUpdate")
+
+    ScriptActor.OnUpdate(self, deltaTime)
+    
+    UpdateAlienStructureMove(self, deltaTime)
+
+end
 -- END CRAG
 
 -- HARVESTER
