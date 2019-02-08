@@ -106,10 +106,12 @@ function ParasiteMixin:SetParasited( fromPlayer, durationOverride )
             if parasiteTimeChanged then
                 self.timeParasited = Shared.GetTime()
             end
+
+            if not self.parasited then
+                self:AddTimedCallback(ParasiteMixin.UpdateParasiteState, self.parasiteDuration)
+            end
             
             self.parasited = true
-
-            self:AddTimedCallback(ParasiteMixin.UpdateParasiteState, self.parasiteDuration)
             
         end
     
@@ -119,9 +121,13 @@ end
 
 function ParasiteMixin:TransferParasite(from)
     
-    self.parasiteDuration = from.parasiteDuration
+    self.parasiteDuration = from.parasiteDuration or kParasiteDuration
     self.timeParasited = from.timeParasited
     self.parasited = from.parasited
+
+    if self.parasited then
+        self:AddTimedCallback(ParasiteMixin.UpdateParasiteState, math.max(self.timeParasited + self.parasiteDuration - Shared.GetTime(), 1))
+    end
     
     if self.OnParasited and not self.parasited then
         self:OnParasited()
@@ -156,7 +162,7 @@ end
 function ParasiteMixin:UpdateParasiteState()
 
     if not self.parasited then
-        return
+        return false
     end
     
     -- See if parsited time is over
@@ -171,7 +177,7 @@ function ParasiteMixin:UpdateParasiteState()
         
     end
 
-    return false
+    return self.parasited and math.max(self.timeParasited + self.parasiteDuration - Shared.GetTime(), 1) or false
 
 end
 

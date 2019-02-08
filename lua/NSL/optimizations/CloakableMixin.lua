@@ -32,6 +32,13 @@ function CloakableMixin:OnTimedUpdate(deltaTime)
     return self:GetIsAlive()
 end
 
-CloakableMixin.OnUpdate = nil
+-- Support for CompMod S15
+function CloakableMixin:OnUpdate(deltaTime)
+    if false then
+        UpdateCloakState(self, deltaTime)
+    end
+end
+
+-- CloakableMixin.OnUpdate = nil
 CloakableMixin.OnProcessMove = nil
 CloakableMixin.OnProcessSpectate = nil

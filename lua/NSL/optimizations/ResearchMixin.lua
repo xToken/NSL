@@ -54,10 +54,16 @@ function ResearchMixin:__initmixin()
     
 end
 
+function ResearchMixin:GetShouldUpdateResearch()
+    return self.researchingId ~= kTechId.None and ( GetIsUnitActive(self) or 
+        ( HasMixin(self, "Recycle") and self.researchingId == kTechId.Recycle ) or 
+        ( HasMixin(self, "Consume") and self.researchingId == kTechId.Consume ) )
+end
+
 function ResearchMixin:UpdateResearch(deltaTime)
 
     local researchNode = self:GetTeam():GetTechTree():GetTechNode(self.researchingId)
-    if researchNode and self.researchingId ~= kTechId.None and ( GetIsUnitActive(self) or ( HasMixin(self, "Recycle") and self.researchingId == kTechId.Recycle ) ) then
+    if researchNode and self:GetShouldUpdateResearch() then
     
         local researchDuration = LookupTechData(researchNode:GetTechId(), kTechDataResearchTimeKey, 0.01)
         

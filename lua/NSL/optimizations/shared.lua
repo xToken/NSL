@@ -7,7 +7,6 @@
 EffectsMixin.OnProcessMove = nil
 EffectsMixin.OnUpdate = nil
 
-ScoringMixin.OnProcessMove = nil
 ScoringMixin.OnUpdate = nil
 
 CelerityMixin.OnProcessMove = nil

@@ -21,7 +21,9 @@ Script.Load("lua/NSL/firstpersonspecblock/server.lua")
 Script.Load("lua/NSL/handicap/server.lua")
 Script.Load("lua/NSL/heartbeat/server.lua")
 Script.Load("lua/NSL/messages/server.lua")
-Script.Load("lua/NSL/optimizations/server.lua")
+if NSL_Optimizations_Enabled then
+	Script.Load("lua/NSL/optimizations/server.lua")
+end
 Script.Load("lua/NSL/pause/server.lua")
 Script.Load("lua/NSL/playerdata/server.lua")
 Script.Load("lua/NSL/serversettings/server.lua")

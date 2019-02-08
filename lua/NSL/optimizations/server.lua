@@ -3,10 +3,6 @@
 -- lua/NSL/optimizations/server.lua
 -- - Dragon
 
-Script.Load("lua/NSL/optimizations/CloakableMixin.lua")
-Script.Load("lua/NSL/optimizations/LOSMixin.lua")
-Script.Load("lua/NSL/optimizations/RepositioningMixin.lua")
-
 local InternalSleep = GetNSLUpValue(SleeperMixin.CheckAll, "InternalSleep")
 local InternalWakeUp = GetNSLUpValue(SleeperMixin.CheckAll, "InternalWakeUp")
 local InternalGetCanSleep = GetNSLUpValue(SleeperOnUpdateServer, "InternalGetCanSleep")
@@ -24,6 +20,22 @@ function SleeperOnUpdateServer(deltaTime)
         SleeperMixin.timeLastCheckAll = Shared.GetTime()
     end
     
+end
+
+function SleeperMixin:OnKill()
+    self:WakeUp()
+end
+
+function SleeperMixin:OnConstructionComplete()
+    self:WakeUp()
+end
+
+function SleeperMixin:OnPowerOn()
+    self:WakeUp()
+end
+
+function SleeperMixin:OnPowerOff()
+    self:WakeUp()
 end
 
 Event.Hook("UpdateServer", SleeperOnUpdateServer)
@@ -51,105 +63,6 @@ originalDeathTriggerOnTriggerEntered = Class_ReplaceMethod("DeathTrigger", "OnTr
 	end
 )
 -- END DEATH TRIGGER
-
--- CRAG
-local function OnCragHealCallback(self)
-	if GetIsUnitActive(self) then
-		self:PerformHealing()
-		self.healingActive = self:GetIsHealingActive()
-        self.healWaveActive = self:GetIsHealWaveActive()
-	end
-	return self:GetIsAlive()
-end
-
-local originalCragOnCreate
-originalCragOnCreate = Class_ReplaceMethod("Crag", "OnCreate",
-	function(self)
-		originalCragOnCreate(self)
-		self:AddTimedCallback(OnCragHealCallback, Crag.kHealInterval)
-	end
-)
-
-function Crag:GetCanSleep()
-    return not self.moving and self:GetIsBuilt() and not self:GetHasOrder() and self:GetIsAlive() and not self.isRepositioning
-end
-
-function Crag:OnUpdate(deltaTime)
-
-    PROFILE("Crag:OnUpdate")
-
-    ScriptActor.OnUpdate(self, deltaTime)
-    
-    UpdateAlienStructureMove(self, deltaTime)
-
-end
-
-function Crag:OnOrderGiven(order)
-    if order and order:GetType() == kTechId.Move then
-    	self:WakeUp()
-    end
-end
--- END CRAG
-
--- SHADE
-local originalShadeOnInitialized
-originalShadeOnInitialized = Class_ReplaceMethod("Shade", "OnInitialized",
-	function(self)
-		originalShadeOnInitialized(self)
-		InitMixin(self, SleeperMixin)
-	end
-)
-
-function Shade:GetCanSleep()
-    return not self.moving and self:GetIsBuilt() and not self:GetHasOrder() and self:GetIsAlive() and not self.isRepositioning
-end
-
-function Shade:OnOrderGiven(order)
-    if order and order:GetType() == kTechId.Move then
-    	self:WakeUp()
-    end
-end
--- END SHADE
-
--- SHIFT
-local UpdateShiftButtons = GetNSLUpValue(Shift.OnUpdate, "UpdateShiftButtons")
-local kEchoCooldown = 1
-
-local function OnShiftButtonsCallback(self)
-	UpdateShiftButtons(self)
-	self.echoActive = self.timeLastEcho + kEchoCooldown > Shared.GetTime()
-	return self:GetIsAlive()
-end
-
-local originalShiftOnCreate
-originalShiftOnCreate = Class_ReplaceMethod("Shift", "OnCreate",
-	function(self)
-		originalShiftOnCreate(self)
-        InitMixin(self, SleeperMixin)
-		self:AddTimedCallback(OnShiftButtonsCallback, 2)
-	end
-)
-
-function Shift:GetCanSleep()
-    return not self.moving and self:GetIsBuilt() and not self:GetHasOrder() and self:GetIsAlive() and not self.isRepositioning
-end
-
-function Shift:OnUpdate(deltaTime)
-
-    PROFILE("Shift:OnUpdate")
-
-    ScriptActor.OnUpdate(self, deltaTime)
-    
-    UpdateAlienStructureMove(self, deltaTime)
-
-end
-
-function Shift:OnOrderGiven(order)
-    if order and order:GetType() == kTechId.Move then
-    	self:WakeUp()
-    end
-end
--- END SHIFT
 
 -- RESOURCE TOWERS
 local function OnCollectResourcesCallback(self)
@@ -315,6 +228,12 @@ end
 function TunnelEntrance:GetCanSleep()
     return false -- For now...
 end
+
+if TunnelExit then
+    function TunnelExit:GetCanSleep()
+        return false
+    end
+end
 -- END TUNNELS
 
 -- WHIP
@@ -343,9 +262,67 @@ originalArmsLabOnInitialized = Class_ReplaceMethod("ArmsLab", "OnInitialized",
 )
 
 function ArmsLab:GetCanSleep()
-	return true
+	return self:GetIsBuilt()
 end
 -- END ARMSLAB
+
+-- ARMORY
+local originalArmoryOnInitialized
+originalArmoryOnInitialized = Class_ReplaceMethod("Armory", "OnInitialized",
+    function(self)
+        originalArmoryOnInitialized(self)
+        InitMixin(self, SleeperMixin)
+    end
+)
+
+function Armory:GetCanSleep()
+    return self:GetIsBuilt()
+end
+
+Armory.OnUpdate = nil
+-- END ARMORY
+
+-- SENTRYBATTERY
+local originalSentryBatteryOnInitialized
+originalSentryBatteryOnInitialized = Class_ReplaceMethod("SentryBattery", "OnInitialized",
+    function(self)
+        originalSentryBatteryOnInitialized(self)
+        InitMixin(self, SleeperMixin)
+    end
+)
+
+function SentryBattery:GetCanSleep()
+    return self:GetIsBuilt()
+end
+-- END SENTRYBATTERY
+
+-- PHASEGATES
+local originalPhaseGateOnInitialized
+originalPhaseGateOnInitialized = Class_ReplaceMethod("PhaseGate", "OnInitialized",
+    function(self)
+        originalPhaseGateOnInitialized(self)
+        InitMixin(self, SleeperMixin)
+    end
+)
+
+function PhaseGate:GetCanSleep()
+    return self:GetIsBuilt()
+end
+-- END PHASEGATES
+
+-- ROBOTICSFACTORY
+local originalRoboticsFactoryOnInitialized
+originalRoboticsFactoryOnInitialized = Class_ReplaceMethod("RoboticsFactory", "OnInitialized",
+    function(self)
+        originalRoboticsFactoryOnInitialized(self)
+        InitMixin(self, SleeperMixin)
+    end
+)
+
+function RoboticsFactory:GetCanSleep()
+    return self:GetIsBuilt()
+end
+-- END ROBOTICSFACTORY
 
 -- WEAPON
 local originalWeaponOnInitialized
@@ -553,86 +530,50 @@ function PowerConsumerMixin:OnUpdatePowerSurge()
 end
 -- END PowerConsumerMixin
 
--- ScoringMixin
-function ScoringMixin:__initmixin()
-    
-    PROFILE("ScoringMixin:__initmixin")
-    
-    self.score = 0
-    -- Some types of points are added continuously. These are tracked here.
-    self.continuousScores = { }
-    
-    self.serverJoinTime = Shared.GetTime()
+-- ConsumeMixin
+-- COMPMOD S15
+if ConsumeMixin then
 
-    self.playerLevel = -1
-    self.totalXP = -1
-    self.playerSkill = -1
-    self.adagradSum = 0
-    
-    self.weightedEntranceTimes = {}
-    self.weightedEntranceTimes[kTeam1Index] = {}
-    self.weightedEntranceTimes[kTeam2Index] = {}
-    
-    self.weightedExitTimes = {}
-    self.weightedExitTimes[kTeam1Index] = {}
-    self.weightedExitTimes[kTeam2Index] = {}
+    local function OnConsumeCompleted(self)
+        DestroyEntity(self)
+    end
 
-    self:AddTimedCallback(ScoringMixin.OnUpdateTimes, 1)
-    
+    function ConsumeMixin:OnResearchComplete(researchId)
+
+        if researchId == kTechId.Consume then
+
+            -- Do not display new killfeed messages during concede sequence
+            if GetConcedeSequenceActive() then
+                return
+            end
+
+            self:TriggerEffects("recycle_end")
+            Server.SendNetworkMessage( "Consume", { techId = self:GetTechId() }, true )
+
+            local team = self:GetTeam()
+            local deathMessageTable = team:GetDeathMessage(team:GetCommander(), kDeathMessageIcon.Consumed, self)
+            team:ForEachPlayer(function(player) Server.SendNetworkMessage(player:GetClient(), "DeathMessage", deathMessageTable, true) end)
+
+            self.consumed = true
+            self.timeConsumed = Shared.GetTime()
+
+            self:OnConsumed()
+
+            self:AddTimedCallback(OnConsumeCompleted, 2 + 1)
+
+        end
+
+    end
 end
-
-function ScoringMixin:OnUpdateTimes(deltaTime)
-
-    if not self.commanderTime then
-        self.commanderTime = 0
-    end
-    
-    if not self.playTime then
-        self.playTime = 0
-    end
-    
-    if not self.marineTime then
-        self.marineTime = 0
-    end
-    
-    if not self.alienTime then
-        self.alienTime = 0
-    end    
-    
-    if self:GetIsPlaying() then
-    
-        if self:isa("Commander") then
-            self.commanderTime = self.commanderTime + deltaTime
-        end
-        
-        self.playTime = self.playTime + deltaTime
-        
-        if self:GetTeamType() == kMarineTeamType then
-            self.marineTime = self.marineTime + deltaTime
-        end
-        
-        if self:GetTeamType() == kAlienTeamType then
-            self.alienTime = self.alienTime + deltaTime
-        end
-    
-    end
-
-    return true
-
-end
--- END ScoringMixin
 
 -- TODOS:
 --[[
 ----------------------------
 Structures:
 ----------------------------
-Armory
-InfantryPortal
-Observatory
-PrototypeLab
+Sentry
 Tunnel
-TunnelEntrance
+TunnelEntrance (+Exit)
 Web
 -----------------------------
 OTHERS:
@@ -653,8 +594,6 @@ PulseEffect
 ----------------------------
 Figure out:
 ----------------------------
--- NOT REQUIRED ATM, these structures dont sleep
-MinimapConnectionMixin
 
 -- PLAYER MIXINS, not important ATM
 PickupableMixin
