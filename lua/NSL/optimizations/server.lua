@@ -276,7 +276,7 @@ originalArmoryOnInitialized = Class_ReplaceMethod("Armory", "OnInitialized",
 )
 
 function Armory:GetCanSleep()
-    return self:GetIsBuilt()
+    return self:GetIsBuilt() and self.deployed
 end
 
 Armory.OnUpdate = nil
