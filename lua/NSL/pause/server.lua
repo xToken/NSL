@@ -315,6 +315,9 @@ local function ResumeEntStates()
 				break
 			end
 		end
+		if ent.WakeUp then
+			ent:WakeUp()
+		end
 	end
 
 end
