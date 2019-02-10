@@ -88,14 +88,9 @@ end
 local function GetRefBadgeforID(ns2id)
 	local NSLBadges = GetNSLConfigValue("Badges")
 	if NSLBadges and type(NSLBadges) == "table" then
-		local level = 0
 		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level then
-			if pData.NSL_Level <= level then
-				return
-			end
-			level = pData.NSL_Level
-			return NSLBadges[level].badge, NSLBadges[level].name
+		if pData and pData.NSL_Level and pData.NSL_Level > 0 then
+			return NSLBadges[pData.NSL_Level].badge, NSLBadges[pData.NSL_Level].name
 		end
 	end
 end
@@ -167,16 +162,16 @@ local function OnClientConnectENSLResponse(response)
 					NSL_League = "ENSL"
 				}
 				if responsetable.admin then
-					clientData.NSL_Level = 4
+					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Admin"
 				elseif responsetable.referee then
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 2
 					clientData.NSL_Rank = "Ref"
 				elseif responsetable.caster then
-					clientData.NSL_Level = 2
+					clientData.NSL_Level = 1
 					clientData.NSL_Rank = "Caster"
 				elseif responsetable.moderator then
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 2
 					clientData.NSL_Rank = "Mod"
 				else
 					clientData.NSL_Level = 0
@@ -187,7 +182,7 @@ local function OnClientConnectENSLResponse(response)
 				local cRefs = GetNSLConfigValue("REFS")
 				if cRefs and table.contains(cRefs, ns2id) then
 					--A manually configured 'Ref' - give them ref level
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 2
 					clientData.NSL_Rank = "Ref"
 				end
 				
@@ -219,7 +214,7 @@ local function OnClientConnectAUSNS2Response(response)
 					NSL_ID = responsetable.UserID or "",
 					NSL_TID = responsetable.TeamID or "",
 					NSL_Level = responsetable.IsAdmin and 1 or 0,
-					NSL_Rank = nil,
+					NSL_Rank = responsetable.IsAdmin and "Admin" or nil,
 					NSL_Icon = nil,
 					NSL_League = "AUSNS2"}
 					
@@ -448,7 +443,7 @@ local function OnClientCommandShowFunctionData(client, target)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local heading = false
-	if GetIsNSLAdmin(NS2ID) then
+	if GetIsNSLRef(NS2ID) then
 		local targetPlayer = NSLGetPlayerMatching(target)
 		local targetClient
 		if targetPlayer then
