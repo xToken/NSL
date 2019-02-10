@@ -4,48 +4,40 @@
 		{
 		"PerfLevel":							"Low",
 		"Interp": 								80,
-		"MoveRate": 							33,
+		"MoveRate": 							40,
 		"ClientRate": 							33,
-		"TickRate":								33,
+		"TickRate":								40,
 		"MaxDataRate": 							100
 		},
 		{
 		"PerfLevel":							"Medium",
 		"Interp": 								50,
-		"MoveRate": 							40,
+		"MoveRate": 							50,
 		"ClientRate": 							40,
-		"TickRate":								40,
+		"TickRate":								50,
 		"MaxDataRate": 							100
 		},
 		{
 		"PerfLevel":							"High",
 		"Interp": 								40,
-		"MoveRate": 							50,
+		"MoveRate": 							60,
 		"ClientRate": 							50,
-		"TickRate":								50,
+		"TickRate":								60,
 		"MaxDataRate": 							100
 		},
 		{
 		"PerfLevel":							"Extreme",
 		"Interp": 								33,
-		"MoveRate": 							60,
+		"MoveRate": 							70,
 		"ClientRate": 							60,
-		"TickRate":								65,
+		"TickRate":								70,
 		"MaxDataRate": 							100
 		},
 		{
 		"PerfLevel":							"Experimental",
-		"Interp": 								70,
-		"MoveRate": 							50,
-		"ClientRate": 							20,
-		"TickRate":								30,
-		"MaxDataRate": 							100
-		},
-		{
-		"PerfLevel":							"Experimental2",
 		"Interp": 								15,
 		"MoveRate": 							100,
-		"ClientRate": 							100,
+		"ClientRate": 							95,
 		"TickRate":								100,
 		"MaxDataRate": 							100
 		}
