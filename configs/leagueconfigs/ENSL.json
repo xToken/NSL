@@ -1,10 +1,9 @@
 {
-"Version": 3.1,
+"Version": 3.2,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
-"PlayerRefLevel": 						2,
-"PlayerAdminLevel":						3,
+"PlayerRefLevel": 						1,
 "AutomaticMapCycleDelay":				10800,
 "PauseEndDelay": 						5,
 "PauseStartDelay": 						5,
@@ -53,7 +52,6 @@
 											"UseDefaultSkins":						true
 										},
 "Badges":				 				[
-											{"badge": "ensl_mod", 		"name": "ENSL Moderator"},
 											{"badge": "ensl_caster", 	"name": "ENSL Caster"},
 											{"badge": "ensl_ref", 		"name": "ENSL Referee"},
 											{"badge": "ensl_admin",		"name": "ENSL Admin"},

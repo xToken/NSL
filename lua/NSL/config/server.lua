@@ -11,7 +11,7 @@ local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
 								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.0, leaguesConfigComplete = false,
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.1, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.2, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
 							}
 local NSL_Mode = kNSLPluginConfigs.DISABLED
@@ -338,16 +338,6 @@ function GetIsNSLRef(ns2id)
 		local pData = GetNSLUserData(ns2id)
 		if pData and pData.NSL_Level then
 			return pData.NSL_Level >= GetNSLConfigValue("PlayerRefLevel")
-		end
-	end
-	return false
-end
-
-function GetIsNSLAdmin(ns2id)
-	if ns2id then
-		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level then
-			return pData.NSL_Level >= GetNSLConfigValue("PlayerAdminLevel")
 		end
 	end
 	return false

@@ -1,10 +1,9 @@
 {
-"Version": 3.1,
+"Version": 3.2,
 "LeagueName": 							"AusNS2",
 "PlayerDataURL": 						"http://ausns2.org/league-api.php?lookup=player&steamid=",
 "PlayerDataFormat":						"AUSNS",
 "PlayerRefLevel": 						1,
-"PlayerAdminLevel":						1,
 "AutomaticMapCycleDelay":				10800,
 "PauseEndDelay": 						5,
 "PauseStartDelay": 						1,

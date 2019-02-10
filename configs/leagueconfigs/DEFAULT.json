@@ -1,10 +1,9 @@
 {
-"Version": 3.1,
+"Version": 3.2,
 "LeagueName": 							"DEFAULT",
 "PlayerDataURL": 						"www.yournicewebsite.com",
 "PlayerDataFormat":						"N/A",
-"PlayerRefLevel": 						2,
-"PlayerAdminLevel":						3,
+"PlayerRefLevel": 						1,
 "AutomaticMapCycleDelay":				10800,
 "PauseEndDelay": 						5,
 "PauseStartDelay": 						5,
@@ -53,7 +52,7 @@
 											"UseDefaultSkins":						true
 										},
 "Badges":				 				[
-											{"badge": "mod", 		"name": "Moderator"},
+											{"badge": "ref", 		"name": "Referee"},
 										],
 "REFS":									[
 											123456789101112131415
