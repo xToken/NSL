@@ -320,7 +320,24 @@ originalRoboticsFactoryOnInitialized = Class_ReplaceMethod("RoboticsFactory", "O
 )
 
 function RoboticsFactory:GetCanSleep()
-    return self:GetIsBuilt()
+    return self:GetIsBuilt() and not self.open
+end
+
+-- Create entity but don't let the commander take control until it has rolled out
+function RoboticsFactory:OverrideCreateManufactureEntity(techId)
+
+    if techId == kTechId.ARC or techId == kTechId.MAC then
+    
+        self.researchId = techId
+        self.open = true
+
+        self:WakeUp()
+        
+        -- Create entity inside ourselves, but wait until we are open before we move
+        self.builtEntity = self:ManufactureEntity()
+        
+    end
+    
 end
 -- END ROBOTICSFACTORY
 
