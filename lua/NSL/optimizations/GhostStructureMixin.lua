@@ -53,7 +53,6 @@ function GhostStructureMixin:__initmixin()
         --Set this to false, hopefully triggers fieldwatcher then?
         self.isGhostStructure = false
         self:AddFieldWatcher("isGhostStructure", GhostStructureMixin.OnUpdateGhostEffects)
-
     end
 
     self:AddTimedCallback(SetupTriggerBody, 0)
@@ -84,11 +83,6 @@ local function ClearGhostStructure(self, refundScalar)
 
         DestroyEntity(self)
 
-    end
-
-    if Client then
-        -- Allow some grace for prediction of entity being poofed?
-        self:SetModel(nil)
     end
     
 end
