@@ -1,5 +1,17 @@
 # Changelog
 
+## 2-14-19 (Buld 117)
+- Removed client side model clear on ghost structure poofing, was causing asserts for spectators.
+
+## 2-9-19 (Build 116)
+- Fixed ARCs and MACs getting stuck in the Robo because it didnt open :<
+
+## 2-8-19 (Build 115)
+- Re-enabled optimizations module (beware!)
+
+## 1-30-19 | 2-5-19 (Builds 113-114)
+- A/B testing of optimizations module
+
 ## 1-28-19 (Build 112)
 - Adjusted all console commands to use default admin commands hooks - Refs are still given access to 'league' based commands.  No change in overall functionality
 - Added 'Optimizations' module which reconfigures sleep mixin to actually completely turn off entity updates - various mixin and other tweaks to support this
