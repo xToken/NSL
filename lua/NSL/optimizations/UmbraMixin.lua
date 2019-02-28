@@ -50,7 +50,6 @@ function UmbraMixin:__initmixin()
     if Client then
         self.timeLastUmbraEffect = 0
         self.umbraIntensity = 0
-        self:AddFieldWatcher("dragsUmbra", UmbraMixin.TriggerClientSideUmbraEffects)
     end
     
 end
@@ -96,48 +95,40 @@ if Server then
     
 end
 
-function UmbraMixin:TriggerClientSideUmbraEffects()
-    if self:GetHasUmbra() then
-        self:AddTimedCallback(UmbraMixin.UpdateClientSideUmbraEffects, kEffectInterval)
-    end
-    return true
-end
-
-function UmbraMixin:UpdateClientSideUmbraEffects(deltaTime)
-
-    if self:GetHasUmbra() then
-    
-        local effectInterval = kStaticEffectInterval
-        if self.lastOrigin ~= self:GetOrigin() then
-            effectInterval = kEffectInterval
-            self.lastOrigin = self:GetOrigin()
-        end
-
-        if self.timeLastUmbraEffect + effectInterval < Shared.GetTime() then
-        
-            local coords = self:GetCoords()
-            
-            if HasMixin(self, "Target") then
-                coords.origin = self:GetEngagementPoint()
-            end
-        
-            self:TriggerEffects("umbra_drag", { effecthostcoords = coords } )
-            self.timeLastUmbraEffect = Shared.GetTime()
-        end
-        
-        self.umbraIntensity = 1
-        
-    else
-    
-        self.umbraIntensity = math.max(0, self.umbraIntensity - deltaTime * .5)
-    
-    end
-
-    return self.umbraIntensity > 0
-
-end
-
 function UmbraMixin:OnUpdateRender()
+
+    if self:GetHasUmbra() or self.umbraIntensity > 0 then
+
+        if self:GetHasUmbra() then
+    
+            local effectInterval = kStaticEffectInterval
+            if self.lastOrigin ~= self:GetOrigin() then
+                effectInterval = kEffectInterval
+                self.lastOrigin = self:GetOrigin()
+            end
+
+            if self.timeLastUmbraEffect + effectInterval < Shared.GetTime() then
+            
+                local coords = self:GetCoords()
+                
+                if HasMixin(self, "Target") then
+                    coords.origin = self:GetEngagementPoint()
+                end
+            
+                self:TriggerEffects("umbra_drag", { effecthostcoords = coords } )
+                self.timeLastUmbraEffect = Shared.GetTime()
+            end
+            
+            self.umbraIntensity = 1
+            
+        else
+            
+            self.lastUmbraIntensityUpdate = self.lastUmbraIntensityUpdate or (Shared.GetTime() - 0.05)
+            self.umbraIntensity = math.max(0, self.umbraIntensity - (Shared.GetTime() - self.lastUmbraIntensityUpdate) * .5)
+        
+        end
+
+    end
 
     local model = self:GetRenderModel()
     if model then
