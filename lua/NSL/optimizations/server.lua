@@ -3,6 +3,42 @@
 -- lua/NSL/optimizations/server.lua
 -- - Dragon
 
+-- TODOS:
+--[[
+----------------------------
+Structures:
+----------------------------
+Sentry
+Tunnel
+TunnelEntrance (+Exit)
+Web
+-----------------------------
+OTHERS:
+-----------------------------
+DOTMarker
+Effect -- Only Client Side?
+ObjectiveInfo
+DropPack
+Pheromone
+ResourcePoint
+SpawnBlocker
+TechPoint
+TimedEmitter
+Tracer
+PulseEffect
+----------------------------
+Figure out:
+----------------------------
+
+-- PLAYER MIXINS, not important ATM
+PickupableMixin
+PickupableWeaponMixin
+SprintMixin
+StunMixin
+TunnelUserMixin
+WebableMixin
+--]]
+
 local InternalSleep = GetNSLUpValue(SleeperMixin.CheckAll, "InternalSleep")
 local InternalWakeUp = GetNSLUpValue(SleeperMixin.CheckAll, "InternalWakeUp")
 local InternalGetCanSleep = GetNSLUpValue(SleeperOnUpdateServer, "InternalGetCanSleep")
@@ -83,7 +119,7 @@ originalResourceTowerOnCreate = Class_ReplaceMethod("ResourceTower", "OnCreate",
 local originalResourceTowerGetCanSleep
 originalResourceTowerGetCanSleep = Class_ReplaceMethod("ResourceTower", "GetCanSleep",
     function(self)
-        return self:GetIsBuilt()
+        return self:GetIsBuilt() and self:GetIsAlive()
     end
 )
 
@@ -114,6 +150,13 @@ originalARCOnOrderGiven = Class_ReplaceMethod("ARC", "OnOrderGiven",
 -- END ARC
 
 -- CYST
+-- CYSTS use a fixed time on every update, so once we have 'slept' it properly, it will callback like crazy upon first wakeup
+function Cyst:WakeUp()
+    if self.nextUpdate < Shared.GetTime() then
+        self.nextUpdate = Shared.GetTime()
+    end
+end
+
 function Cyst:GetCanSleep()
     return self:GetIsActuallyConnected() and self:GetIsAlive() and self:GetIsBuilt()
 end
@@ -129,7 +172,34 @@ function Cyst:OnEntityChange(entityId, newEntityId)
     end
 
 end
+
+local originalCystOnKill
+originalCystOnKill = Class_ReplaceMethod("Cyst", "OnKill",
+    function(self)
+        for _, id in ipairs(self.children) do
+            local cyst = Shared.GetEntity(id)
+            if cyst then
+                cyst:WakeUp()
+            end
+        end
+        originalCystOnKill(self)
+    end
+)  
 -- END CYST
+
+-- HIVE
+local originalHiveOnKill
+originalHiveOnKill = Class_ReplaceMethod("Hive", "OnKill",
+    function(self)
+        originalHiveOnKill(self)
+        local cysts = GetEntitiesForTeamWithinRange("Cyst", self:GetTeamNumber(), self:GetOrigin(), self:GetCystParentRange())
+        for _, cyst in ipairs(cysts) do
+            -- WAKEUP LAZY CYSTS, go find your parent
+            cyst:WakeUp()
+        end
+    end
+)
+-- END HIVE
 
 -- DRIFTER
 local kDetectInterval = 0.5
@@ -419,6 +489,118 @@ function NutrientMist:RequestHealing(requestorId)
 end
 -- END NUTRIENT MIST
 
+-- SOUND EFFECTS
+local kSoundEndBufferTime = 0.5
+
+local originalSoundEffectOnCreate
+originalSoundEffectOnCreate = Class_ReplaceMethod("SoundEffect", "OnCreate",
+    function(self)
+        originalSoundEffectOnCreate(self)
+        self:SetUpdates(false)
+    end
+)
+
+function SoundEffect:SetAsset(assetPath)
+    
+    if string.len(assetPath) == 0 then
+        return
+    end
+    
+    local assetIndex = Shared.GetSoundIndex(assetPath)
+    if assetIndex == 0 then
+    
+        Shared.Message("Effect " .. assetPath .. " wasn't precached")
+        return
+        
+    end
+    
+    self.assetIndex = assetIndex
+    self.assetLength = GetSoundEffectLength(assetPath)
+    self.assetPath = assetPath
+
+    --[[
+    if not self:GetParent() and self:GetOrigin() == Vector(0,0,0) then
+        Print("Warning: %s is being player at (0,0,0)", assetPath)
+    end
+    --]]
+    
+end
+
+function SoundEffect:CheckAndDestroy()
+
+    if not self.playing then
+        DestroyEntity(self)
+        return false
+    end
+
+    if self.playing and Shared.GetTime() > self.startTime + self.assetLength + kSoundEndBufferTime then
+        -- If we are still playing and past our lifetime, destroy
+        self.playing = false
+    end
+
+    -- If not, return approximate adjusted lifetime left if still playing, otherwise just cancel - the stop tag should have cleaned us?
+    return self.playing and math.max((self.startTime + self.assetLength + kSoundEndBufferTime) - Shared.GetTime(), kSoundEndBufferTime) or kSoundEndBufferTime
+
+end
+
+function SoundEffect:Start()
+    
+    -- Asset must be assigned before playing.
+    assert(self.assetIndex ~= 0)
+    
+    self.playing = true
+    self.startTime = Shared.GetTime()
+
+    -- When we start playing, determine expiry timer
+    if not self:GetIsMapEntity() and self.assetLength >= 0 then
+        self:AddTimedCallback(SoundEffect.CheckAndDestroy, self.assetLength + kSoundEndBufferTime)
+    end
+
+end
+
+SoundEffect.OnUpdate = nil 
+function SoundEffect:OnProcessMove()
+end
+-- END SOUND EFFECTS
+
+-- PARTICLE EFFECTS
+local function CleanupParticleEffect(self)
+    DestroyEntity(self)
+    return false
+end
+
+local originalParticleEffectOnCreate
+originalParticleEffectOnCreate = Class_ReplaceMethod("ParticleEffect", "OnCreate",
+    function(self)
+        originalParticleEffectOnCreate(self)
+        self:SetUpdates(false)
+    end
+)
+
+-- BAH
+local CreateEffect = GetNSLUpValue(Shared.CreateEffect, "CreateEffect")
+
+function Shared.CreateEffect(player, effectName, parent, coords)
+    local e = CreateEffect(player, effectName, parent, coords)
+    e:AddTimedCallback(CleanupParticleEffect, e.lifeTime)
+    return e
+end
+
+function Shared.CreateAttachedEffect(player, effectName, parent, coords, attachPoint, view)
+
+    -- We only attach effects to the view model on the client (i.e. during prediction)
+    assert(view == nil or view == false)
+    local e = CreateEffect(player, effectName, parent, coords, attachPoint)
+    e:AddTimedCallback(CleanupParticleEffect, e.lifeTime)
+    return e
+    
+end
+
+ParticleEffect.OnUpdate = nil
+function ParticleEffect:OnProcessMove()
+end
+-- END PARTICLE EFFECTS
+
 -- CLOG FALL NONSENSE
 local oldClogFallMixin_AllChildFalling = ClogFallMixin_AllChildFalling
 function ClogFallMixin_AllChildFalling(self)
@@ -582,41 +764,3 @@ if ConsumeMixin then
 
     end
 end
-
--- TODOS:
---[[
-----------------------------
-Structures:
-----------------------------
-Sentry
-Tunnel
-TunnelEntrance (+Exit)
-Web
------------------------------
-OTHERS:
------------------------------
-DOTMarker
-Effect
-ObjectiveInfo
-DropPack
-ParticleEffect
-Pheromone
-ResourcePoint
-SoundEffect
-SpawnBlocker
-TechPoint
-TimedEmitter
-Tracer
-PulseEffect
-----------------------------
-Figure out:
-----------------------------
-
--- PLAYER MIXINS, not important ATM
-PickupableMixin
-PickupableWeaponMixin
-SprintMixin
-StunMixin
-TunnelUserMixin
-WebableMixin
---]]
