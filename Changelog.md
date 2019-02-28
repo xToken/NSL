@@ -1,5 +1,10 @@
 # Changelog
 
+## 2-28-19 (Buld 118)
+- Fixed cysts ticking too fast after they had slept for a considerable amount of time
+- Fixed umbra effect sometimes lingering on entities forever
+- Re-enabled optimizations module
+
 ## 2-14-19 (Buld 117)
 - Removed client side model clear on ghost structure poofing, was causing asserts for spectators.
 
