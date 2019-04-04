@@ -490,6 +490,7 @@ end
 -- END NUTRIENT MIST
 
 -- SOUND EFFECTS
+--[[
 local kSoundEndBufferTime = 0.5
 
 local originalSoundEffectOnCreate
@@ -522,7 +523,6 @@ function SoundEffect:SetAsset(assetPath)
     if not self:GetParent() and self:GetOrigin() == Vector(0,0,0) then
         Print("Warning: %s is being player at (0,0,0)", assetPath)
     end
-    --]]
     
 end
 
@@ -561,6 +561,7 @@ end
 SoundEffect.OnUpdate = nil 
 function SoundEffect:OnProcessMove()
 end
+--]]
 -- END SOUND EFFECTS
 
 -- PARTICLE EFFECTS
