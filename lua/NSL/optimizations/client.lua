@@ -105,7 +105,7 @@ originalArmoryOnInitialized = Class_ReplaceMethod("Armory", "OnInitialized",
     end
 )
 
-local UpdateArmoryAnim = GetNSLUpValue(Armory.OnUpdate, "UpdateArmoryAnim")
+local UpdateArmoryAnim = debug.getupvaluex(Armory.OnUpdate, "UpdateArmoryAnim")
 
 function Armory:OnUpdateClientAnims(deltaTime)
 
@@ -136,7 +136,6 @@ originalArmoryOnUpdateRender = Class_ReplaceMethod("Armory", "OnUpdateRender",
 -- END ARMORY
 
 -- SOUND EFFECTS
---[[
 local function DestroySoundEffect(self)
     
     if self.soundEffectInstance then
@@ -145,7 +144,7 @@ local function DestroySoundEffect(self)
         self.soundEffectInstance = nil
         
     end
-    
+
 end
 
 local originalSoundEffectOnCreate
@@ -153,74 +152,55 @@ originalSoundEffectOnCreate = Class_ReplaceMethod("SoundEffect", "OnCreate",
     function(self)
         originalSoundEffectOnCreate(self)
         self:SetUpdates(false)
-        self:AddFieldWatcher("assetIndex", SoundEffect.UpdateClientPlaybackState)
+        self:AddFieldWatcher("assetIndex", SoundEffect.UpdateClientAsset)
         self:AddFieldWatcher("playing", SoundEffect.UpdateClientPlaybackState)
         self:AddFieldWatcher("startTime", SoundEffect.UpdateClientPlaybackState)
-        self:AddFieldWatcher("positional", SoundEffect.UpdateClientPlaybackState)
-        self:AddFieldWatcher("volume", SoundEffect.UpdateClientPlaybackState)
+        self:AddFieldWatcher("positional", SoundEffect.UpdateClientPositionalState)
+        self:AddFieldWatcher("volume", SoundEffect.UpdateClientVolumeState)
     end
 )
 
 function SoundEffect:UpdateClientPlaybackEffects()
 
-    if self.assetIndex ~= 0 then
+    if self.soundEffectInstance then
 
-        if self.clientAssetIndex ~= self.assetIndex then
-
-            DestroySoundEffect(self)
-    
-            if self.assetIndex ~= 0 then
+        if self.clientPlaying ~= self.playing or self.clientStartTime ~= self.startTime then
+        
+            self.clientPlaying = self.playing
+            self.clientStartTime = self.startTime
             
-                self.soundEffectInstance = Client.CreateSoundEffect(self.assetIndex)
-                self.soundEffectInstance:SetParent(self:GetId())
-                
-            end
-
-            self.clientAssetIndex = self.assetIndex
-
-        end
-
-        if self.soundEffectInstance then
-    
-            if self.clientPlaying ~= self.playing or self.clientStartTime ~= self.startTime then
+            if self.playing then
             
-                self.clientPlaying = self.playing
-                self.clientStartTime = self.startTime
+                self.soundEffectInstance:Start()
+                self.soundEffectInstance:SetVolume(self.volume)
+                self.soundEffectInstance:SetPositional(self.positional)
+
+                if self.clientSetParameters then
                 
-                if self.playing then
-                
-                    self.soundEffectInstance:Start()
+                    for c = 1, #self.clientSetParameters do
                     
-                    if self.clientSetParameters then
-                    
-                        for c = 1, #self.clientSetParameters do
-                        
-                            local param = self.clientSetParameters[c]
-                            self.soundEffectInstance:SetParameter(param.name, param.value, param.speed)
-                            
-                        end
-                        self.clientSetParameters = nil
+                        local param = self.clientSetParameters[c]
+                        self.soundEffectInstance:SetParameter(param.name, param.value, param.speed)
                         
                     end
+                    self.clientSetParameters = nil
                     
-                else
-                    self.soundEffectInstance:Stop()
                 end
                 
-            end
+            else
+                self.soundEffectInstance:Stop()
 
-            if self.clientVolume ~= self.volume then
-                self.soundEffectInstance:SetVolume(self.volume)
-                self.clientVolume = self.volume
-            end
+                if self.loopingSound then
+                    self:SetUpdates(false)
+                end
 
-            if self.clientPositional ~= self.positional then
-        
-                self.soundEffectInstance:SetPositional(self.positional)
-                self.clientPositional = self.positional
-                
             end
+            
+        end
 
+        if self.clientVolume ~= self.volume then
+            self.soundEffectInstance:SetVolume(self.volume)
+            self.clientVolume = self.volume
         end
 
     end
@@ -234,23 +214,56 @@ function SoundEffect:UpdateClientPlaybackState()
         -- If we are the predictor, we already know of this sound - dont play, now or ever
         local predictor = Shared.GetEntity(self.predictorId)
         if Client.GetLocalPlayer() == predictor and Client.GetIsControllingPlayer() then
-            return false
+            -- Do nothing, return true to continue callbacks
+            return true
         end
         
     end
 
     -- Update playback this tick - multiple fieldwatchers may trigger at the same time, dont want to update the sfx many times.
     -- Fieldwatchers trigger before OnUpdate, so we just update for 1 tick.
-    self:SetUpdates(true)
+    self:UpdateClientPlaybackEffects()
 
     return true
 
 end
 
-function SoundEffect:OnUpdate()
-    self:UpdateClientPlaybackEffects()
-    self:SetUpdates(false)
+function SoundEffect:UpdateClientAsset()
+
+    DestroySoundEffect(self)
+    
+    if self.assetIndex ~= 0 then
+    
+        self.soundEffectInstance = Client.CreateSoundEffect(self.assetIndex)
+        self.soundEffectInstance:SetParent(self:GetId())
+        
+    end
+
+    return true
+
 end
+
+function SoundEffect:UpdateClientPositionalState()
+
+    if self.soundEffectInstance then
+        self.soundEffectInstance:SetPositional(self.positional)
+    end
+    return true
+
+end
+
+function SoundEffect:UpdateClientVolumeState()
+
+    if self.soundEffectInstance then
+        self.soundEffectInstance:SetVolume(self.volume)
+    end
+    return true
+
+end
+
+SoundEffect.OnUpdate = nil
+--function SoundEffect:OnUpdate()
+--end
 
 -- Ideally these are no longer called?
 function SoundEffect:OnProcessSpectate()
@@ -259,5 +272,3 @@ end
 function SoundEffect:OnProcessMove()
 end
 -- END SOUND EFFECTS
---]]
-Shared.Message("NS2Opti loaded!")
