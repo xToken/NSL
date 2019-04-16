@@ -11,15 +11,12 @@ kNSLCaptainsStates = enum( {'REGISTRATION', 'VOTING', 'SELECTING', 'ROUND1', 'RO
 kNSLPluginBuild = 118
 
 -- Shared defs
-Script.Load("lua/NSL/nsl_utilities_class.lua")
+Script.Load("lua/NSL/nsl_utilities.lua")
 
 Script.Load("lua/NSL/handicap/shared.lua")
 Script.Load("lua/NSL/heartbeat/shared.lua")
 Script.Load("lua/NSL/gameinfo/shared.lua")
-if NSL_Optimizations_Enabled then
-	Shared.Message("Loading NSL Optimizations.")
-	Script.Load("lua/NSL/optimizations/shared.lua")
-end
+Script.Load("lua/NSL/optimizations/shared.lua")
 Script.Load("lua/NSL/pause/shared.lua")
 Script.Load("lua/NSL/playerdata/shared.lua")
 Script.Load("lua/NSL/spectator_techtree/shared.lua")
