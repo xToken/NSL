@@ -1,5 +1,10 @@
 # Changelog
 
+## 4-16-19 (Buld 120)
+- Removed UpValue utility func, use built-in NS2 debug utility func
+- Re-enabled sound FX optimizations with fixes for local looping sounds not playing correctly.
+- Fixed script error for cyst wakeup calls if cysts had children that dont sleep
+
 ## 2-28-19 (Buld 118)
 - Fixed cysts ticking too fast after they had slept for a considerable amount of time
 - Fixed umbra effect sometimes lingering on entities forever
