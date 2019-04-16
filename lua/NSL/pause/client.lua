@@ -120,7 +120,7 @@ originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update",
 			scoreboardUpdate = math.max(0, scoreboardUpdate - deltaTime)
 			if scoreboardUpdate == 0 then
 				if not playerData then
-					playerData = GetNSLUpValue(Scoreboard_ReloadPlayerData, "playerData")
+					playerData = debug.getupvaluex(Scoreboard_ReloadPlayerData, "playerData")
 				end
 				for id, data in pairs(playerData) do
 					data.LastUpdateTime = data.LastUpdateTime - kPausedScoreboardUpdateRate - deltaTime

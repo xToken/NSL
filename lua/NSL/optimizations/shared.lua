@@ -3,6 +3,8 @@
 -- lua/NSL/optimizations/shared.lua
 -- - Dragon
 
+Shared.Message("Loading NSL Optimizations.")
+
 -- NILS
 EffectsMixin.OnProcessMove = nil
 EffectsMixin.OnUpdate = nil

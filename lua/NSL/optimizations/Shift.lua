@@ -6,7 +6,7 @@
 if Server then
 
     -- SHIFT
-    local UpdateShiftButtons = GetNSLUpValue(Shift.OnUpdate, "UpdateShiftButtons")
+    local UpdateShiftButtons = debug.getupvaluex(Shift.OnUpdate, "UpdateShiftButtons")
     if UpdateShiftButtons then
         local kEchoCooldown = 1
 

@@ -3,45 +3,9 @@
 -- lua/NSL/optimizations/server.lua
 -- - Dragon
 
--- TODOS:
---[[
-----------------------------
-Structures:
-----------------------------
-Sentry
-Tunnel
-TunnelEntrance (+Exit)
-Web
------------------------------
-OTHERS:
------------------------------
-DOTMarker
-Effect -- Only Client Side?
-ObjectiveInfo
-DropPack
-Pheromone
-ResourcePoint
-SpawnBlocker
-TechPoint
-TimedEmitter
-Tracer
-PulseEffect
-----------------------------
-Figure out:
-----------------------------
-
--- PLAYER MIXINS, not important ATM
-PickupableMixin
-PickupableWeaponMixin
-SprintMixin
-StunMixin
-TunnelUserMixin
-WebableMixin
---]]
-
-local InternalSleep = GetNSLUpValue(SleeperMixin.CheckAll, "InternalSleep")
-local InternalWakeUp = GetNSLUpValue(SleeperMixin.CheckAll, "InternalWakeUp")
-local InternalGetCanSleep = GetNSLUpValue(SleeperOnUpdateServer, "InternalGetCanSleep")
+local InternalSleep = debug.getupvaluex(SleeperMixin.CheckAll, "InternalSleep")
+local InternalWakeUp = debug.getupvaluex(SleeperMixin.CheckAll, "InternalWakeUp")
+local InternalGetCanSleep = debug.getupvaluex(SleeperOnUpdateServer, "InternalGetCanSleep")
 
 Event.RemoveHook("UpdateServer", SleeperOnUpdateServer)
 
@@ -77,7 +41,7 @@ end
 Event.Hook("UpdateServer", SleeperOnUpdateServer)
 
 -- DEATH TRIGGER
-local GetDamageOverTimeIsEnabled = GetNSLUpValue(DeathTrigger.OnInitialized, "GetDamageOverTimeIsEnabled")
+local GetDamageOverTimeIsEnabled = debug.getupvaluex(DeathTrigger.OnInitialized, "GetDamageOverTimeIsEnabled")
 
 local originalDeathTriggerOnInitialized
 originalDeathTriggerOnInitialized = Class_ReplaceMethod("DeathTrigger", "OnInitialized",
@@ -178,7 +142,8 @@ originalCystOnKill = Class_ReplaceMethod("Cyst", "OnKill",
     function(self)
         for _, id in ipairs(self.children) do
             local cyst = Shared.GetEntity(id)
-            if cyst then
+            --Might not always be a cyst methinks...
+            if cyst and cyst.WakeUp then
                 cyst:WakeUp()
             end
         end
@@ -210,10 +175,10 @@ if GetOldDrifterOnUpdateHook then
     DrifterOnUpdate = GetOldDrifterOnUpdateHook()
 end
 
-local ScanForNearbyEnemy = GetNSLUpValue(DrifterOnUpdate, "ScanForNearbyEnemy")
-local UpdateTasks = GetNSLUpValue(DrifterOnUpdate, "UpdateTasks")
-local FindTask = GetNSLUpValue(UpdateTasks, "FindTask")
-local kDrifterSelfOrderRange = GetNSLUpValue(FindTask, "kDrifterSelfOrderRange")
+local ScanForNearbyEnemy = debug.getupvaluex(DrifterOnUpdate, "ScanForNearbyEnemy")
+local UpdateTasks = debug.getupvaluex(DrifterOnUpdate, "UpdateTasks")
+local FindTask = debug.getupvaluex(UpdateTasks, "FindTask")
+local kDrifterSelfOrderRange = debug.getupvaluex(FindTask, "kDrifterSelfOrderRange")
 
 local function FindTask2(self)
     if not self:GetCurrentOrder() then
@@ -490,7 +455,6 @@ end
 -- END NUTRIENT MIST
 
 -- SOUND EFFECTS
---[[
 local kSoundEndBufferTime = 0.5
 
 local originalSoundEffectOnCreate
@@ -523,6 +487,7 @@ function SoundEffect:SetAsset(assetPath)
     if not self:GetParent() and self:GetOrigin() == Vector(0,0,0) then
         Print("Warning: %s is being player at (0,0,0)", assetPath)
     end
+    --]]
     
 end
 
@@ -561,7 +526,6 @@ end
 SoundEffect.OnUpdate = nil 
 function SoundEffect:OnProcessMove()
 end
---]]
 -- END SOUND EFFECTS
 
 -- PARTICLE EFFECTS
@@ -579,7 +543,7 @@ originalParticleEffectOnCreate = Class_ReplaceMethod("ParticleEffect", "OnCreate
 )
 
 -- BAH
-local CreateEffect = GetNSLUpValue(Shared.CreateEffect, "CreateEffect")
+local CreateEffect = debug.getupvaluex(Shared.CreateEffect, "CreateEffect")
 
 function Shared.CreateEffect(player, effectName, parent, coords)
     local e = CreateEffect(player, effectName, parent, coords)

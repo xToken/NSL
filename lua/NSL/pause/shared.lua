@@ -17,8 +17,8 @@ local function SaveClientViewAngles(player)
 	if Client then
 		if not kClientPaused then
 			kClientPaused = true
-			kClientView.yaw = GetNSLUpValue(Client.SetYaw, "_cameraYaw")
-			kClientView.pitch = GetNSLUpValue(Client.SetPitch, "_cameraPitch")
+			kClientView.yaw = debug.getupvaluex(Client.SetYaw, "_cameraYaw")
+			kClientView.pitch = debug.getupvaluex(Client.SetPitch, "_cameraPitch")
 			return true
 		else
 			Client.SetYaw(kClientView.yaw)
@@ -285,7 +285,7 @@ end
 ReplaceLocals(CreateTokenBucket, { GetNumberOfTokens = GetNumberOfTokens })
 ReplaceLocals(CreateTokenBucket, { RemoveTokens = RemoveTokens })
 
-local UpdateAnimationState = GetNSLUpValue(BaseModelMixin.ProcessMoveOnModel, "UpdateAnimationState")
+local UpdateAnimationState = debug.getupvaluex(BaseModelMixin.ProcessMoveOnModel, "UpdateAnimationState")
 ReplaceLocals(UpdateAnimationState, { Shared_GetTime = Shared.GetTime })
 ReplaceLocals(UpdateAnimationState, { Shared_GetPreviousTime = Shared.GetPreviousTime })
 

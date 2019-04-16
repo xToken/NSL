@@ -4,7 +4,7 @@
 -- - Dragon
 
 local kCloakUpdateRate = 0.1
-local UpdateCloakState = GetNSLUpValue(CloakableMixin.OnUpdate, "UpdateCloakState")
+local UpdateCloakState = debug.getupvaluex(CloakableMixin.OnUpdate, "UpdateCloakState")
 
 function CloakableMixin:__initmixin()
     

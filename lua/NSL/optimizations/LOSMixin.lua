@@ -5,12 +5,12 @@
 
 if Server then
 
-    local UpdateLOS = GetNSLUpValue(LOSMixin.__initmixin, "UpdateLOS")
-    local SharedUpdate = GetNSLUpValue(LOSMixin.OnUpdate, "SharedUpdate")
-    local MarkNearbyDirty = GetNSLUpValue(SharedUpdate, "MarkNearbyDirty")
-    local UpdateSelfSighted = GetNSLUpValue(SharedUpdate, "UpdateSelfSighted")
-    local LookForEnemies = GetNSLUpValue(SharedUpdate, "LookForEnemies")
-    local kLOSTimeout = GetNSLUpValue(SharedUpdate, "kLOSTimeout")
+    local UpdateLOS = debug.getupvaluex(LOSMixin.__initmixin, "UpdateLOS")
+    local SharedUpdate = debug.getupvaluex(LOSMixin.OnUpdate, "SharedUpdate")
+    local MarkNearbyDirty = debug.getupvaluex(SharedUpdate, "MarkNearbyDirty")
+    local UpdateSelfSighted = debug.getupvaluex(SharedUpdate, "UpdateSelfSighted")
+    local LookForEnemies = debug.getupvaluex(SharedUpdate, "LookForEnemies")
+    local kLOSTimeout = debug.getupvaluex(SharedUpdate, "kLOSTimeout")
 
     function LOSMixin:__initmixin()
         
