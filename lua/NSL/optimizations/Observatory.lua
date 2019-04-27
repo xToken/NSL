@@ -56,7 +56,9 @@ Observatory.kRelevancyPortalRange = 40
 
 local kAnimationGraph = PrecacheAsset("models/marine/observatory/observatory.animation_graph")
 
-local networkVars = { }
+local networkVars = {
+    beaconLocation = "vector",
+}
 
 AddMixinNetworkVars(BaseModelMixin, networkVars)
 AddMixinNetworkVars(ClientModelMixin, networkVars)
@@ -157,6 +159,8 @@ function Observatory:OnInitialized()
     end
     
     InitMixin(self, IdleMixin)
+
+    self.beaconLocation = self:GetDistressOrigin()
 
 end
 
@@ -534,10 +538,17 @@ end
 
 function Observatory:RevealCysts()
 
+    PROFILE("Observatory:RevealCysts")
+
     for _, cyst in ipairs(GetEntitiesForTeamWithinRange("Cyst", GetEnemyTeamNumber(self:GetTeamNumber()), self:GetOrigin(), Observatory.kDetectionRange)) do
         if self:GetIsBuilt() and self:GetIsPowered() then
             cyst:SetIsSighted(true)
         end
+    end
+    
+    local distressOrigin = self:GetDistressOrigin()
+    if self.beaconLocation ~= distressOrigin then
+        self.beaconLocation = self:GetDistressOrigin()
     end
 
     return self:GetIsAlive()
@@ -644,5 +655,37 @@ function Observatory:GetHealthbarOffset()
     return 0.9
 end 
 
+function Observatory:ShowDestinationOverride()
+
+    local player = Client.GetLocalPlayer()
+    return player ~= nil and player:isa("Commander")
+
+end
+
+function Observatory:GetDestinationLocationName()
+
+    if self.beaconLocation and self.beaconLocation ~= 0 then
+        local location = GetLocationForPoint(self.beaconLocation)
+        if location then
+            return location and location:GetName() or ""
+        end
+    end
+    return ""
+
+end
+
+function Observatory:OverrideHintString( hintString, forEntity )
+    
+    if not GetAreEnemies(self, forEntity) and self.beaconLocation and self.beaconLocation ~= 0 then
+        local location = GetLocationForPoint(self.beaconLocation)
+        local locationName = location and location:GetName() or ""
+        if locationName and locationName~="" then
+            return string.format(Locale.ResolveString( "OBSERVATORY_BEACON_TO_HINT" ), locationName )
+        end
+    end
+
+    return hintString
+
+end
 
 Shared.LinkClassToMap("Observatory", Observatory.kMapName, networkVars)

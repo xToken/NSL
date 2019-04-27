@@ -136,6 +136,7 @@ originalArmoryOnUpdateRender = Class_ReplaceMethod("Armory", "OnUpdateRender",
 -- END ARMORY
 
 -- SOUND EFFECTS
+--[[
 local function DestroySoundEffect(self)
     
     if self.soundEffectInstance then
@@ -271,4 +272,5 @@ end
 
 function SoundEffect:OnProcessMove()
 end
+--]]
 -- END SOUND EFFECTS

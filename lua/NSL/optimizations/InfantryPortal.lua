@@ -36,11 +36,16 @@ Script.Load("lua/SupplyUserMixin.lua")
 Script.Load("lua/IdleMixin.lua")
 Script.Load("lua/ParasiteMixin.lua")
 
+if Client then
+    Script.Load("lua/GraphDrivenModel.lua")
+end
+
 class 'InfantryPortal' (ScriptActor)
 
 local kSpinEffect = PrecacheAsset("cinematics/marine/infantryportal/spin.cinematic")
 local kAnimationGraph = PrecacheAsset("models/marine/infantry_portal/infantry_portal.animation_graph")
 local kHoloMarineModel = PrecacheAsset("models/marine/male/male_spawn.model")
+local kMarineAnimationGraph = PrecacheAsset("models/marine/male/male.animation_graph")
 
 local kHoloMarineMaterialname = PrecacheAsset("cinematics/vfx_materials/marine_ip_spawn.material")
 
@@ -70,6 +75,7 @@ local kIpPushDirections = 8
 local networkVars =
 {
     queuedPlayerId = "entityid",
+    queuedPlayerModel = string.format("string (%d)", 128 ),
     queuedPlayerStartTime = "time",
 }
 
@@ -106,20 +112,50 @@ local function CreateSpinEffect(self)
     
     end
     
+    local marineVariant = Client.GetOptionInteger("marineVariant", kDefaultMarineVariant)
+    local modelPath = ""
+    
     if not self.fakeMarineModel and not self.fakeMarineMaterial then
     
-        self.fakeMarineModel = Client.CreateRenderModel(RenderScene.Zone_Default)
-        self.fakeMarineModel:SetModel(Shared.GetModelIndex(kHoloMarineModel))
+        if self.queuedPlayerModel then
+            modelPath = self.queuedPlayerModel
+        else
+            local sexType = string.lower(Client.GetOptionString("sexType", "Male"))
+            modelPath = "models/marine/" .. sexType .. "/" .. sexType .. GetVariantModel(kMarineVariantData, marineVariant)
+        end
+
+        local model = PrecacheAsset(modelPath)
+        self.fakeMarineModel = CreateGraphDrivenModel(model, kMarineAnimationGraph)
         
         local coords = self:GetCoords()
         coords.origin = coords.origin + Vector(0, 0.4, 0)
-        
         self.fakeMarineModel:SetCoords(coords)
-        self.fakeMarineModel:InstanceMaterials()
-        self.fakeMarineModel:SetMaterialParameter("hiddenAmount", 1.0)
+        self.fakeMarineModel:SetAnimationInput("move", "idle")
+        self.fakeMarineModel:SetAnimationInput("alive", true)
+        self.fakeMarineModel:SetAnimationInput("body_yaw", 30)
+        self.fakeMarineModel:SetAnimationInput("body_pitch", -8)
+
+        self.fakeMarineModel:InstanceGDMMaterials()
+        self.fakeMarineModel:SetGDMMaterialParameter("hiddenAmount", 0)
+        self.fakeMarineModel:SetGDMMaterialParameter("patchIndex", -2)
         
-        self.fakeMarineMaterial = AddMaterial(self.fakeMarineModel, kHoloMarineMaterialname)
+        self.fakeMarineMaterial = self.fakeMarineModel:AddGDMMaterial(kHoloMarineMaterialname)
+
+    end
     
+    if self.clientQueuedPlayerId ~= self.queuedPlayerId then
+        if self.fakeMarineModel then
+            DestroyGraphDrivenModel(self.fakeMarineModel)
+            self.fakeMarineModel = nil
+            self.fakeMarineMaterial = nil
+        end
+        self.timeSpinStarted = self.queuedPlayerStartTime or Shared.GetTime()
+        self.clientQueuedPlayerId = self.queuedPlayerId
+    end
+    
+    if self.fakeMarineModel and self.fakeMarineMaterial then
+        local spawnProgress = Clamp((Shared.GetTime() - self.timeSpinStarted) / kMarineRespawnTime, 0, 1)
+        self.fakeMarineMaterial:SetParameter("spawnProgress", spawnProgress+0.2)    -- Add a little so it always fills up
     end
 
 end
@@ -134,7 +170,9 @@ local function DestroySpinEffect(self)
     end
     
     if self.fakeMarineModel then    
-        self.fakeMarineModel:SetIsVisible(false)
+        DestroyGraphDrivenModel(self.fakeMarineModel)
+        self.fakeMarineModel = nil
+        self.fakeMarineMaterial = nil
     end
 
 end
@@ -176,6 +214,7 @@ function InfantryPortal:OnCreate()
     end
     
     self.queuedPlayerId = Entity.invalidId
+    self.queuedPlayer = nil
     
     self:SetLagCompensated(true)
     self:SetPhysicsType(PhysicsType.Kinematic)
@@ -229,7 +268,7 @@ local function InfantryPortalUpdate(self)
         
             local queuedPlayer = Shared.GetEntity(self.queuedPlayerId)
             if queuedPlayer then
-            
+                self.queuedPlayer = queuedPlayer
                 remainingSpawnTime = math.max(0, self.queuedPlayerStartTime + self:GetSpawnTime() - Shared.GetTime())
             
                 if remainingSpawnTime < 0.3 and self.timeLastPush + 0.5 < Shared.GetTime() then
@@ -240,8 +279,9 @@ local function InfantryPortalUpdate(self)
                 end
                 
             else
-            
+                
                 self.queuedPlayerId = nil
+                self.queuedPlayer = nil
                 self.queuedPlayerStartTime = nil
                 
             end
@@ -312,8 +352,8 @@ function InfantryPortal:OnDestroy()
         DestroySpinEffect(self)
         
         if self.fakeMarineModel then
-        
-            Client.DestroyRenderModel(self.fakeMarineModel)
+            
+            DestroyGraphDrivenModel(self.fakeMarineModel)
             self.fakeMarineModel = nil
             self.fakeMarineMaterial = nil
             
@@ -343,8 +383,10 @@ local function QueueWaitingPlayer(self)
             
             playerToSpawn:SetIsRespawning(true)
             team:RemovePlayerFromRespawnQueue(playerToSpawn)
-            
             self.queuedPlayerId = playerToSpawn:GetId()
+            if HasMixin(playerToSpawn, "MarineVariant") then
+                self.queuedPlayerModel = playerToSpawn:GetVariantModel()
+            end
             self.queuedPlayerStartTime = Shared.GetTime()
 
             self:StartSpinning()            
@@ -381,6 +423,7 @@ end
 
 function InfantryPortal:OnReplace(newStructure)
     newStructure.queuedPlayerId = self.queuedPlayerId
+    newEntityId.queuedPlayer = self.queuedPlayer
 end
 
 -- Spawn player on top of IP. Returns true if it was able to, false if way was blocked.
@@ -457,6 +500,7 @@ function InfantryPortal:RequeuePlayer()
     
     -- Don't spawn player.
     self.queuedPlayerId = Entity.invalidId
+    self.queuedPlayer = nil
     self.queuedPlayerStartTime = nil
 
 end
@@ -470,6 +514,7 @@ if Server then
             -- Player left or was replaced, either way
             -- they're not in the queue anymore
             self.queuedPlayerId = Entity.invalidId
+            self.queuedPlayer = nil
             self.queuedPlayerStartTime = nil
             
         end

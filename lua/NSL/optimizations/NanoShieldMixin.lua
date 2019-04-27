@@ -38,7 +38,8 @@ NanoShieldMixin.optionalCallbacks =
 
 NanoShieldMixin.networkVars =
 {
-    nanoShielded = "boolean"
+    nanoShielded = "boolean",
+    timeNanoShieldInit = "private time",
 }
 
 
@@ -135,6 +136,16 @@ end
 
 function NanoShieldMixin:GetIsNanoShielded()
     return self.nanoShielded
+end
+
+function NanoShieldMixin:GetNanoShieldTimeRemaining()
+    local percentLeft = 0
+
+    if self.nanoShielded then
+        percentLeft = Clamp( math.abs( (self.timeNanoShieldInit + kNanoShieldDuration) - Shared.GetTime() ) / kNanoShieldDuration, 0.0, 1.0 )
+    end
+
+    return percentLeft
 end
 
 function NanoShieldMixin:GetCanBeNanoShielded()

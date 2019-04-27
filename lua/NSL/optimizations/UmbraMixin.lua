@@ -38,6 +38,9 @@ kUmbraModifier["Pistol"] = kUmbraBulletModifier
 kUmbraModifier["Sentry"] = kUmbraBulletModifier
 kUmbraModifier["Minigun"] = kUmbraMinigunModifier
 kUmbraModifier["Railgun"] = kUmbraRailgunModifier
+kUmbraModifier["Grenade"] = kUmbraGrenadeModifier
+kUmbraModifier["ClusterGrenade"] = kUmbraGrenadeModifier
+kUmbraModifier["PulseGrenade"] = kUmbraGrenadeModifier
 
 function UmbraMixin:__initmixin()
     

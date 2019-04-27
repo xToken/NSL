@@ -143,16 +143,25 @@ function CorrodeMixin:OnDestroy()
     
 end
 
+CorrodeMixin.kCorrodeDamageTypes = {
+    [kDamageType.Corrode] = true,
+    [kDamageType.ArmorOnly] = true
+}
+
 function CorrodeMixin:OnTakeDamage(damage, attacker, doer, point, direction)
 
     if Server then
     
-        if doer and doer.GetDamageType and doer:GetDamageType() == kDamageType.Corrode then
+        if doer and doer.GetDamageType and CorrodeMixin.kCorrodeDamageTypes[doer:GetDamageType()] then
             self:SetCorroded()
         end
     
     end
     
+end
+
+function CorrodeMixin:GetIsCorroded()
+    return self.isCorroded
 end
 
 if Server then

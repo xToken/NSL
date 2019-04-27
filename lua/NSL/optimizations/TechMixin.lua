@@ -10,7 +10,7 @@ TechMixin.type = "Tech"
 
 TechMixin.optionalCallbacks =
 {
-    OnTechIdSet = "Will be called after the tech id is set inside SetTechId."
+
 }
 
 TechMixin.expectedCallbacks = 
