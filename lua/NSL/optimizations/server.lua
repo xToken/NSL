@@ -411,46 +411,10 @@ function NutrientMist:Perform()
     
     for index, entity in ipairs(entities) do
         
-        entity:TriggerCatalyst(2, self:RequestHealing(entity:GetId()))
+        entity:TriggerCatalyst(2)
         
     end
 
-end
-
-local function NeedsHealing(ent)
-    return ent.AmountDamaged and ent:AmountDamaged() > 0
-end
-
-function NutrientMist:RequestHealing(requestorId)
-    
-    local requestor = Shared.GetEntity(requestorId)
-    if not requestor then
-        return false
-    end
-
-    if not NeedsHealing(requestor) or not requestor.GetCanCatalyzeHeal or not requestor:GetCanCatalyzeHeal() then
-        return false
-    end
-
-    -- clean table, removing entities that no longer exist or no longer need healing
-    for i = #self.healTargets, 1, -1 do
-        local ent = Shared.GetEntity(self.healTargets[i])
-        if (not ent) or (not NeedsHealing(ent)) then
-            table.remove(self.healTargets, i)
-            self.numHealTargets = self.numHealTargets - 1
-        end
-    end
-
-    -- see if there is room for another entity to be healed
-    if self.numHealTargets < CatalystMixin.kMaxHealTargets then
-        table.insert(self.healTargets, requestorId)
-        self.numHealTargets = self.numHealTargets + 1
-        return true
-    end
-    
-    return false -- no room with this mist for another entity.
-    -- requestor will either have to wait, or find healing with a different mist.
-    
 end
 -- END NUTRIENT MIST
 

@@ -128,14 +128,9 @@ CatalystMixin.OnUpdate = nil
 
 function CatalystMixin:UpdateCatalystEffects()
 
-    if self.shouldHeal then
-        self:AddHealth(self:GetMaxHealth() * CatalystMixin.kHealPercentage)
-    end
-
     if self.timeCatalystEnds < Shared.GetTime() then
         self.isCatalysted = false
         self.timeCatalystEnds = 0
-        self.shouldHeal = false
         if self.OnCatalystEnd then
             self:OnCatalystEnd()
         end
@@ -144,14 +139,13 @@ function CatalystMixin:UpdateCatalystEffects()
 
 end
 
-function CatalystMixin:TriggerCatalyst(duration, shouldHeal)
+function CatalystMixin:TriggerCatalyst(duration)
 
     if Server and self:GetCanCatalyst() then
         local wasCatalyzed = self.isCatalysted
         duration = ConditionalValue(duration ~= nil, duration, CatalystMixin.kDefaultDuration)
         self.timeCatalystEnds = Shared.GetTime() + duration
         self.isCatalysted = true
-        --self.shouldHeal = shouldHeal or false
         if not wasCatalyzed then
             self:AddTimedCallback(CatalystMixin.UpdateCatalystEffects, duration)
         end

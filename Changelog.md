@@ -1,5 +1,8 @@
 # Changelog
 
+## 4-28-19 (Buld 122)
+- Fixed assert caused by NutrientMist
+
 ## 4-23-19 (Buld 121)
 - Compatibility with B327
 
