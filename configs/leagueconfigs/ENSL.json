@@ -45,7 +45,7 @@
 										},
 "OFFICIAL":								{
 											"TournamentModeForfeitClock":			900,
-											"TournamentModeRestartDuration": 		30,
+											"TournamentModeRestartDuration": 		15,
 											"Limit6PlayerPerTeam": 					true,
 											"MercsRequireApproval": 				true,
 											"OverrideTeamNames": 					true,
