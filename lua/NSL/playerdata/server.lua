@@ -90,7 +90,7 @@ local function GetRefBadgeforID(ns2id)
 	if NSLBadges and type(NSLBadges) == "table" then
 		local pData = GetNSLUserData(ns2id)
 		if type(pData.NSL_Level) == "number" then
-			local level = pData.NSL_Level - 1
+			local level = pData.NSL_Level
 			if level then
 				return NSLBadges[level].badge, NSLBadges[level].name
 			end
@@ -107,12 +107,12 @@ local function UpdateClientBadge(ns2id, data)
 	local teamBadge = GetBadgeForPlayerData(data)
 	local teamBadgeName = GetNSLConfigValue("BadgeTitle")
 	local success
-	local row = 1
+	local row = 5
 	if refBadge then
 		success = GiveBadge(ns2id, refBadge, row)
 		if success then
 			SetFormalBadgeName(refBadge, badgeName)
-			row = 2
+			row = 4
 		end
 	end
 	if teamBadge then
