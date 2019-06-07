@@ -42,21 +42,6 @@ NanoShieldMixin.networkVars =
     timeNanoShieldInit = "private time",
 }
 
-
-local function UpdateClientNanoShieldEffects(self)
-
-    assert(Client)
-    
-    if self:GetIsNanoShielded() and self:GetIsAlive() then
-        self:_CreateEffect()
-    else
-        self:_RemoveEffect() 
-    end
-
-    return true
-    
-end
-
 function NanoShieldMixin:__initmixin()
     
     PROFILE("NanoShieldMixin:__initmixin")
@@ -70,7 +55,7 @@ function NanoShieldMixin:__initmixin()
 
     if Client then
 
-        self:AddFieldWatcher("nanoShielded", UpdateClientNanoShieldEffects)
+        self:AddFieldWatcher("nanoShielded", NanoShieldMixin.UpdateClientNanoShieldEffects)
 
     end
     
@@ -125,10 +110,10 @@ function NanoShieldMixin:ActivateNanoShield()
             self.shieldLoopSound:Start()
             
             StartSoundEffectOnEntity(kNanoShieldStartSound, self)
+
+            self:AddTimedCallback(NanoShieldMixin.CheckandClearNanoShield, kNanoShieldDuration)
             
         end
-
-        self:AddTimedCallback(NanoShieldMixin.CheckandClearNanoShield, kNanoShieldDuration)
         
     end
     
@@ -161,16 +146,8 @@ function NanoShieldMixin:GetCanBeNanoShielded()
 end
 
 function NanoShieldMixin:CheckandClearNanoShield()
-
-    if not self:GetIsNanoShielded() then
-        return
-    end
     
-    -- See if nano shield time is over
-    if self.timeNanoShieldInit + kNanoShieldDuration < Shared.GetTime() then
-        ClearNanoShield(self, true)
-    end
-
+    ClearNanoShield(self, true)
     return false
 
 end
@@ -267,6 +244,18 @@ if Client then
             self.nanoShieldEntities = nil
         end            
 
+    end
+
+    function NanoShieldMixin:UpdateClientNanoShieldEffects()
+
+        if self:GetIsNanoShielded() and self:GetIsAlive() then
+            self:_CreateEffect()
+        else
+            self:_RemoveEffect() 
+        end
+
+        return true
+        
     end
     
 end
