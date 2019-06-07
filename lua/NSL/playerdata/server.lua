@@ -89,8 +89,11 @@ local function GetRefBadgeforID(ns2id)
 	local NSLBadges = GetNSLConfigValue("Badges")
 	if NSLBadges and type(NSLBadges) == "table" then
 		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level and pData.NSL_Level > 0 then
-			return NSLBadges[pData.NSL_Level].badge, NSLBadges[pData.NSL_Level].name
+		if type(pData.NSL_Level) == "number" then
+			local level = pData.NSL_Level - 1
+			if level then
+				return NSLBadges[level].badge, NSLBadges[level].name
+			end
 		end
 	end
 end
@@ -162,10 +165,10 @@ local function OnClientConnectENSLResponse(response)
 					NSL_League = "ENSL"
 				}
 				if responsetable.admin then
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 4
 					clientData.NSL_Rank = "Admin"
 				elseif responsetable.referee then
-					clientData.NSL_Level = 2
+					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				elseif responsetable.caster then
 					clientData.NSL_Level = 1
@@ -182,7 +185,7 @@ local function OnClientConnectENSLResponse(response)
 				local cRefs = GetNSLConfigValue("REFS")
 				if cRefs and table.contains(cRefs, ns2id) then
 					--A manually configured 'Ref' - give them ref level
-					clientData.NSL_Level = 2
+					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				end
 				
