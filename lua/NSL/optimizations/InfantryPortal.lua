@@ -111,6 +111,16 @@ local function CreateSpinEffect(self)
         self.spinCinematic:SetRepeatStyle(Cinematic.Repeat_Endless)
     
     end
+   
+    if self.clientQueuedPlayerId ~= self.queuedPlayerId then
+        if self.fakeMarineModel then
+            DestroyGraphDrivenModel(self.fakeMarineModel)
+            self.fakeMarineModel = nil
+            self.fakeMarineMaterial = nil
+        end
+        self.timeSpinStarted = self.queuedPlayerStartTime or Shared.GetTime()
+        self.clientQueuedPlayerId = self.queuedPlayerId
+    end
     
     local marineVariant = Client.GetOptionInteger("marineVariant", kDefaultMarineVariant)
     local modelPath = ""
@@ -141,16 +151,6 @@ local function CreateSpinEffect(self)
         
         self.fakeMarineMaterial = self.fakeMarineModel:AddGDMMaterial(kHoloMarineMaterialname)
 
-    end
-    
-    if self.clientQueuedPlayerId ~= self.queuedPlayerId then
-        if self.fakeMarineModel then
-            DestroyGraphDrivenModel(self.fakeMarineModel)
-            self.fakeMarineModel = nil
-            self.fakeMarineMaterial = nil
-        end
-        self.timeSpinStarted = self.queuedPlayerStartTime or Shared.GetTime()
-        self.clientQueuedPlayerId = self.queuedPlayerId
     end
     
     if self.fakeMarineModel and self.fakeMarineMaterial then
@@ -695,17 +695,18 @@ function InfantryPortal:OnUpdateRender()
     if shouldSpin then
 
         if self.clientQueuedPlayerId ~= self.queuedPlayerId then
+            if self.fakeMarineModel then
+                DestroyGraphDrivenModel(self.fakeMarineModel)
+                self.fakeMarineModel = nil
+                self.fakeMarineMaterial = nil
+            end
             self.timeSpinStarted = self.queuedPlayerStartTime or Shared.GetTime()
             self.clientQueuedPlayerId = self.queuedPlayerId
         end
-        
-        local spawnProgress = Clamp((Shared.GetTime() - self.timeSpinStarted) / kMarineRespawnTime, 0, 1)
 
-        if self.fakeMarineModel and self.fakeMarineMaterial then
-        
-            self.fakeMarineModel:SetIsVisible(true)
+        if self.timeSpinStarted and self.fakeMarineMaterial then
+            local spawnProgress = Clamp((Shared.GetTime() - self.timeSpinStarted) / kMarineRespawnTime, 0, 1)
             self.fakeMarineMaterial:SetParameter("spawnProgress", spawnProgress+0.2)    -- Add a little so it always fills up
-
         end
 
     end
