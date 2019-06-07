@@ -1,5 +1,14 @@
 # Changelog
 
+## 6-7-19 (Buld 125)
+- Fixed badge icon granted being 1 rank off from actual players rank
+- Updated to new badge icons
+- Disabled heartbeat system
+- Disabled optimizations
+
+## 4-28-19 (Buld 123)
+- Fixed assert caused by IP spawning model
+
 ## 4-28-19 (Buld 122)
 - Fixed assert caused by NutrientMist
 

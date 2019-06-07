@@ -53,20 +53,31 @@
 										},
 "Badges":				 				[
 											{"badge": "ensl_caster", 	"name": "ENSL Caster"},
+											{"badge": "ensl_mod",		"name": "ENSL Gather Moderator"},
 											{"badge": "ensl_ref", 		"name": "ENSL Referee"},
 											{"badge": "ensl_admin",		"name": "ENSL Admin"},
 										],
 "REFS":									[
 											344054,
 											3490104,
-											5176141
+											5176141,
+											32430346
 										],
 "AdminGroups":							{
-											"2":{
+											"1":{
 												"commands": 
 												[
 													"sv_kick", "sv_say",  "sv_changemap", "sh_adminmenu", "sh_kick",
 													"sh_say", "sh_changelevel"
+												],
+												"type": "allowed"
+											},
+											"2":{
+												"commands": 
+												[
+													"sv_ban", "sv_unban",  "sv_kick",  "sv_say", "sv_changemap" "sv_reset", "sv_switchteam", 
+													"sv_rrall", "sv_eject", "sv_tsay", "sv_psay", "sh_adminmenu", "sh_ban", "sh_unban",
+													"sh_kick", "sh_say", "sh_changelevel", "sh_reset", "sh_setteam", "sh_rr", "sh_eject"
 												],
 												"type": "allowed"
 											},
