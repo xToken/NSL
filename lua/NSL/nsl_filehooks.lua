@@ -11,6 +11,7 @@ if not string.find(Script.CallStack(), "Main.lua") then
 	end
 	-- Optimizations
 		-- REPLACE
+	--[[
 	ModLoader.SetupFileHook("lua/CatalystMixin.lua", "lua/NSL/optimizations/CatalystMixin.lua", "replace")
 	ModLoader.SetupFileHook("lua/CorrodeMixin.lua", "lua/NSL/optimizations/CorrodeMixin.lua", "replace")
 	ModLoader.SetupFileHook("lua/EnergizeMixin.lua", "lua/NSL/optimizations/EnergizeMixin.lua", "replace")
@@ -40,7 +41,7 @@ if not string.find(Script.CallStack(), "Main.lua") then
 	ModLoader.SetupFileHook("lua/Crag.lua", "lua/NSL/optimizations/Crag.lua", "post")
 	ModLoader.SetupFileHook("lua/Shift.lua", "lua/NSL/optimizations/Shift.lua", "post")
 	ModLoader.SetupFileHook("lua/Shade.lua", "lua/NSL/optimizations/Shade.lua", "post")
-
+	--]]
 	-- END
 	if Client then
 		-- Not sure if this is still needed, but meh

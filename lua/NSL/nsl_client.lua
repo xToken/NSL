@@ -8,9 +8,9 @@ Script.Load("lua/NSL/nsl_shared.lua")
 
 -- Load client defs
 Script.Load("lua/NSL/eventhooks/client.lua")
-Script.Load("lua/NSL/heartbeat/client.lua")
+--Script.Load("lua/NSL/heartbeat/client.lua") -- Vanilla added 15sec timeout with B327
 Script.Load("lua/NSL/messages/client.lua")
-Script.Load("lua/NSL/optimizations/client.lua")
+--Script.Load("lua/NSL/optimizations/client.lua")
 Script.Load("lua/NSL/pause/client.lua")
 Script.Load("lua/NSL/playerdata/client.lua")
 Script.Load("lua/NSL/spectator_techtree/client.lua")
