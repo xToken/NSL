@@ -91,7 +91,7 @@ local function GetRefBadgeforID(ns2id)
 		local pData = GetNSLUserData(ns2id)
 		if type(pData.NSL_Level) == "number" then
 			local level = pData.NSL_Level
-			if level then
+			if level and NSLBadges[level] then
 				return NSLBadges[level].badge, NSLBadges[level].name
 			end
 		end
