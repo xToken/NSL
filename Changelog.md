@@ -1,5 +1,8 @@
 # Changelog
 
+## 6-8-19 (Buld 126)
+- Fixed assert caused by players joining that didnt have badges
+
 ## 6-7-19 (Buld 125)
 - Fixed badge icon granted being 1 rank off from actual players rank
 - Updated to new badge icons
