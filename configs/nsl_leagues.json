@@ -1,8 +1,9 @@
 {
-	"Version": 1.0,
+	"Version": 1.1,
 	"Leagues": [
 		"ENSL",
-		"AUSNS2"
+		"AUSNS2",
+		"NOSTALGIA"
 	],
 	"EndOfTable": true
 }
