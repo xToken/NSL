@@ -176,49 +176,52 @@ end
 
 table.insert(gCaptainsStateChange, OnUpdateCaptainsState)
 
-local function FinalizeNSLConsoleCommands()
-	-- Only run if stuff to register
-	local nslPlugin
-	if Shine then
-		nslPlugin = Shine.Plugins["nsl"]
-	end
-	if #gNSLConsoleCommands > 0 then
-		local HookTable = debug.getregistry()["Event.HookTable"]
-		for i = #gNSLConsoleCommands, 1, -1 do
-			local cc = gNSLConsoleCommands[i]
-			local command = "Console_"..cc.command
-			if not rawget(HookTable, command) then
-				if cc.open then
-					-- If its a command for everyone, we dont need to check if shine is present
-					RegisterNSLServerCommand(command)
-					CreateServerAdminCommand(command, cc.callback, GetNSLMessageDefaultText(cc.helper), cc.open)
-				else
-					-- This command requires perms.
-					if nslPlugin then
-						-- Register with shine
-						-- NSL mod built to work with vanilla admin command system, so most params are just strings - NSL mod handles the processing already
-						RegisterNSLServerCommand(command)
-						nslPlugin:CreateCommand({Command = cc.command, Callback = cc.callback, Params = cc.params, Help = GetNSLMessageDefaultText(cc.helper)})
-					else
-						RegisterNSLServerCommand(command)
-						CreateServerAdminCommand(command, cc.callback, GetNSLMessageDefaultText(cc.helper))
-					end
-				end
-			else
-				--Print(string.format("Skipping already registered event %s!",cc.command))
-			end
-			table.remove(gNSLConsoleCommands, i)
+local function FinalizeNSLConsoleCommands(configloaded)
+	-- Only run if its part of final config load
+	if configloaded == "complete" then
+		-- Only run if stuff to register
+		local nslPlugin
+		if Shine then
+			nslPlugin = Shine.Plugins["nsl"]
 		end
-	end
-	if #gNSLServerAdminCommands > 0 then
-		for i = #gNSLServerAdminCommands, 1, -1 do
-			local cc = gNSLServerAdminCommands[i]
-			if nslPlugin then
-				-- Register with shine
-				-- NSL mod built to work with vanilla admin command system, so most params are just strings - NSL mod handles the processing already
-				nslPlugin:CreateCommand({Command = cc.command, Callback = cc.callback, Params = cc.params, Help = GetNSLMessageDefaultText(cc.helper)})
-			else
-				CreateServerAdminCommand("Console_"..cc.command, cc.callback, GetNSLMessageDefaultText(cc.helper))
+		if #gNSLConsoleCommands > 0 then
+			local HookTable = debug.getregistry()["Event.HookTable"]
+			for i = #gNSLConsoleCommands, 1, -1 do
+				local cc = gNSLConsoleCommands[i]
+				local command = "Console_"..cc.command
+				if not rawget(HookTable, command) then
+					if cc.open then
+						-- If its a command for everyone, we dont need to check if shine is present
+						RegisterNSLServerCommand(command)
+						CreateServerAdminCommand(command, cc.callback, GetNSLMessageDefaultText(cc.helper), cc.open)
+					else
+						-- This command requires perms.
+						if nslPlugin then
+							-- Register with shine
+							-- NSL mod built to work with vanilla admin command system, so most params are just strings - NSL mod handles the processing already
+							RegisterNSLServerCommand(command)
+							nslPlugin:CreateCommand({Command = cc.command, Callback = cc.callback, Params = cc.params, Help = GetNSLMessageDefaultText(cc.helper)})
+						else
+							RegisterNSLServerCommand(command)
+							CreateServerAdminCommand(command, cc.callback, GetNSLMessageDefaultText(cc.helper))
+						end
+					end
+				else
+					--Print(string.format("Skipping already registered event %s!",cc.command))
+				end
+				table.remove(gNSLConsoleCommands, i)
+			end
+		end
+		if #gNSLServerAdminCommands > 0 then
+			for i = #gNSLServerAdminCommands, 1, -1 do
+				local cc = gNSLServerAdminCommands[i]
+				if nslPlugin then
+					-- Register with shine
+					-- NSL mod built to work with vanilla admin command system, so most params are just strings - NSL mod handles the processing already
+					nslPlugin:CreateCommand({Command = cc.command, Callback = cc.callback, Params = cc.params, Help = GetNSLMessageDefaultText(cc.helper)})
+				else
+					CreateServerAdminCommand("Console_"..cc.command, cc.callback, GetNSLMessageDefaultText(cc.helper))
+				end
 			end
 		end
 	end
