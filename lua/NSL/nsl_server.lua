@@ -21,7 +21,7 @@ Script.Load("lua/NSL/firstpersonspecblock/server.lua")
 Script.Load("lua/NSL/handicap/server.lua")
 --Script.Load("lua/NSL/heartbeat/server.lua") -- Vanilla added 15sec timeout with B327
 Script.Load("lua/NSL/messages/server.lua")
---Script.Load("lua/NSL/optimizations/server.lua")
+--Script.Load("lua/NSL/optimizations/server.lua") -- Vanilla added entity update changes with B328 making this obsolete
 Script.Load("lua/NSL/pause/server.lua")
 Script.Load("lua/NSL/playerdata/server.lua")
 Script.Load("lua/NSL/serversettings/server.lua")
