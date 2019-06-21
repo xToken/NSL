@@ -230,6 +230,32 @@ local function OnClientConnectAUSNS2Response(response)
 	end
 end
 
+local function HandleStaticLeagueConfig(ns2id)
+	if ns2id then
+		--Check config refs here
+		local cRefs = GetNSLConfigValue("REFS")
+		if cRefs and table.contains(cRefs, ns2id) then
+			--A manually configured 'Ref' - give them powerz
+			local player = GetPlayerMatchingNS2Id(ns2id)
+			local clientData = {
+				S_ID = "",
+				NICK = player:GetName(),
+				NSL_Team = "",
+				NSL_ID = "",
+				NSL_TID = "",
+				NSL_League = "NA"
+			}
+			clientData.NSL_Level = 1
+			clientData.NSL_Rank = "Admin"
+
+			NSL_ClientData[ns2id] = clientData
+			UpdateCallbacksWithNSLData(player, clientData)
+			RemovePlayerFromRetryTable(player)
+			UpdateClientBadge(ns2id, NSL_ClientData[ns2id])
+		end
+	end
+end
+
 function UpdateNSLPlayerData(RefTable)
 	if not GetNSLUserData(RefTable.id) then
 		--Check for retry
@@ -247,6 +273,9 @@ function UpdateNSLPlayerData(RefTable)
 				end
 				if GetNSLConfigValue("PlayerDataFormat") == "AUSNS" then
 					Shared.SendHTTPRequest(string.format("%s%s", QueryURL, steamId), "GET", OnClientConnectAUSNS2Response)
+				end
+				if GetNSLConfigValue("PlayerDataFormat") == "N/A" then
+					HandleStaticLeagueConfig(RefTable.id)
 				end
 			else
 				--Configs might not be loaded yet - push out time
@@ -269,7 +298,7 @@ end
 
 local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
-	if GetNSLModEnabled() and NS2ID > 0 and GetNSLConfigValue("PlayerDataFormat") ~= "N/A" then
+	if GetNSLModEnabled() and NS2ID > 0 then
 		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
 	end
 	if not table.contains(G_IDTable, NS2ID) then
@@ -294,15 +323,23 @@ end
 
 Event.Hook("UpdateServer", OnServerUpdated)
 
+local function ForceUpdatePlayerData()
+	-- Blank existing table
+	NSL_ClientData = { }
+	-- Re-add everyone as if they just joined
+	local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
+	for p = 1, #playerList do
+		local playerClient = Server.GetOwner(playerList[p])
+		if playerClient then
+			OnNSLClientConnected(playerClient)
+		end
+	end
+end
+table.insert(gLeagueChangeFunctions, ForceUpdatePlayerData)
+
 local function UpdatePlayerDataOnActivation(newState)
 	if not newState == kNSLPluginConfigs.DISABLED then
-		local playerList = EntityListToTable(Shared.GetEntitiesWithClassname("Player"))
-		for p = 1, #playerList do
-			local playerClient = Server.GetOwner(playerList[p])
-			if playerClient then
-				OnNSLClientConnected(playerClient)
-			end
-		end
+		ForceUpdatePlayerData()
 	end
 end
 
