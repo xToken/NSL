@@ -1,0 +1,138 @@
+{
+"Version": 3.2,
+"LeagueName": 							"NOSTALGIA",
+"PlayerDataURL": 						"",
+"PlayerDataFormat":						"N/A",
+"PlayerRefLevel": 						1,
+"AutomaticMapCycleDelay":				10800,
+"PauseEndDelay": 						5,
+"PauseStartDelay": 						5,
+"PauseMaxPauses": 						2,
+"PausedReadyNotificationDelay": 		30,
+"PauseEnabled": 						true,
+"FriendlyFireDamagePercentage": 		0.33,
+"FriendlyFireEnabled":			 		true,
+"TournamentModeAlertDelay": 			30,
+"TournamentModeGameStartDelay": 		15,
+"FirstPersonSpectate":					true,
+"UseCustomSpawnConfigs":				true,
+"UseFixedSpawnsWhenLoaded":				false,
+"UseDefaultSkins":						false,
+"PauseOnDisconnect":					false,
+"SavePlayerStates":						true,
+"ReportErrors":							true,
+"ErrorReportURL":						"https://m2xo9pp3kc.execute-api.us-east-2.amazonaws.com/default/SubmitErrorReports",
+"PausedMaxDuration": 					300,
+"MessageColor":							"FF69B4",
+"NetworkTruncation":					1,
+"HeartbeatRequired":					true,
+"LeagueDecal":							"",
+"BadgeTitle":							"Team - ",
+"TournamentModeForfeitClock":			0,
+"TournamentModeRestartDuration": 		90,
+"Limit6PlayerPerTeam": 					false,
+"MercsRequireApproval": 				false,
+"OverrideTeamNames": 					false,
+"CaptainsVotingDuration":				60,
+"CaptainsSelectionTimeAllowed":			30,
+"CaptainsMapVoteTimeAllowed":			60,
+"CaptainsAlertDelay":					30,
+"GATHER": 								{
+											"OverrideTeamNames": 					false
+										},
+"PCW": 									{
+											"OverrideTeamNames": 					true
+										},
+"OFFICIAL":								{
+											"TournamentModeForfeitClock":			900,
+											"TournamentModeRestartDuration": 		15,
+											"Limit6PlayerPerTeam": 					true,
+											"MercsRequireApproval": 				true,
+											"OverrideTeamNames": 					true,
+											"UseDefaultSkins":						true
+										},
+"Badges":				 				[
+										],
+"REFS":									[
+											344054,
+											5176141,
+											32430346
+										],
+"AdminGroups":							{
+											"1":{
+												"commands": 
+												[
+													"sv_rcon", "sh_rcon"
+												],
+												"type": "disallowed"
+											}		
+										},
+"CustomSpawns":    						{
+											"ns2_tram":     [
+																{
+																	"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
+																	"expiryDate":           {"year": 2099, "month": 3, "day": 3},
+																	"spawnData":            [
+																								{
+																									"name":             "Shipping",
+																									"team":             "marines",
+																									"enemyspawns":      [ 
+																														{"name": "Warehouse", "weight": 1 },
+																														{"name": "Server Room", "weight": 1 }
+																														],
+																									"weight": 1
+																								}
+																							]
+																}
+															],
+											"ns2_summit":   [
+																{
+																	"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
+																	"expiryDate":           {"year": 2099, "month": 3, "day": 3},
+																	"spawnData":            [
+																								{
+																									"name":             "Atrium",
+																									"team":             "marines",
+																									"enemyspawns":      ["Sub Access"],
+																									"weight": 1
+																								},
+																								{
+																									"name":             "Flight Control",
+																									"team":             "both",
+																									"enemyspawns":      ["Data Core"],
+																									"weight": 1
+																								},
+																								{
+																									"name":             "Data Core",
+																									"team":             "both",
+																									"enemyspawns":      ["Flight Control"],
+																									"weight": 1
+																								}
+																							]
+																}
+															],
+											"ns2_descent":  [
+																{
+																	"effectiveDate":        {"year": 2017, "month": 11, "day": 5},
+																	"expiryDate":           {"year": 2099, "month": 3, "day": 3},
+																	"spawnData":            [
+																								{
+																									"name":             "Drone Bay",
+																									"team":             "both",
+																									"enemyspawns":      ["Fabrication"],
+																									"weight": 1
+																								},
+																								{
+																									"name":             "Fabrication",
+																									"team":             "both",
+																									"enemyspawns":      ["Drone Bay"],
+																									"weight": 1
+																								}
+																							]
+																}
+															]
+						                },
+"LogoLocations":						{
+										},
+"EndOfTable": true
+}

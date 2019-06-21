@@ -1,5 +1,12 @@
 # Changelog
 
+## 6-21-19 (Buld 127)
+- Fixed server commands being registered multiple times in some cases
+- Added support for leagues without player databases
+- Fixed player data cache not being cleared when league is changed
+- Fully removed optimizations module now that entity throttling is live in 328
+- Added additional league
+
 ## 6-8-19 (Buld 126)
 - Fixed assert caused by players joining that didnt have badges
 
