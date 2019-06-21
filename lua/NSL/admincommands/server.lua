@@ -71,7 +71,6 @@ end
 RegisterNSLConsoleCommand("sv_nslhelp", OnClientCommandNSLHelp, "SV_NSLHELP", true)
 
 local function UpdateNSLMode(client, mode)
-	Print(ToString(mode))
 	mode = mode or ""
 	local currentMode = GetNSLMode()
 	if string.lower(mode) == "gather" and currentMode ~= kNSLPluginConfigs.GATHER then
