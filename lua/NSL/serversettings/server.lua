@@ -113,7 +113,8 @@ originalNS2GRGetWarmUpPlayerLimit = Class_ReplaceMethod("NS2Gamerules", "GetWarm
 local oldGetCanTakeDamage = LiveMixin.GetCanTakeDamage
 -- Prevent damage to players in warmup mode
 function LiveMixin:GetCanTakeDamage()
-	if GetNSLModEnabled() and GetGameInfoEntity():GetState() == kGameState.WarmUp then
+	-- WarmUp func is part of newer builds 'pregame', only active if that exists in gamestate enum
+	if table.contains(kGameState, "WarmUp") and GetNSLModEnabled() and GetGameInfoEntity():GetState() == kGameState.WarmUp then
 		return false
 	end
 
