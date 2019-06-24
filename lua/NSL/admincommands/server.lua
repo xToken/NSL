@@ -55,15 +55,14 @@ function SendClientServerAdminMessage(client, message, ...)
 end
 
 local function OnClientCommandNSLHelp(client)
-	if client then
-		local NS2ID = client:GetUserId()
-		local ref = GetIsNSLRef(NS2ID)
-		for _, t in ipairs(gNSLHelpMessages) do
-			if t.refOnly and ref then
-				SendClientServerAdminMessage(client, t.message, t.command..": ")
-			elseif not t.refOnly then
-				SendClientServerAdminMessage(client, t.message, t.command..": ")
-			end
+	if not client then return end
+	local NS2ID = client:GetUserId()
+	local ref = GetIsNSLRef(NS2ID)
+	for _, t in ipairs(gNSLHelpMessages) do
+		if t.refOnly and ref then
+			SendClientServerAdminMessage(client, t.message, t.command..": ")
+		elseif not t.refOnly then
+			SendClientServerAdminMessage(client, t.message, t.command..": ")
 		end
 	end
 end
@@ -71,6 +70,7 @@ end
 RegisterNSLConsoleCommand("sv_nslhelp", OnClientCommandNSLHelp, "SV_NSLHELP", true)
 
 local function UpdateNSLMode(client, mode)
+	if not GetIsClientNSLRef(client) then return end
 	mode = mode or ""
 	local currentMode = GetNSLMode()
 	if string.lower(mode) == "gather" and currentMode ~= kNSLPluginConfigs.GATHER then
@@ -97,6 +97,7 @@ RegisterNSLConsoleCommand("sv_nslcfg", UpdateNSLMode, "SV_NSLCFG", false, {{ Typ
 --CreateServerAdminCommand("Console_sv_nslcfg", OnAdminCommandSetMode, "<state> - disabled,gather,pcw,official,captains - Changes the configuration mode of the NSL plugin.")
 
 local function UpdateNSLLeague(client, league)
+	if not client then return end
 	league = string.upper(league or "")
 	if GetNSLLeagueValid(league) then
 		SetActiveLeague(league)
@@ -110,6 +111,7 @@ CreateNSLServerAdminCommand("sv_nslconfig", UpdateNSLLeague, "SV_NSLCONFIG", {{ 
 --RegisterNSLConsoleCommand("sv_nslconfig", OnClientCommandSetLeague, "SV_NSLCONFIG")
 
 local function UpdateNSLPerfConfig(client, perfcfg)
+	if not GetIsClientNSLRef(client) then return end
 	perfcfg = string.upper(perfcfg or "")
 	if GetPerfLevelValid(perfcfg) and not GetNSLPerfConfigsBlocked() then
 		SetPerfLevel(perfcfg)
@@ -123,6 +125,7 @@ RegisterNSLConsoleCommand("sv_nslperfconfig", UpdateNSLPerfConfig, "SV_NSLPERFCO
 --CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
 
 local function UpdateNSLLeagueAccess(client)
+	if not client then return end
 	SetNSLAdminAccess(not GetNSLLeagueAdminsAccess())
 	if GetNSLLeagueAdminsAccess() then
 		SendClientServerAdminMessage(client, "NSL_LEAGUE_ADMIN_ACCESS_ALLOWED")
@@ -134,6 +137,7 @@ end
 CreateNSLServerAdminCommand("sv_nslleagueadmins", UpdateNSLLeagueAccess, "SV_NSLLEAGUEADMINS")
 
 local function UpdateNSLPerfConfigAccess(client)
+	if not client then return end
 	SetNSLPerfConfigAccess(not GetNSLPerfConfigsBlocked())
 	if GetNSLPerfConfigsBlocked() then
 		SendClientServerAdminMessage(client, "NSL_PERF_CONFIGS_DISALLOWED")
@@ -145,6 +149,7 @@ end
 CreateNSLServerAdminCommand("sv_nslallowperfconfigs", UpdateNSLPerfConfigAccess, "SV_NSLLEAGUEPERACCESS")
 
 local function UpdateNSLCaptainsLimit(client, limit)
+	if not GetIsClientNSLRef(client) then return end
 	limit = tonumber(limit)
 	if limit and limit >= 5 and limit <= 12 then
 		SetNSLCaptainsLimit(limit)
@@ -158,12 +163,9 @@ RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSL
 --CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
 
 local function OnCommandNSLPassword(client, password)
-	if not client then return end
-	local NS2ID = client:GetUserId()
-	if GetIsNSLRef(NS2ID) then
-		Server.SetPassword(password or "")
-		SendClientServerAdminMessage(client, "NSL_SET_PASSWORD", password and string.rep("*", string.len(password)) or "nothing")
-	end
+	if not GetIsClientNSLRef(client) then return end
+	Server.SetPassword(password or "")
+	SendClientServerAdminMessage(client, "NSL_SET_PASSWORD", password and string.rep("*", string.len(password)) or "nothing")
 end
 
 RegisterNSLConsoleCommand("sv_nslpassword", OnCommandNSLPassword, "SV_NSLPASSWORD", false, {{ Type = "string", Optional = true}})
