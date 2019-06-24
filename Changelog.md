@@ -1,5 +1,9 @@
 # Changelog
 
+## 6-23-19 (Buld 128)
+- Fixed server commands being server admin commands and not 'League' commands
+- Added function to make command validations easier
+
 ## 6-21-19 (Buld 127)
 - Fixed server commands being registered multiple times in some cases
 - Added support for leagues without player databases
