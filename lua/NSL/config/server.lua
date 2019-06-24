@@ -343,6 +343,11 @@ function GetIsNSLRef(ns2id)
 	return false
 end
 
+function GetIsClientNSLRef(client)
+	if not client then return false end
+	return GetIsNSLRef(client:GetUserId())
+end
+
 local function GetGroupCanRunCommand(groupData, commandName)
     
 	local existsInList = false
