@@ -108,14 +108,14 @@ local function UpdateClientBadge(ns2id, data)
 	local teamBadgeName = GetNSLConfigValue("BadgeTitle")
 	local success
 	local row = 5
-	if refBadge then
+	if refBadge and GiveBadge then
 		success = GiveBadge(ns2id, refBadge, row)
 		if success then
 			SetFormalBadgeName(refBadge, badgeName)
 			row = 4
 		end
 	end
-	if teamBadge then
+	if teamBadge and GiveBadge then
 		success = GiveBadge(ns2id, teamBadge, row)
 		if success then
 			SetFormalBadgeName(teamBadge, teamBadgeName .. data.NSL_Team)
