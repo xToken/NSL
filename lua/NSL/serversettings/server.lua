@@ -178,21 +178,39 @@ ReplaceLocals(NS2Gamerules.OnUpdate, { ServerAgeCheck = NewServerAgeCheck })
 
 -- Set friendly fire percentage
 local function SetupServerConfig(config)
-	if (config == "complete" or config == "reload") and GetNSLModEnabled() then
-		kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
-		-- Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
-		Server.SetConfigSetting("rookie_friendly", false)
-		Server.SetConfigSetting("force_even_teams_on_join", false)
-		Server.SetConfigSetting("auto_team_balance", {enabled_after_seconds = 0, enabled = false, enabled_on_unbalance_amount = 2})
-		Server.SetConfigSetting("end_round_on_team_unbalance", nil)
-		Server.SetConfigSetting("end_round_on_team_unbalance_check_after_time", nil)
-		Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
-		Server.SetConfigSetting("auto_kick_afk_time", nil)
-		Server.SetConfigSetting("auto_kick_afk_capacity", nil)
-		Server.SetConfigSetting("quickplay_ready", false)
-		Server.SetConfigSetting("auto_vote_add_commander_bots", false)
-		--Server.SetVariableTableCommandsAllowed(not GetNSLMode() == kNSLPluginConfigs.OFFICIAL)
+	if (config == "complete" or config == "reload") then
+
+		if GetNSLModEnabled() then
+			kFriendlyFireScalar = GetNSLConfigValue("FriendlyFireDamagePercentage")
+			-- Block AFK, AutoConcede, AutoTeamBalance and other server cfg stuff
+			Server.SetConfigSetting("rookie_friendly", false)
+			Server.SetConfigSetting("force_even_teams_on_join", false)
+			Server.SetConfigSetting("auto_team_balance", {enabled_after_seconds = 0, enabled = false, enabled_on_unbalance_amount = 2})
+			Server.SetConfigSetting("end_round_on_team_unbalance", nil)
+			Server.SetConfigSetting("end_round_on_team_unbalance_check_after_time", nil)
+			Server.SetConfigSetting("end_round_on_team_unbalance_after_warning_time", nil)
+			Server.SetConfigSetting("auto_kick_afk_time", nil)
+			Server.SetConfigSetting("auto_kick_afk_capacity", nil)
+			Server.SetConfigSetting("quickplay_ready", false)
+			Server.SetConfigSetting("auto_vote_add_commander_bots", false)
+			--Server.SetVariableTableCommandsAllowed(not GetNSLMode() == kNSLPluginConfigs.OFFICIAL)
+		end
+
 	end
+
 end
 
 table.insert(gConfigLoadedFunctions, SetupServerConfig)
+
+local function SetupServerRanking()
+	if not GetNSLModEnabled() or not GetNSLConfigValue("RankingDisabled") then
+		gRankingDisabled = false
+		Shared.Message(string.format("Server Ranking Enabled."))
+	else
+		gRankingDisabled = true
+		Shared.Message(string.format("Server Ranking Disabled."))
+	end
+end
+
+table.insert(gConfigLoadedFunctions, SetupServerRanking)
+table.insert(gPluginStateChange, SetupServerRanking)
