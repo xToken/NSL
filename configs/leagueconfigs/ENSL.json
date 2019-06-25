@@ -1,5 +1,5 @@
 {
-"Version": 3.2,
+"Version": 3.3,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
@@ -37,11 +37,14 @@
 "CaptainsSelectionTimeAllowed":			30,
 "CaptainsMapVoteTimeAllowed":			60,
 "CaptainsAlertDelay":					30,
+"RankingDisabled":						false,
+"ForceLeagueNicks":						false,
 "GATHER": 								{
 											"OverrideTeamNames": 					false
 										},
 "PCW": 									{
-											"OverrideTeamNames": 					true
+											"OverrideTeamNames": 					true,
+											"RankingDisabled":						true
 										},
 "OFFICIAL":								{
 											"TournamentModeForfeitClock":			900,
@@ -49,7 +52,9 @@
 											"Limit6PlayerPerTeam": 					true,
 											"MercsRequireApproval": 				true,
 											"OverrideTeamNames": 					true,
-											"UseDefaultSkins":						true
+											"UseDefaultSkins":						true,
+											"RankingDisabled":						true,
+											"ForceLeagueNicks":						true
 										},
 "Badges":				 				[
 											{"badge": "ensl_caster", 	"name": "ENSL Caster"},
