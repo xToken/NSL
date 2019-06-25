@@ -302,19 +302,18 @@ end
 
 local function OnCommandReady(client)
 	local gamerules = GetGamerules()
-	if gamerules and client and GetNSLModEnabled() then
+	if gamerules and client and GetNSLModEnabled() and not GetIsGamePaused() then
 		if gamerules:GetGameState() <= kGameState.PreGame then
 			ClientReady(client)
 		else
 			CheckforInProgressGameToCancel(client, gamerules)
 		end
+		return true
 	end
+	return false
 end
 
-RegisterNSLConsoleCommand("ready", OnCommandReady, "CMD_READY", true)
-gChatCommands["ready"] = OnCommandReady
-gChatCommands["!ready"] = OnCommandReady
-gChatCommands["rdy"] = OnCommandReady
+table.insert(gReadyCommandFunctions, OnCommandReady)
 
 local function ClientNotReady(client)
 
@@ -334,19 +333,18 @@ end
 
 local function OnCommandNotReady(client)
 	local gamerules = GetGamerules()
-	if gamerules and client and GetNSLModEnabled() then
+	if gamerules and client and GetNSLModEnabled() and not GetIsGamePaused() then
 		if gamerules:GetGameState() <= kGameState.PreGame then
 			ClientNotReady(client)
 		else
 			CheckforInProgressGameToCancel(client, gamerules)
 		end
+		return true
 	end
+	return false
 end
 
-RegisterNSLConsoleCommand("notready", OnCommandNotReady, "CMD_NOTREADY", true)
-gChatCommands["notready"] = OnCommandNotReady
-gChatCommands["!notready"] = OnCommandNotReady
-gChatCommands["notrdy"] = OnCommandNotReady
+table.insert(gNotReadyCommandFunctions, OnCommandNotReady)
 
 local function UpdateTournamentMode(newState)
 	if newState == kNSLPluginConfigs.DISABLED then
