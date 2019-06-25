@@ -11,10 +11,18 @@ local function SetupClientRatesandConfig(client)
 	if GetNSLDefaultPerfValue("Interp") then
 		--If non-default rates, send to clients.
 		if GetNSLDefaultPerfValue("Interp") ~= Shared.GetServerPerformanceData():GetInterpMs() then
-			Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+			if Server.SetInterpolationDelay then
+				Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+			else
+				Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
+			end
 		end
 		if GetNSLDefaultPerfValue("MoveRate") ~= Shared.GetServerPerformanceData():GetMoverate() then
-			Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+			if Server.SetMoveRate then
+				Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+			else
+				Shared.ConsoleCommand(string.format("mr %f", (GetNSLPerfValue("MoveRate"))))
+			end
 		end
 	end
 end
@@ -28,14 +36,14 @@ end
 
 local function SetupRates()
 	
-	if GetNSLPerfValue("TickRate") > Server.GetTickrate() then
+	if Server.GetTickrate and Server.SetTickRate and GetNSLPerfValue("TickRate") > Server.GetTickrate() then
 		-- Tickrate going up, increase it first.
 		Server.SetTickRate(GetNSLPerfValue("TickRate"))
 		
 		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
 			Server.SetSendRate(GetNSLPerfValue("ClientRate"))
 		end
-	elseif GetNSLPerfValue("TickRate") <= Server.GetTickrate() then
+	elseif Server.GetTickrate and Server.SetTickRate and GetNSLPerfValue("TickRate") <= Server.GetTickrate() then
 		-- Tickrate going down, set updaterate first.
 		if GetNSLPerfValue("ClientRate") ~= Server.GetSendrate() then
 			Server.SetSendRate(GetNSLPerfValue("ClientRate"))
@@ -50,11 +58,19 @@ local function SetupRates()
 	end
 	
 	if GetNSLPerfValue("Interp") ~= Shared.GetServerPerformanceData():GetInterpMs() then
-		Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+		if Server.SetInterpolationDelay then
+			Server.SetInterpolationDelay(GetNSLPerfValue("Interp") / 1000)
+		else
+			Shared.ConsoleCommand(string.format("interp %f", (GetNSLPerfValue("Interp") / 1000)))
+		end
 	end
 	
 	if GetNSLPerfValue("MoveRate") ~= Shared.GetServerPerformanceData():GetMoverate() then
-		Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+		if Server.SetMoveRate then
+			Server.SetMoveRate(GetNSLPerfValue("MoveRate"))
+		else
+			Shared.ConsoleCommand(string.format("mr %f", (GetNSLPerfValue("MoveRate"))))
+		end
 	end
 	
 	SetupNSLTag()
