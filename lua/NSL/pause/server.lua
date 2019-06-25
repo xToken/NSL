@@ -512,13 +512,13 @@ local function OnCommandUnPause(client)
 		if player ~= nil  and GetIsGamePaused() then
 			local teamnumber = player:GetTeamNumber()
 			local lastPause = teamnumber == 1 and gamestate.team1lastresume or gamestate.team2lastresume
-			if teamnumber and ValidateTeamNumber(teamnumber) and lastPause + 2 < Shared.GetTime() then
+			if teamnumber and ValidateTeamNumber(teamnumber) and lastPause + 2 < Shared.GetTime(true) then
 				if teamnumber == 1 then
 					gamestate.team1resume = not gamestate.team1resume
-					gamestate.team1lastresume = Shared.GetTime()
+					gamestate.team1lastresume = Shared.GetTime(true)
 				else
 					gamestate.team2resume = not gamestate.team2resume
-					gamestate.team2lastresume = Shared.GetTime()
+					gamestate.team2lastresume = Shared.GetTime(true)
 				end
 				if gamestate.team2resume and not gamestate.team1resume then
 					SendAllClientsMessage("PauseTeamReadyMessage", false, player:GetName(), GetActualTeamName(2), GetActualTeamName(1))
@@ -542,6 +542,18 @@ gChatCommands["unpause"] = OnCommandUnPause
 gChatCommands["!unpause"] = OnCommandUnPause
 gChatCommands["resume"] = OnCommandUnPause
 gChatCommands["!resume"] = OnCommandUnPause
+
+local function OnCommandReady(client)
+	
+	if client and GetNSLModEnabled() and GetNSLConfigValue("PauseEnabled") and GetIsGamePaused() then
+		OnCommandUnPause(client)
+		return true
+	end
+	return false
+
+end
+
+table.insert(gReadyCommandFunctions, OnCommandReady)
 
 local function OnCommandAdminPause(client)
 	
