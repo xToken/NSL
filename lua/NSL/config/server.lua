@@ -269,6 +269,7 @@ local function OnServerUpdated()
 		if Shared.GetServerPerformanceData():GetInterpMs() > 0 then
 			--wait for this to be valid
 			PerfConfigs["DEFAULT"] = {
+				PerfLevel = "Default",
 				Interp = Shared.GetServerPerformanceData():GetInterpMs(),
 				MoveRate = Shared.GetServerPerformanceData():GetMoverate(),
 				ClientRate = Server.GetSendrate(),
