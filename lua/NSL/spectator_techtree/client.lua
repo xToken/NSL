@@ -4,7 +4,7 @@
 -- - Dragon
 
 local function UpdateOverheadGUI(script)
-	if script then
+	if script and script.keyHints then
 		local numLines = 1
 		local keyHintsText = string.gsub(script.keyHints:GetText(), "\n", " ")
 		keyHintsText = keyHintsText .. " " .. string.format("[%s+(1/2)] Toggle TechMaps", BindingsUI_GetInputValue("ShowTechMap"))
