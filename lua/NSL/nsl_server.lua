@@ -17,7 +17,7 @@ Script.Load("lua/NSL/coinflip/server.lua")
 --Script.Load("lua/NSL/consistencychecks/server.lua") -- Loaded by filereplace
 Script.Load("lua/NSL/customspawns/server.lua")
 Script.Load("lua/NSL/errorreporter/server.lua")
-Script.Load("lua/NSL/firstpersonspecblock/server.lua")
+--Script.Load("lua/NSL/firstpersonspecblock/server.lua") -- Legacy code, is no longer up to date with vanilla changes
 Script.Load("lua/NSL/handicap/server.lua")
 --Script.Load("lua/NSL/heartbeat/server.lua") -- Vanilla added 15sec timeout with B327
 Script.Load("lua/NSL/messages/server.lua")
