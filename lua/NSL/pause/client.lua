@@ -49,44 +49,25 @@ end
 
 Event.Hook("LoadComplete", OnLoadComplete)
 
--- Allow chats to still work during pauses
-local startedChatTime = 0
-local kChatMinWindow = 0.005
-
-function ChatUI_GetStartedChatTime()
-    return startedChatTime
-end
-
 local oldChatUI_EnterChatMessage = ChatUI_EnterChatMessage
 function ChatUI_EnterChatMessage(teamOnly)
-	local wasEnteringChat = ChatUI_EnteringChatMessage()
+	gTimeBypass = true
 	oldChatUI_EnterChatMessage(teamOnly)
-	if not wasEnteringChat and ChatUI_EnteringChatMessage() then
-		startedChatTime = Client.GetTime()
-	end
+	gTimeBypass = false
 end
 
 local function ChatUICreation(scriptName, script)
 
 	if scriptName == "GUIChat" then
 
-		function GUIChat:SendCharacterEvent(character)
-			local enteringChatMessage = ChatUI_EnteringChatMessage()
-			
-			if (Client.GetTime() - ChatUI_GetStartedChatTime()) > kChatMinWindow and enteringChatMessage then
-			
-				local currentText = self.inputItem:GetWideText()
-				if currentText:length() < kMaxChatLength then
-				
-					self.inputItem:SetWideText(currentText .. character)
-					return true
-					
-				end
-				
+		local originalGUIChatSendCharacterEvent
+		originalGUIChatSendCharacterEvent = Class_ReplaceMethod("GUIChat", "SendCharacterEvent", 
+			function(self, character)
+				gTimeBypass = true
+				originalGUIChatSendCharacterEvent(self, character)
+				gTimeBypass = false
 			end
-			
-			return false
-		end
+		)
 	
 	end
 	
@@ -94,41 +75,11 @@ end
 
 ClientUI.AddScriptCreationEventListener(ChatUICreation)
 
--- List of GUI scripts that still update normally during pauses
-local kPausedUpdateScripts = { "GUIScoreboard", "GUIChat", "GUIMinimapFrame", "GUIInsight_PlayerFrames", "GUITechMap", "GUIInsight_Overhead", "GUIMainMenu",
-								"GUIInsight_PenTool", "GUIInsight_PlayerHealthbars", "GUIInsight_Graphs", "GUINSLSpectatorTechMap", "GUINSLFollowingSpectatorHUD",
-								"GUIEggDisplay" }
-local kPausedScoreboardUpdateRate = 0.5
-local scoreboardUpdate = 0.5
-
-function AddGUIScriptToPausedUpdates(GUIClassName)
-    table.insert(kPausedUpdateScripts, GUIClassName)
-end
-
-local playerData
 local originalGUIManagerUpdate
 originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update", 
 	function(self, deltaTime)
-		local player = Client.GetLocalPlayer()
-		if player and player.gamepaused then
-			for s = #self.scripts, 1, -1 do
-				local script = self.scripts[s]
-				if script and table.contains(kPausedUpdateScripts, script.classname) then
-					script.lastUpdateTime = script.lastUpdateTime - deltaTime
-				end
-			end
-			scoreboardUpdate = math.max(0, scoreboardUpdate - deltaTime)
-			if scoreboardUpdate == 0 then
-				if not playerData then
-					playerData = debug.getupvaluex(Scoreboard_ReloadPlayerData, "playerData")
-				end
-				for id, data in pairs(playerData) do
-					data.LastUpdateTime = data.LastUpdateTime - kPausedScoreboardUpdateRate - deltaTime
-				end
-				Scoreboard_ReloadPlayerData()
-				scoreboardUpdate = kPausedScoreboardUpdateRate
-			end
-		end
+		gTimeBypass = true
 		originalGUIManagerUpdate(self, deltaTime)
+		gTimeBypass = false
 	end
 )
