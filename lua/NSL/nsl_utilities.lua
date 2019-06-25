@@ -76,3 +76,10 @@ if not debug.getupvaluex then
     end
     debug.getupvaluex = getupvalue
 end
+
+-- Cheatiness
+if not string.UTF8SanitizeForNS2 then
+    function string.UTF8SanitizeForNS2(s)
+        return s
+    end
+end
