@@ -523,3 +523,17 @@ end
 
 RegisterNSLConsoleCommand("sv_nslfunctiondata", OnClientCommandShowFunctionData, "SV_NSLFUNCTIONDATA", false,
 	{{ Type = "string", Optional = true}})
+
+local originalNS2PlayerGetName
+originalNS2PlayerGetName = Class_ReplaceMethod("Player", "GetName", 
+	function(self)
+		if GetNSLConfigValue("ForceLeagueNicks") then
+			if self.playerInfo then 
+				if self.playerInfo:GetNSLName() ~= "" then
+					return self.playerInfo:GetNSLName()
+				end
+			end
+		end
+		return self.name ~= "" and self.name or kDefaultPlayerName
+	end
+)
