@@ -37,6 +37,10 @@ gNSLConsoleCommands = { }
 gNSLServerAdminCommands = { }
 -- Captains Phase change
 gCaptainsStateChange = { }
+-- Ready chat/console command callbacks
+gReadyCommandFunctions = { }
+-- NotReady chat/console command callbacks
+gNotReadyCommandFunctions = { }
 
 local function OnClientConnected(client)
 	if GetNSLModEnabled() then
@@ -228,3 +232,25 @@ local function FinalizeNSLConsoleCommands(configloaded)
 end
 
 table.insert(gConfigLoadedFunctions, FinalizeNSLConsoleCommands)
+
+local function OnCommandReady(client)
+	for i = #gReadyCommandFunctions, 1, -1 do
+		if gReadyCommandFunctions[i](client) then return end
+	end
+end
+
+RegisterNSLConsoleCommand("ready", OnCommandReady, "CMD_READY", true)
+gChatCommands["ready"] = OnCommandReady
+gChatCommands["!ready"] = OnCommandReady
+gChatCommands["rdy"] = OnCommandReady
+
+local function OnCommandNotReady(client)
+	for i = #gNotReadyCommandFunctions, 1, -1 do
+		if gNotReadyCommandFunctions[i](client) then return end
+	end
+end
+
+RegisterNSLConsoleCommand("notready", OnCommandNotReady, "CMD_NOTREADY", true)
+gChatCommands["notready"] = OnCommandNotReady
+gChatCommands["!notready"] = OnCommandNotReady
+gChatCommands["notrdy"] = OnCommandNotReady
