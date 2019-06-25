@@ -32,7 +32,7 @@ local function OnGameEndReportErrors()
 		for k, v in pairs(kReportedErrors) do
 			table.insert(errData, v)
 		end
-		postData = { OS = osver, Mods = string.sub(modData, 1, -2), Error = errData, ErrorCount = kReportedErrorsCount, Build = kNSLPluginBuild }
+		postData = { OS = osver, Mods = string.sub(modData, 1, -2), Error = errData, ErrorCount = kReportedErrorsCount, Build = kNSLPluginBuild, NS2_Build = Shared.GetBuildNumber() }
 		Shared.SendHTTPRequest(GetNSLConfigValue("ErrorReportURL"), "POST", { data = json.encode(postData) }, OnErrorReportResponse)
 		kReportedErrors = { }
 		kReportedErrorsCount = 0
