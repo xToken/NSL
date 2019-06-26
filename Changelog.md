@@ -3,12 +3,13 @@
 ## 6-23-19 (Buld 130)
 - 'Ready' command will no longer work during pauses for game resets.
 - During a pause, 'ready' will toggle your teams readiness for the game to unpause, just like resume/unpause.
-- Removed sleeping of GUI scripts during pause, all GUI scripts will now run as if the game is unpaused.  This should fix chat and scoreboard issues.
+- Fixed GUI workarounds to allow specific GUI scripts to update during pause so that it works with 328 changes.
 - Fixed issue where you couldnt mark your team as not ready during a pause after you had marked them as ready.
 - Added config setting to control server ranking status.
 - Added config setting to control forcing league nicknames.
 - Removed legacy first person spectating block code, was no longer functional and not currently in use by any leagues.
 - Added game build to NSL error reporter.
+- Fixed Default perf level not being selectable after changing to other perf levels
 
 ## 6-23-19 (Buld 128)
 - Fixed server commands being server admin commands and not 'League' commands
