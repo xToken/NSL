@@ -443,6 +443,7 @@ RegisterNSLConsoleCommand("sv_nsltsay", OnClientCommandTeamChat, "SV_NSLTSAY", f
 
 local function OnClientCommandPlayerChat(client, target, ...)
 	if not client then return end
+	if not target then return end
 	local NS2ID = client:GetUserId()
 	local player = NSLGetPlayerMatching(target)
 	if GetIsNSLRef(NS2ID) and player then
@@ -483,7 +484,7 @@ local function OnClientCommandShowFunctionData(client, target)
 	if not client then return end
 	local NS2ID = client:GetUserId()
 	local heading = false
-	if GetIsNSLRef(NS2ID) then
+	if GetIsNSLRef(NS2ID) and target then
 		local targetPlayer = NSLGetPlayerMatching(target)
 		local targetClient
 		if targetPlayer then
