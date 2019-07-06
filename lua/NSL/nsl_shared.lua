@@ -8,11 +8,12 @@ kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL', 'CAPTAINS'}
 kNSLCaptainsStates = enum( {'REGISTRATION', 'VOTING', 'SELECTING', 'ROUND1', 'ROUND2', 'MAPVOTE'})
 
 -- For reference
-kNSLPluginBuild = 130
+kNSLPluginBuild = 131
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")
 
+Script.Load("lua/NSL/customspawns/shared.lua")
 Script.Load("lua/NSL/handicap/shared.lua")
 --Script.Load("lua/NSL/heartbeat/shared.lua") -- Vanilla added 15sec timeout with B327
 Script.Load("lua/NSL/gameinfo/shared.lua")

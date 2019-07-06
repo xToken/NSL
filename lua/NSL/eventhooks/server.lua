@@ -64,8 +64,8 @@ Event.Hook("ClientDisconnect", OnClientDisconnect)
 
 local originalNS2GameRulesEndGame
 originalNS2GameRulesEndGame = Class_ReplaceMethod("NS2Gamerules", "EndGame", 
-	function(self, winningTeam)
-		originalNS2GameRulesEndGame(self, winningTeam)
+	function(self, winningTeam, autoConceded)
+		originalNS2GameRulesEndGame(self, winningTeam, autoConceded)
 		for i = #gGameEndFunctions, 1, -1 do
 			gGameEndFunctions[i](self, winningTeam)
 		end
@@ -170,6 +170,15 @@ end
 
 table.insert(gLeagueChangeFunctions, OnUpdateLeagueName)
 table.insert(gConfigLoadedFunctions, OnUpdateLeagueName)
+
+local function OnUpdateSpawnConfig(_)
+	local gameInfo = GetGameInfoEntity()
+	if gameInfo then
+		gameInfo:SetSpawnSelectionMode(GetNSLConfigValue("CustomSpawnModes"))
+	end
+end
+
+table.insert(gConfigLoadedFunctions, OnUpdateSpawnConfig)
 
 local function OnUpdateCaptainsState(newState)
 	local gameInfo = GetGameInfoEntity()

@@ -18,4 +18,5 @@ Script.Load("lua/NSL/teammanager/client.lua")
 
 -- Load custom GUI scripts if needed
 AddClientUIScriptForClass("Spectator", "NSL/GUI/GUINSLFollowingSpectatorHUD")
+AddClientUIScriptForClass("AlienCommander", "NSL/GUI/GUINSLSpawnSelectionMenu")
 AddClientUIScriptForTeam(kSpectatorIndex, "NSL/GUI/GUINSLSpectatorTechMap")

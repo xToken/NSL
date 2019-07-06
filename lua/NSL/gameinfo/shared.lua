@@ -17,7 +17,9 @@ local networkVars =
 	teamupdates = "integer (0 to 9)",
 	heartbeat = "boolean",
 	tournamentMode = "boolean",
-	captainsstate = "enum kNSLCaptainsStates"
+	spawnSelection = "boolean",
+	spawnSelected = "entityid",
+	captainsState = "enum kNSLCaptainsStates"
 }
 
 local function ApplyClientCFGInitialUpdate(self)
@@ -40,7 +42,9 @@ originalGameInfoOnCreate = Class_ReplaceMethod("GameInfo", "OnCreate",
 			self.teamupdates = 0
 			self.heartbeat = false
 			self.tournamentMode = GetNSLModEnabled()
-			self.captainsstate = 1 -- GetNSLCaptainsState()
+			self.spawnSelection = false
+			self.spawnSelected = -1
+			self.captainsState = 1 -- GetNSLCaptainsState()
 		end
 		
 		if Client then
@@ -100,8 +104,16 @@ function GameInfo:GetTournamentMode()
     return self.tournamentMode
 end
 
+function GameInfo:GetSpawnSelectionEnabled()
+    return self.spawnSelection
+end
+
+function GameInfo:GetSpawnSelection()
+    return self.spawnSelected
+end
+
 function GameInfo:GetNSLCaptainsState()
-	return self.captainsstate
+	return self.captainsState
 end
 
 if Server then
@@ -142,8 +154,20 @@ if Server then
         self.tournamentMode = tM
     end
 
+    function GameInfo:SetSpawnSelectionMode(tV)
+    	if tV and type(tV) == "table" and table.contains(tV, "AliensChoose") then
+    		self.spawnSelection = true
+    	else
+    		self.spawnSelection = false
+    	end
+	end
+
+	function GameInfo:SetSpawnSelection(techPointId)
+	    self.spawnSelected = techPointId
+	end
+
     function GameInfo:SetNSLCaptainsState(newState)
-		self.captainsstate = newState
+		self.captainsState = newState
 	end
 
 end
