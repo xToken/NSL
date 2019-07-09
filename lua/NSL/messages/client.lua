@@ -210,3 +210,4 @@ local function OnCommandToggleOpponentMute()
 end
 
 Event.Hook("Console_toggleopponentmute", OnCommandToggleOpponentMute)
+Event.Hook("Console_tom", OnCommandToggleOpponentMute)
