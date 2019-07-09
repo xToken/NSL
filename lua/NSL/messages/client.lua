@@ -8,6 +8,21 @@ Script.Load("lua/dkjson.lua")
 local kNSLChatSoundWarning = PrecacheAsset("sound/NS2.fev/common/invalid")
 local kNSLLanguageIDLookup = { }
 local kNSLStringReference = { }
+local configFileName = "NSLClientConfig.json"
+local kNSLOpponentChatMute = false
+
+local function SaveNSLClientConfig()
+    SaveConfigFile(configFileName, { opponentChatMute = kNSLOpponentChatMute })
+end
+
+local function LoadNSLClientConfig()
+    local defaultConfig = { opponentChatMute = false }
+    WriteDefaultConfigFile(configFileName, defaultConfig)
+    local config = LoadConfigFile(configFileName) or defaultConfig
+    kNSLOpponentChatMute = config.opponentChatMute or false
+end
+
+LoadNSLClientConfig()
 
 local function BuildNSLLanguageTable()
 
@@ -154,3 +169,44 @@ local function AdminChatMessageRecieved(message)
 end
 
 Client.HookNetworkMessage("NSLAdminChat", AdminChatMessageRecieved)
+
+local oldOnMessageChat
+
+-- Validate against the NSL global opponents chat mute option
+local function OnMessageChat(message)
+    local player = Client.GetLocalPlayer()
+    if player and kNSLOpponentChatMute then
+        if player:GetTeamNumber() ~= message.teamNumber and (message.teamNumber == 1 or message.teamNumber == 2) then
+            -- We dont want to see this chat message
+            return
+        end
+    end
+    return oldOnMessageChat(message)
+end
+
+local d = debug.getregistry()
+for k, v in pairs(d) do
+    if type(v) == "function" then
+        local vF = debug.getinfo(v)
+        if vF.short_src == "lua/Chat.lua" then
+            oldOnMessageChat = v
+            --table.remove(d, i) -- This doesnt seem to actually unregister anything?..
+            break
+        end
+    end
+end
+
+if oldOnMessageChat then
+
+    Client.HookNetworkMessage("Chat", OnMessageChat)
+    -- This causes a warning message, but our hook still gets inserted... need to find better solution.
+
+end
+
+local function OnCommandToggleOpponentMute()
+    kNSLOpponentChatMute = not kNSLOpponentChatMute
+    SaveNSLClientConfig()
+    Shared.Message(string.format("NSL: Opponents Chat is now %s.", kNSLOpponentChatMute and "hidden" or "visible"))
+end
+
+Event.Hook("Console_toggleopponentmute", OnCommandToggleOpponentMute)
