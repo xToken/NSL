@@ -1,5 +1,5 @@
 {
-"Version": 3.3,
+"Version": 3.4,
 "LeagueName": 							"AusNS2",
 "PlayerDataURL": 						"http://ausns2.org/league-api.php?lookup=player&steamid=",
 "PlayerDataFormat":						"AUSNS",
@@ -15,8 +15,7 @@
 "TournamentModeAlertDelay": 			30,
 "TournamentModeGameStartDelay": 		15,
 "FirstPersonSpectate":					true,
-"UseCustomSpawnConfigs":				false,
-"UseFixedSpawnsWhenLoaded":				false,
+"CustomSpawnModes":						[ ],
 "UseDefaultSkins":						false,
 "PauseOnDisconnect":					false,
 "SavePlayerStates":						true,

@@ -1,5 +1,5 @@
 {
-"Version": 3.3,
+"Version": 3.4,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
@@ -15,8 +15,7 @@
 "TournamentModeAlertDelay": 			30,
 "TournamentModeGameStartDelay": 		15,
 "FirstPersonSpectate":					true,
-"UseCustomSpawnConfigs":				true,
-"UseFixedSpawnsWhenLoaded":				false,
+"CustomSpawnModes":						[ "CustomSpawns", "AliensChoose"],
 "UseDefaultSkins":						false,
 "PauseOnDisconnect":					false,
 "SavePlayerStates":						true,
@@ -117,6 +116,18 @@
 																														{"name": "Server Room", "weight": 1 }
 																														],
 																									"weight": 1
+																								},
+																								{
+																									"name":             "Warehouse",
+																									"team":             "aliens",
+																									"enemyspawns":      ["Shipping"],
+																									"weight": 1
+																								},
+																								{
+																									"name":             "Server Room",
+																									"team":             "aliens",
+																									"enemyspawns":      ["Shipping"],
+																									"weight": 1
 																								}
 																							]
 																}
@@ -142,6 +153,12 @@
 																									"name":             "Data Core",
 																									"team":             "both",
 																									"enemyspawns":      ["Flight Control"],
+																									"weight": 1
+																								},
+																								{
+																									"name":             "Sub Access",
+																									"team":             "aliens",
+																									"enemyspawns":      ["Atrium"],
 																									"weight": 1
 																								}
 																							]

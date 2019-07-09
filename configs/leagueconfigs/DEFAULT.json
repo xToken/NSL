@@ -1,5 +1,5 @@
 {
-"Version": 3.3,
+"Version": 3.4,
 "LeagueName": 							"DEFAULT",
 "PlayerDataURL": 						"www.yournicewebsite.com",
 "PlayerDataFormat":						"N/A",
@@ -15,8 +15,7 @@
 "TournamentModeAlertDelay": 			30,
 "TournamentModeGameStartDelay": 		15,
 "FirstPersonSpectate":					true,
-"UseCustomSpawnConfigs":				true,
-"UseFixedSpawnsWhenLoaded":				false,
+"CustomSpawnModes":						[ "AliensChoose"],
 "UseDefaultSkins":						false,
 "PauseOnDisconnect":					false,
 "SavePlayerStates":						true,
