@@ -65,6 +65,8 @@ local function OnClientCommandNSLHelp(client)
 			SendClientServerAdminMessage(client, t.message, t.command..": ")
 		end
 	end
+	--Hardcode this for now :<
+	SendClientServerAdminMessage(client, "NSL_OPPONENT_MUTE_TOGGLE", "toggleopponentmute: ")
 end
 
 RegisterNSLConsoleCommand("sv_nslhelp", OnClientCommandNSLHelp, "SV_NSLHELP", true)
