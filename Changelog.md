@@ -1,5 +1,10 @@
 # Changelog
 
+## 7-8-19 (Buld 131)
+- Consolidated custom spawn toggles into single option.
+- Supports UseFixedSpawnsWhenLoaded (overrides other options), CustomSpawns - allows spawns to be configured by dates and AliensChoose which allows aliens to choose their spawn.
+- Added client side toggleopponentmute console command, toggles the display of opponents chat messages on or off.
+
 ## 6-23-19 (Buld 130)
 - 'Ready' command will no longer work during pauses for game resets.
 - During a pause, 'ready' will toggle your teams readiness for the game to unpause, just like resume/unpause.
