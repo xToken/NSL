@@ -146,4 +146,5 @@
 	"NSL_CAPTAINS_MAP_VOTE_COMPLETED":"%s won the vote, cycling in %s seconds.",
 	"NSL_CAPTAINS_MAP_VOTE_STARTED":"Map vote has started, will end in %s seconds.",
 	"NSL_CAPTAINS_MAP_VOTE_PERIODIC":"Map vote has %s seconds remaining, currently %s is winning.",
+	"NSL_OPPONENT_MUTE_TOGGLE":"%sThis will hide the opposing teams chat messages if enabled.",
 }
