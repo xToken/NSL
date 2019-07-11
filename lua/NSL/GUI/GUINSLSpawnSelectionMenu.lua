@@ -129,7 +129,9 @@ function GUINSLSpawnSelectionMenu:Initialize()
     
     UpdateUISize(self)
 
-    HelpScreen_AddObserver(self)
+    if HelpScreen_AddObserver then
+        HelpScreen_AddObserver(self)
+    end
     
 end
 
@@ -156,7 +158,9 @@ function GUINSLSpawnSelectionMenu:Uninitialize()
     GUI.DestroyItem(self.background)
     self.background = nil
     
-    HelpScreen_RemoveObserver(self)
+    if HelpScreen_RemoveObserver then
+        HelpScreen_RemoveObserver(self)
+    end
 
     MouseTracker_SetIsVisible(false)
     
