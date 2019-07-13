@@ -1,5 +1,8 @@
 # Changelog
 
+## 7-13-19 (Buld 132)
+- Fixed issue with cross spawn vanilla logic not being cached, which caused issues when aliens selected certain spawn locations.
+
 ## 7-8-19 (Buld 131)
 - Consolidated custom spawn toggles into single option.
 - Supports UseFixedSpawnsWhenLoaded (overrides other options), CustomSpawns - allows spawns to be configured by dates and AliensChoose which allows aliens to choose their spawn.
