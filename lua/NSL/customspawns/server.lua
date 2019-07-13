@@ -8,6 +8,7 @@ local kSelectedAlienSpawn
 local kCustomTechPointData
 local kValidCustomSpawnData = false
 local kSpawnConfigModes = { }
+local spawnSelectionOverrideCache = { }
 
 local kFriendlySpawnHelpers = {
 	ns2_biodome = {
@@ -162,7 +163,7 @@ local function LoadCustomTechPointData(config)
 		--Cache once configs are loaded.
 		local customSpawnData = GetMapSpecificSpawns()
 		local techPoints = EntityListToTable(Shared.GetEntitiesWithClassname("TechPoint"))
-		if customSpawnData then
+		if customSpawnData and table.contains(kSpawnConfigModes, "CustomSpawns") then
 			local tpTable = { }
 			for _, tp in ipairs(techPoints) do
 				tpTable[string.lower(tp:GetLocationName())] = 
@@ -197,7 +198,7 @@ local function LoadCustomTechPointData(config)
 							tpTable[lowerLoc].chooseWeight = v.chooseWeight or 1
 							tpTable[lowerLoc].enemySpawns = { }
 							UpdateEnemySpawnData(tpTable, lowerLoc, v.enemyspawns, 0)
-							vB = vB and vB or 0 + 1
+							--vB = vB + 1
 							if vB >= 2 then
 								vA = true
 								vM = true
@@ -287,6 +288,9 @@ local function LoadCustomTechPointData(config)
 						local lowerLoc = string.lower(currentTechPoint:GetLocationName())
 						currentTechPoint:SetAllowedTeam(teamSpawns[spawnKey[lowerLoc]])
 					end
+
+					-- Cache this as well, to maintain enforcements
+					spawnSelectionOverrideCache = Server.spawnSelectionOverrides
 
 				end
 
@@ -395,12 +399,12 @@ local function onSpawnSelectionMessage(client, message)
         				end
         			end
 
-        		elseif Server.spawnSelectionOverrides then
+        		elseif spawnSelectionOverrideCache then
         		            
-		            for t = 1, #Server.spawnSelectionOverrides do
+		            for t = 1, #spawnSelectionOverrideCache do
 		            
-		                if Server.spawnSelectionOverrides[t].alienSpawn == alienTechPointName then
-		                	table.insertunique(marineTechPointNames, Server.spawnSelectionOverrides[t].marineSpawn)
+		                if spawnSelectionOverrideCache[t].alienSpawn == alienTechPointName then
+		                	table.insertunique(marineTechPointNames, spawnSelectionOverrideCache[t].marineSpawn)
 		                end
 		                
 		            end
