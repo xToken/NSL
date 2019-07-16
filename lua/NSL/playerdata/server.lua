@@ -82,7 +82,8 @@ local function GetPlayerMatchingName(name)
 end
 
 function NSLGetPlayerMatching(id)
-    return GetPlayerMatchingGameID(id) or GetPlayerMatchingNS2Id(id) or GetPlayerMatchingName(id)
+	if not id then return end
+	return GetPlayerMatchingGameID(id) or GetPlayerMatchingNS2Id(id) or GetPlayerMatchingName(id)
 end
 
 local function GetRefBadgeforID(ns2id)
