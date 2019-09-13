@@ -1,5 +1,8 @@
 # Changelog
 
+## 9-13-19 (Buld 133)
+- Fixed random alien spawn not respecting spawn rules for maps with spawn override entities
+
 ## 7-13-19 (Buld 132)
 - Fixed issue with cross spawn vanilla logic not being cached, which caused issues when aliens selected certain spawn locations.
 
