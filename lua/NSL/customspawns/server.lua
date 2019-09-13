@@ -6,9 +6,7 @@
 local kSelectedMarineSpawn
 local kSelectedAlienSpawn
 local kCustomTechPointData
-local kValidCustomSpawnData = false
 local kSpawnConfigModes = { }
-local spawnSelectionOverrideCache = { }
 
 local kFriendlySpawnHelpers = {
 	ns2_biodome = {
@@ -141,16 +139,10 @@ table.insert(gGameEndFunctions, OnGameEndClearSpawns)
 local function UpdateEnemySpawnData(tpTable, currentloc, enemyspawns, teamType)
 	for _, e in ipairs(enemyspawns) do
 		local loc
-		local weight = 1
 		if type(e) == "table" then
 			loc = string.lower(e.name)
-			weight = e.weight
 		else
 			loc = string.lower(e)
-		end
-		if tpTable[loc] then
-			tpTable[loc].allowedTeamNumber = teamType
-			tpTable[loc].chooseWeight = weight
 		end
 		table.insert(tpTable[currentloc].enemySpawns, loc)
 	end
@@ -168,7 +160,6 @@ local function LoadCustomTechPointData(config)
 			for _, tp in ipairs(techPoints) do
 				tpTable[string.lower(tp:GetLocationName())] = 
 				{ 
-					location = string.lower(tp:GetLocationName()),
 					allowedTeamNumber = 3,
 					chooseWeight = 0,
 					enemySpawns = { }
@@ -236,6 +227,68 @@ local function LoadCustomTechPointData(config)
 
 			if table.contains(kSpawnConfigModes, "AliensChoose") then
 
+				if Server.spawnSelectionOverrides and not kCustomTechPointData then
+
+	    		    local validSpawns = { }
+	    		    local spawnKey = { }
+	    		    local teamSpawns = { }
+	    		    local enemySpawns = { }
+
+		            for t = 1, #Server.spawnSelectionOverrides do
+		            	local selectedSpawn = Server.spawnSelectionOverrides[t]
+		            	local lowerMarine = string.lower(selectedSpawn.marineSpawn)
+		            	local lowerAlien = string.lower(selectedSpawn.alienSpawn)
+
+		            	if table.contains(validSpawns, lowerMarine) then
+		            		if teamSpawns[spawnKey[lowerMarine]] == 2 or teamSpawns[spawnKey[lowerMarine]] == 0 then
+		            			teamSpawns[spawnKey[lowerMarine]] = 0
+		            		else
+		            			teamSpawns[spawnKey[lowerMarine]] = 1
+		            		end
+		            		if not table.contains(enemySpawns[spawnKey[lowerMarine]], lowerAlien) then
+		            			table.insert(enemySpawns[spawnKey[lowerMarine]], lowerAlien)
+		            		end		            		
+		            	else
+		            		table.insert(validSpawns, lowerMarine)
+		            		spawnKey[lowerMarine] = #validSpawns
+		            		teamSpawns[spawnKey[lowerMarine]] = 1
+		            		enemySpawns[spawnKey[lowerMarine]] = { lowerAlien }
+		            	end
+		                if table.contains(validSpawns, lowerAlien) then
+		            		if teamSpawns[spawnKey[lowerAlien]] == 1 or teamSpawns[spawnKey[lowerAlien]] == 0 then
+		            			teamSpawns[spawnKey[lowerAlien]] = 0
+		            		else
+		            			teamSpawns[spawnKey[lowerAlien]] = 2
+		            		end
+		            		if not table.contains(enemySpawns[spawnKey[lowerAlien]], lowerMarine) then
+		            			table.insert(enemySpawns[spawnKey[lowerAlien]], lowerMarine)
+		            		end
+		            	else
+		            		table.insert(validSpawns, lowerAlien)
+		            		spawnKey[lowerAlien] = #validSpawns
+		            		teamSpawns[spawnKey[lowerAlien]] = 2
+		            		enemySpawns[spawnKey[lowerAlien]] = { lowerMarine }
+		            	end
+
+		            end
+
+		            if #validSpawns > 0 then
+
+		            	kCustomTechPointData = { }
+
+			            for i = 1, #validSpawns do
+			            	kCustomTechPointData[validSpawns[i]] = 
+							{ 
+								allowedTeamNumber = teamSpawns[i],
+								chooseWeight = 1,
+								enemySpawns = enemySpawns[i]
+							}
+			            end
+
+			        end
+
+				end
+
 				if kCustomTechPointData then
 
 					for _, tp in ipairs(techPoints) do
@@ -250,47 +303,6 @@ local function LoadCustomTechPointData(config)
 						end
 
 					end
-
-				elseif Server.spawnSelectionOverrides then
-
-	    		    local validSpawns = { }
-	    		    local spawnKey = { }
-	    		    local teamSpawns = { }
-
-		            for t = 1, #Server.spawnSelectionOverrides do
-		            	local selectedSpawn = Server.spawnSelectionOverrides[t]
-
-		            	if table.contains(validSpawns, selectedSpawn.marineSpawn) then
-		            		if teamSpawns[spawnKey[selectedSpawn.marineSpawn]] == 2 or teamSpawns[spawnKey[selectedSpawn.marineSpawn]] == 0 then
-		            			teamSpawns[spawnKey[selectedSpawn.marineSpawn]] = 0
-		            		else
-		            			teamSpawns[spawnKey[selectedSpawn.marineSpawn]] = 1
-		            		end
-		            	else
-		            		table.insert(validSpawns, selectedSpawn.marineSpawn)
-		            		spawnKey[selectedSpawn.marineSpawn] = #validSpawns
-		            		teamSpawns[spawnKey[selectedSpawn.marineSpawn]] = 1
-		            	end
-		                if table.contains(validSpawns, selectedSpawn.alienSpawn) then
-		            		if teamSpawns[spawnKey[selectedSpawn.alienSpawn]] == 1 or teamSpawns[spawnKey[selectedSpawn.alienSpawn]] == 0 then
-		            			teamSpawns[spawnKey[selectedSpawn.alienSpawn]] = 0
-		            		else
-		            			teamSpawns[spawnKey[selectedSpawn.alienSpawn]] = 2
-		            		end
-		            	else
-		            		table.insert(validSpawns, selectedSpawn.alienSpawn)
-		            		spawnKey[selectedSpawn.alienSpawn] = #validSpawns
-		            		teamSpawns[spawnKey[selectedSpawn.alienSpawn]] = 2
-		            	end
-		            end
-
-		            for _, currentTechPoint in ipairs(techPoints) do
-						local lowerLoc = string.lower(currentTechPoint:GetLocationName())
-						currentTechPoint:SetAllowedTeam(teamSpawns[spawnKey[lowerLoc]])
-					end
-
-					-- Cache this as well, to maintain enforcements
-					spawnSelectionOverrideCache = Server.spawnSelectionOverrides
 
 				end
 
@@ -399,17 +411,7 @@ local function onSpawnSelectionMessage(client, message)
         				end
         			end
 
-        		elseif spawnSelectionOverrideCache then
-        		            
-		            for t = 1, #spawnSelectionOverrideCache do
-		            
-		                if spawnSelectionOverrideCache[t].alienSpawn == alienTechPointName then
-		                	table.insertunique(marineTechPointNames, spawnSelectionOverrideCache[t].marineSpawn)
-		                end
-		                
-		            end
-		            
-		        end
+        		end
 
 		        if marineTechPointNames and #marineTechPointNames > 0 then
 
