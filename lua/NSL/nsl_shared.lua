@@ -8,7 +8,7 @@ kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL', 'CAPTAINS'}
 kNSLCaptainsStates = enum( {'REGISTRATION', 'VOTING', 'SELECTING', 'ROUND1', 'ROUND2', 'MAPVOTE'})
 
 -- For reference
-kNSLPluginBuild = 133
+kNSLPluginBuild = 135
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")

@@ -1,5 +1,13 @@
 # Changelog
 
+## 9-20-19 (Buld 135)
+- Fixed new main menu not working when game was paused (Build 329)
+- Added sv_nslleaguemapcycle, toggles using the mapcycle configured in the respective league config.  This is a server admin command only!
+- Added note to sv_nslcfg command about seasons & server configs needed mapcycle to clear if mod is disabled.
+- Changed sv_nslcaptainslimit to a server admin only command
+- Cleaned up admin command validations a bit
+- Added ServerAdminsAreRefs config flag to be used in future by default league config
+
 ## 9-13-19 (Buld 133)
 - Fixed random alien spawn not respecting spawn rules for maps with spawn override entities
 
