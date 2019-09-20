@@ -1,9 +1,10 @@
 {
-"Version": 3.4,
+"Version": 3.5,
 "LeagueName": 							"NOSTALGIA",
 "PlayerDataURL": 						"",
 "PlayerDataFormat":						"N/A",
 "PlayerRefLevel": 						1,
+"ServerAdminsAreRefs":					false,
 "AutomaticMapCycleDelay":				10800,
 "PauseEndDelay": 						5,
 "PauseStartDelay": 						5,
@@ -152,6 +153,8 @@
 																}
 															]
 						                },
+"MapCycle":    							[
+										],
 "LogoLocations":						{
 										},
 "EndOfTable": true

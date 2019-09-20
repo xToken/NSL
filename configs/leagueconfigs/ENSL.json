@@ -1,9 +1,10 @@
 {
-"Version": 3.4,
+"Version": 3.5,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
 "PlayerRefLevel": 						1,
+"ServerAdminsAreRefs":					false,
 "AutomaticMapCycleDelay":				10800,
 "PauseEndDelay": 						5,
 "PauseStartDelay": 						5,
@@ -104,6 +105,35 @@
 										},
 "CustomSpawns":    						{
 						                },
+"MapCycle":    							[
+											"ns2_biodome",
+											"ns2_descent",
+											"ns2_veil",
+											"ns2_summit",
+											"ns2_tram",
+											"ns2_kodiak",
+											"ns2_eclipse",
+											"ns2_summit",
+											"ns2_caged",
+											"ns2_derelict",
+											"ns2_docking",
+											"ns2_refinery",
+											"ns2_mineshaft",
+											"ns2_unearthed",
+											{"map": "ns2_jambi", "mods": ["7b986f5"]},
+											{"map": "ns2_jambi_redux", "mods": ["6d45366f"]},
+											{"map": "ns2_tram_nextstop", "mods": ["48b95c32"]},
+											{"map": "ns2_tram_redux", "mods": ["580d269e"]},
+											{"map":"ns2_veil_cured", "mods": ["575b854c"]},
+											{"map": "ns2_veil_redux", "mods": ["6ca087f8"]},
+											{"map": "ns2_summit_redux", "mods": ["6d4c4567"]},
+											{"map": "ns2_derelict_fixed", "mods": ["4230c53c"]},
+											{"map": "ns2_stag", "mods": ["266c0d1d"]},
+											{"map": "ns2_mineral", "mods": ["d873977"]},
+											{"map": "ns2_nexus", "mods": ["17B0E28C"]},
+											{"map": "ns2_origin", "mods": ["3334C994"]},
+											{"map": "ns2_biodamnnn", "mods": ["669841ef"]}
+						                ],
 "LogoLocations":						{
 											"ns2_veil":
 												{
