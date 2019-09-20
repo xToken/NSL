@@ -276,7 +276,17 @@ local function LoadCustomTechPointData(config)
 
 		            	kCustomTechPointData = { }
 
+		            	for _, currentTechPoint in ipairs(techPoints) do
+							kCustomTechPointData[string.lower(currentTechPoint:GetLocationName())] = 
+								{
+									allowedTeamNumber = 3,
+									chooseWeight = 0,
+									enemySpawns = { }
+								}
+						end
+
 			            for i = 1, #validSpawns do
+
 			            	kCustomTechPointData[validSpawns[i]] = 
 							{ 
 								allowedTeamNumber = teamSpawns[i],
@@ -405,10 +415,12 @@ local function onSpawnSelectionMessage(client, message)
 
         			for _, currentTechPoint in ipairs(techPoints) do
         				local lowerloc = string.lower(currentTechPoint:GetLocationName())
-        				local enemySpawns = kCustomTechPointData[lowerloc].enemySpawns
-        				if enemySpawns and table.contains(enemySpawns, alienTechPointName) then
-        					table.insertunique(marineTechPointNames, lowerloc)
-        				end
+        				if kCustomTechPointData[lowerloc] then
+	        				local enemySpawns = kCustomTechPointData[lowerloc].enemySpawns
+	        				if enemySpawns and table.contains(enemySpawns, alienTechPointName) then
+	        					table.insertunique(marineTechPointNames, lowerloc)
+	        				end
+	        			end
         			end
 
         		end
