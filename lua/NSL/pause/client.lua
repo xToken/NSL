@@ -143,3 +143,23 @@ originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update",
 		originalGUIManagerUpdate(self, deltaTime)
 	end
 )
+
+local BaseGUIManagerHook
+local HookTable = debug.getregistry()["Event.HookTable"]
+if HookTable then
+	for i, e in ipairs(HookTable["UpdateClient"]) do
+		if string.find(ToString(e), "lua/GUI/BaseGUIManager.lua") then
+			BaseGUIManagerHook = e
+			table.remove(HookTable["UpdateClient"], i)
+		end
+	end
+end
+
+if BaseGUIManagerHook and type(BaseGUIManagerHook) == "function" then
+	--Print("Sucessfully hooked new GUI system!")
+	Event.Hook("UpdateClient", function(deltaTime)
+		gTimeBypass = true
+		BaseGUIManagerHook(deltaTime)
+		gTimeBypass = false
+	end, "BaseGUIManager")
+end
