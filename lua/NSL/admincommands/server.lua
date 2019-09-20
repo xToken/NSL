@@ -91,7 +91,7 @@ local function UpdateNSLMode(client, mode)
 	end
 	SendClientServerAdminMessage(client, "NSL_MODE_UPDATED", EnumToString(kNSLPluginConfigs, GetNSLMode()))
 	if currentMode == kNSLPluginConfigs.DISABLED or GetNSLMode() == kNSLPluginConfigs.DISABLED then
-		SendClientServerAdminMessage(client, "NSL_MODE_UPDATED_SEASONS_NOTE")
+		SendClientServerAdminMessage(client, "NSL_MODE_UPDATED_NOTE")
 	end
 end
 
@@ -125,6 +125,18 @@ end
 
 RegisterNSLConsoleCommand("sv_nslperfconfig", UpdateNSLPerfConfig, "SV_NSLPERFCONFIG", false, {{ Type = "string", Optional = true}})
 --CreateServerAdminCommand("Console_sv_nslperfconfig", OnAdminCommandSetPerfConfig, "<config> - Changes the performance configuration used by the NSL mod.")
+
+local function ApplyNSLMapcycle(client)
+	if not client then return end
+	SetNSLMapCycle(not GetNSLLeagueMapCycle())
+	if GetNSLLeagueMapCycle() then
+		SendClientServerAdminMessage(client, "NSL_LEAGUE_MAPCYCLE_APPLIED")
+	else
+		SendClientServerAdminMessage(client, "NSL_LEAGUE_MAPCYCLE_REMOVED")
+	end
+end
+
+CreateNSLServerAdminCommand("sv_nslleaguemapcycle", ApplyNSLMapcycle, "SV_NSLLEAGUEMAPCYCLE")
 
 local function UpdateNSLLeagueAccess(client)
 	if not client then return end
@@ -161,8 +173,8 @@ local function UpdateNSLCaptainsLimit(client, limit)
 	end
 end
 
-RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT", false, {{ Type = "string", Optional = true}})
---CreateServerAdminCommand("Console_sv_nslcaptainslimit", OnAdminCommandSetCaptainsLimit, "<limit> - Changes the player limit for each team in Captains mode.")
+--RegisterNSLConsoleCommand("sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT", false, {{ Type = "string", Optional = true}})
+CreateServerAdminCommand("Console_sv_nslcaptainslimit", UpdateNSLCaptainsLimit, "SV_NSLCAPTAINSLIMIT", {{ Type = "string", Optional = true}})
 
 local function OnCommandNSLPassword(client, password)
 	if not GetIsClientNSLRef(client) then return end

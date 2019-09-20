@@ -171,6 +171,17 @@ end
 table.insert(gLeagueChangeFunctions, OnUpdateLeagueName)
 table.insert(gConfigLoadedFunctions, OnUpdateLeagueName)
 
+function UpdateNSLMapCycle()
+	local cycle = debug.getupvaluex(MapCycle_GetMapCycle, "cycle")
+	local leagueMapCycle = GetNSLConfigValue("MapCycle")
+	if cycle and leagueMapCycle and #leagueMapCycle > 0 then
+		cycle.maps = leagueMapCycle
+		ReplaceLocals(MapCycle_GetMapCycle, { cycle = cycle })
+	end
+end
+
+table.insert(gConfigLoadedFunctions, UpdateNSLMapCycle)
+
 local function OnUpdateSpawnConfig(_)
 	local gameInfo = GetGameInfoEntity()
 	if gameInfo then

@@ -11,7 +11,7 @@ local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
 								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.1, leaguesConfigComplete = false,
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.4, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.5, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
 							}
 local NSL_Mode = kNSLPluginConfigs.DISABLED
@@ -22,6 +22,7 @@ local NSL_Scores = { }
 local NSL_ServerCommands = { }
 local NSL_LeagueAdminsAccess = false
 local NSL_PerfConfigsBlocked = false
+local NSL_LeagueMapCycle = false
 local NSL_DefaultPerfCaptured = false
 local NSL_CaptainsPlayerLimit = 6
 local kNSLMaxConfigRetries = 2
@@ -56,6 +57,10 @@ function GetNSLPerfConfigsBlocked()
 	return NSL_PerfConfigsBlocked
 end
 
+function GetNSLLeagueMapCycle()
+	return NSL_LeagueMapCycle
+end
+
 function GetNSLCaptainsPlayerLimit()
 	return NSL_CaptainsPlayerLimit
 end
@@ -65,11 +70,11 @@ function RegisterNSLServerCommand(commandName)
 end
 
 local function SavePluginConfig()
-	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked, captainsplayerlimit = NSL_CaptainsPlayerLimit })
+	SaveConfigFile(configFileName, { mode = NSL_Mode, league = NSL_League, perf = NSL_PerfLevel, recentgames = NSL_Scores, adminaccess = NSL_LeagueAdminsAccess, perfconfigsblocked = NSL_PerfConfigsBlocked, captainsplayerlimit = NSL_CaptainsPlayerLimit, mapcycle = NSL_LeagueMapCycle })
 end
 
 local function LoadConfig()
-	local defaultConfig = { mode = "PCW", league = "DEFAULT", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false, captainsplayerlimit = 6 }
+	local defaultConfig = { mode = "PCW", league = "DEFAULT", perf = "DEFAULT", recentgames = { }, adminaccess = false, perfconfigsblocked = false, captainsplayerlimit = 6, mapcycle = false }
 	WriteDefaultConfigFile(configFileName, defaultConfig)
 	local config = LoadConfigFile(configFileName) or defaultConfig
 	NSL_Mode = type(config.mode) == "number" and config.mode or kNSLPluginConfigs.PCW
@@ -77,6 +82,7 @@ local function LoadConfig()
 	NSL_PerfLevel = config.perf or "DEFAULT"
 	NSL_LeagueAdminsAccess = config.adminaccess or false
 	NSL_PerfConfigsBlocked = config.perfconfigsblocked or false
+	NSL_LeagueMapCycle = config.mapcycle or false
 	NSL_CaptainsPlayerLimit = config.captainsplayerlimit or 6
 	local loadedScores = config.recentgames or { }
 	local updated = false
@@ -132,6 +138,16 @@ function SetNSLAdminAccess(state)
 	if NSL_LeagueAdminsAccess ~= state then
 		NSL_LeagueAdminsAccess = state
 		SavePluginConfig()
+	end
+end
+
+function SetNSLMapCycle(state)
+	if NSL_LeagueMapCycle ~= state then
+		NSL_LeagueMapCycle = state
+		SavePluginConfig()
+	end
+	if NSL_LeagueMapCycle then
+		UpdateNSLMapCycle()
 	end
 end
 
@@ -399,10 +415,7 @@ function GetClientCanRunCommand(client, commandName, printWarning)
 
 	if not client then return end
 	local NS2ID = client:GetUserId()
-	local canRun = false
-	if GetIsNSLRef(NS2ID) then
-		canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
-	end
+	local canRun = GetCanRunCommandviaNSL(NS2ID, commandName)
 	if not canRun then
 		return oldGetClientCanRunCommand(client, commandName, printWarning)
 	end
