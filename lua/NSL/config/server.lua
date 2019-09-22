@@ -428,11 +428,11 @@ if Shine then
     -- Adds the graphical AdminMenu button to Shine's VoteMenu
     -- for NSL admins who can use sh_adminmenu
     local oldHasAccess = Shine.HasAccess
-    function Shine:HasAccess(client, commandName)
+    function Shine:HasAccess(client, commandName, AllowByDefault)
         if not client then return true end
 
         local _, ns2id = Shine:GetUserData(client)
-        local oldAccess = oldHasAccess(self, client, commandName)
+        local oldAccess = oldHasAccess(self, client, commandName, AllowByDefault)
         local newAccess = GetCanRunCommandviaNSL(ns2id, commandName)
 
         return oldAccess or newAccess
