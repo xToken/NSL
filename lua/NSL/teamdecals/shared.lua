@@ -48,7 +48,7 @@ function GetDecalNameforTeamId(teamId)
 	if not teamDecals[leagueName] then
 		ScanTeamDecalFiles(leagueName)
 	end
-	return teamDecals[leagueName][ToString(teamId)] and teamDecals[leagueName][ToString(teamId)] or globalDecals[ToString(teamId)]
+	return teamDecals[leagueName][tostring(teamId)] and teamDecals[leagueName][tostring(teamId)] or globalDecals[tostring(teamId)]
 end
 
 class 'NSLDecal' (Entity)
