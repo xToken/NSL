@@ -40,7 +40,11 @@ local function UpdateTechPointDecalData(techPoints, decalLocations)
 	for _, techPoint in ipairs(techPoints) do
 		if techPoint:GetAttached() then
 			if decalLocations[string.lower(techPoint:GetLocationName())] then
-				decalLocations[string.lower(techPoint:GetLocationName())].decal = techPoint.occupiedTeam == 1 and team1decal or team2decal
+				if techPoint.occupiedTeam == 1 then
+					decalLocations[string.lower(techPoint:GetLocationName())].decal = team1decal
+				else
+					decalLocations[string.lower(techPoint:GetLocationName())].decal = team2decal
+				end
 				decalLocations[string.lower(techPoint:GetLocationName())].active = decalLocations[string.lower(techPoint:GetLocationName())].decal and true or false
 			end
 		else
