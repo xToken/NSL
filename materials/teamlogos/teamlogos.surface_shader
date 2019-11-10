@@ -4,21 +4,17 @@
 		<input name="albedoMap" type="texture" address="wrap"/>
 		<input name="opacityMap" type="texture" address="wrap"/>
 		<input name="emissiveMap" type="texture" address="wrap"/>
+		<input name="hiddenAmount" type="float">0.0</input>
 	</inputs>
 	
 	<code>
 	<![CDATA[
 		void MaterialShader(in Material_Input input, inout Material material)
-		{
-			float2 uv = input.texCoord;
-			//float row = floor(textureIndex / numColumns);
-			//float col = textureIndex - row*numColumns;
-			//uv.x = (col + uv.x) / numColumns;
-			//uv.y = (row + uv.y) / numRows;
-			
-			material.albedo = tex2D(albedoMap, uv).rgb;
-			material.opacity = tex2D(opacityMap, uv).r;
-			material.emissive = tex2D(emissiveMap, uv).rgb;
+		{	
+			float f = 1 - hiddenAmount;
+			material.albedo = tex2D(albedoMap, input.texCoord).rgb;
+			material.opacity = tex2D(opacityMap, input.texCoord).r * f;
+			material.emissive = tex2D(emissiveMap, input.texCoord).rgb;
 		}
 	]]>
 	</code>
