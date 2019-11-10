@@ -53,7 +53,6 @@ local function UpdateUISize(self)
 
     self.titleText:SetPosition(GUIScale(kTitleVoteOffset))
     self.titleText:SetScale(GetScaledVector())
-    GUIMakeFontScale(self.titleText)
 
     for i = 1, 10 do
 
@@ -62,7 +61,6 @@ local function UpdateUISize(self)
         vec.y = vec.y + 15
         self["spawnLocation"..i]:SetPosition(GUIScale(vec))
         self["spawnLocation"..i]:SetScale(GetScaledVector())
-        GUIMakeFontScale(self["spawnLocation"..i])
 
     end
     
