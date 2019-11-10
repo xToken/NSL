@@ -333,7 +333,10 @@ function GetNSLPerfValue(value)
 end
 
 function GetNSLDefaultPerfValue(value)
-	return PerfConfigs["DEFAULT"][value]
+	if PerfConfigs["DEFAULT"] and PerfConfigs["DEFAULT"][value] then
+		return PerfConfigs["DEFAULT"][value]
+	end
+	return nil
 end
 
 function GetNSLLeagueValid(league)
