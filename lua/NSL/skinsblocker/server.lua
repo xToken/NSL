@@ -5,10 +5,18 @@
 
 -- This seems stupid, but gender models are also considered 'variants'.  Allow for marines BUT force 'default' variant
 function MarineVariantMixin:GetVariantModel()
-	if GetNSLConfigValue("UseDefaultSkins") then
-		return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ kMarineVariant.green ]
+	if kMarineVariantBaseType.bigmac then
+		if GetNSLConfigValue("UseDefaultSkins") then
+			local k = self:GetMarineTypeString()
+			return MarineVariantMixin.kModelNames[ k ][ self.marineType == kMarineVariantBaseType.bigmac and kMarineVariant.bigmac or kMarineVariant.green ]
+		end
+		return MarineVariantMixin.kModelNames[ self:GetMarineTypeString() ][ self.variant ]
+	else
+		if GetNSLConfigValue("UseDefaultSkins") then
+			return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ kMarineVariant.green ]
+		end
+	    return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ self.variant ]
 	end
-    return MarineVariantMixin.kModelNames[ self:GetGenderString() ][ self.variant ]
 end
 
 -- Weapon Skin Update call would be skipped when default skins is enabled
