@@ -1,5 +1,9 @@
 # Changelog
 
+## 11-14-19 (Buld 136)
+- Fixed assert from calling marine variant function that was removed with B331 BMAC
+- Added fallback default name when using ForceLeagueNicks and an unregistered player joins
+
 ## 9-20-19 (Buld 135)
 - Fixed new main menu not working when game was paused (Build 329)
 - Added sv_nslleaguemapcycle, toggles using the mapcycle configured in the respective league config.  This is a server admin command only!
