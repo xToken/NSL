@@ -11,6 +11,7 @@ local NSL_FunctionData = { }
 local NSL_PlayerDataRetries = { }
 local NSL_PlayerDataMaxRetries = 3
 local NSL_PlayerDataTimeout = 30
+local kDefaultNSLPlayerName = 'UnknownPlayer'
 
 --These are the only mandatory fields
 --S_ID 		- Steam ID
@@ -535,6 +536,7 @@ originalNS2PlayerGetName = Class_ReplaceMethod("Player", "GetName",
 					return self.playerInfo:GetNSLName()
 				end
 			end
+			return kDefaultNSLPlayerName
 		end
 		return self.name ~= "" and self.name or kDefaultPlayerName
 	end
