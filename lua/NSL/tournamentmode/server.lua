@@ -61,6 +61,23 @@ local function GetRealPlayerCountPerTeam(teamNumber)
 	return c
 end
 
+local function CheckAutoConcede()
+	local gameRules = GetGamerules()
+	if GetNSLModEnabled() and gameRules:GetGameState() == kGameState.Started then
+		local team1Players = GetRealPlayerCountPerTeam(1)
+		local team2Players = GetRealPlayerCountPerTeam(2)
+		if math.abs(team1Players - team2Players) > GetNSLConfigValue("AutoConcedeDifference") then
+            if team1Players < team2Players then
+                gameRules:EndGame(gameRules.team1, true)
+            else
+            	gameRules:EndGame(gameRules.team2, true)
+            end
+		end
+	end
+end
+
+table.insert(gTeamJoinedFunctions, CheckAutoConcede)
+
 local function CheckCanJoinTeam(gameRules, player, teamNumber)
 	if (teamNumber == 1 or teamNumber == 2) and GetNSLModEnabled() and GetNSLConfigValue("Limit6PlayerPerTeam") then
 		if gameRules:GetGameState() == kGameState.Started then
@@ -208,6 +225,8 @@ local function TournamentModeOnDisconnect(client)
 	if TournamentModeSettings.countdownstarted then
 		CheckCancelGameStart()
 	end
+	--Check for auto-concede
+	CheckAutoConcede()
 end
 
 table.insert(gDisconnectFunctions, TournamentModeOnDisconnect)
