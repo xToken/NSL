@@ -67,7 +67,7 @@ local function CheckAutoConcede()
 		local team1Players = GetRealPlayerCountPerTeam(1)
 		local team2Players = GetRealPlayerCountPerTeam(2)
 		if math.abs(team1Players - team2Players) > GetNSLConfigValue("AutoConcedeDifference") then
-            if team1Players < team2Players then
+            if team1Players > team2Players then
                 gameRules:EndGame(gameRules.team1, true)
             else
             	gameRules:EndGame(gameRules.team2, true)
