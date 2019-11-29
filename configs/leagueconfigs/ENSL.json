@@ -20,7 +20,6 @@
 "UseDefaultSkins":						false,
 "PauseOnDisconnect":					false,
 "SavePlayerStates":						true,
-"ReportErrors":							true,
 "ErrorReportURL":						"https://m2xo9pp3kc.execute-api.us-east-2.amazonaws.com/default/SubmitErrorReports",
 "PausedMaxDuration": 					300,
 "MessageColor":							"CC2EFA",

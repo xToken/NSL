@@ -120,6 +120,7 @@
 
 - **sv_nslallowperfconfigs**: Toggles league staff having access set performance configs.
 - **sv_nslleagueadmins**: Toggles league staff having access to administrative commands on server.
+- **sv_nslerrorreporter**: Toggles automatic reporting of script errors.
 - **sv_nslleaguemapcycle**: Toggles league map cycle being applied to server.  This will not overwrite server mapcycle!
 - **sv_nslconfig**: <league> - Changes the league settings used by the NSL plugin (ENSL, AUSNS2, NOSTALGIA, DEFAULT.
 - **sv_nslcaptainslimit**: <limit> Changes the player limit for each team in Captains mode.

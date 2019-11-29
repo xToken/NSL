@@ -183,3 +183,15 @@ local function OnCommandNSLPassword(client, password)
 end
 
 RegisterNSLConsoleCommand("sv_nslpassword", OnCommandNSLPassword, "SV_NSLPASSWORD", false, {{ Type = "string", Optional = true}})
+
+local function UpdateNSLErrorReporter(client)
+	if not client then return end
+	SetNSLShouldPostErrors(not GetNSLShouldPostErrors())
+	if GetNSLShouldPostErrors() then
+		SendClientServerAdminMessage(client, "NSL_ERRORREPORTER_ENABLED")
+	else
+		SendClientServerAdminMessage(client, "NSL_ERRORREPORTER_DISABLED")
+	end
+end
+
+CreateNSLServerAdminCommand("sv_nslerrorreporter", UpdateNSLErrorReporter, "SV_NSLERRORREPORTER")

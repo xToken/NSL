@@ -22,7 +22,7 @@ local function OnErrorReportResponse(data)
 end
 
 local function OnGameEndReportErrors()
-	if GetNSLConfigValue("ReportErrors") and kReportedErrorsCount > 0 then
+	if GetNSLShouldPostErrors() and kReportedErrorsCount > 0 then
 		local osver = jit and jit.os or ""
 		local modData = ""
 		local errData = { }
