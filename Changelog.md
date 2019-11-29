@@ -1,5 +1,10 @@
 # Changelog
 
+## 11-28-19 (Buld 137)
+- Fixed incorrect team being awarded victory from auto-concede
+- Added server admin command to disable automatic error reporting
+- Locked marine models to male in officials
+
 ## 11-14-19 (Buld 136)
 - Fixed assert from calling marine variant function that was removed with B331 BMAC
 - Added fallback default name when using ForceLeagueNicks and an unregistered player joins
