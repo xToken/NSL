@@ -7,8 +7,7 @@
 function MarineVariantMixin:GetVariantModel()
 	if kMarineVariantBaseType.bigmac then
 		if GetNSLConfigValue("UseDefaultSkins") then
-			local k = self:GetMarineTypeString()
-			return MarineVariantMixin.kModelNames[ k ][ self.marineType == kMarineVariantBaseType.bigmac and kMarineVariant.bigmac or kMarineVariant.green ]
+			return MarineVariantMixin.kModelNames[ "male" ][ kMarineVariant.green ]
 		end
 		return MarineVariantMixin.kModelNames[ self:GetMarineTypeString() ][ self.variant ]
 	else
