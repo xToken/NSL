@@ -49,7 +49,7 @@
 											"AutoConcedeDifference":				2,
 										},
 "OFFICIAL":								{
-											"TournamentModeForfeitClock":			900,
+											"TournamentModeForfeitClock":			0,
 											"TournamentModeRestartDuration": 		15,
 											"Limit6PlayerPerTeam": 					true,
 											"MercsRequireApproval": 				true,
