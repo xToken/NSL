@@ -66,6 +66,16 @@ function FollowMoveMixin:UpdateMove(input)
 	end
 end
 
+-- Something about this feels wrong....
+local oldCameraHolderMixinGetViewAnglesForRendering = CameraHolderMixin.GetViewAnglesForRendering
+function CameraHolderMixin:GetViewAnglesForRendering()
+	if self.gamepaused and ValidateTeamNumber(self:GetTeamNumber()) then
+		return (Angles(kClientView.pitch, kClientView.yaw + self.baseYaw, self.viewRoll))
+	else
+		return oldCameraHolderMixinGetViewAnglesForRendering(self)
+	end
+end
+
 --Blocks input.
 local originalNS2PlayerOnProcessMove
 originalNS2PlayerOnProcessMove = Class_ReplaceMethod("Player", "OnProcessMove", 
