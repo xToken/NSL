@@ -1,5 +1,9 @@
 # Changelog
 
+## 6-12-20 (Buld 138)
+- Fixed issue with asset error after 332 relating to scoreboard changes
+- Corrected issue allowing for 1 frame of input even during pauses resulting from 332 input changes.
+
 ## 11-28-19 (Buld 137)
 - Fixed incorrect team being awarded victory from auto-concede
 - Added server admin command to disable automatic error reporting

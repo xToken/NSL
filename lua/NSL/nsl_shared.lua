@@ -8,7 +8,7 @@ kNSLPluginConfigs =  enum( {'DISABLED', 'GATHER', 'PCW', 'OFFICIAL', 'CAPTAINS'}
 kNSLCaptainsStates = enum( {'REGISTRATION', 'VOTING', 'SELECTING', 'ROUND1', 'ROUND2', 'MAPVOTE'})
 
 -- For reference
-kNSLPluginBuild = 136
+kNSLPluginBuild = 138
 
 -- Shared defs
 Script.Load("lua/NSL/nsl_utilities.lua")
@@ -24,7 +24,7 @@ Script.Load("lua/NSL/spectator_techtree/shared.lua")
 Script.Load("lua/NSL/teamdecals/shared.lua")
 
 -- NSL Network Messages below
-local kMaxFunctionMessageLength = 80
+local kMaxFunctionMessageLength = 200
 local kNSLMessageIDMax = 255
 local kMaxAdminChatLength = 250
 local kNSLMessageAltMax = 25
