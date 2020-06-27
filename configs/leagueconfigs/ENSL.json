@@ -120,6 +120,7 @@
 											"ns2_refinery",
 											"ns2_mineshaft",
 											"ns2_unearthed",
+											"ns2_metro",
 											{"map": "ns2_jambi", "mods": ["7b986f5"]},
 											{"map": "ns2_jambi_redux", "mods": ["6d45366f"]},
 											{"map": "ns2_tram_nextstop", "mods": ["48b95c32"]},
