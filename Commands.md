@@ -39,7 +39,7 @@
 
 ##### General Commands:
 - **sv_nslhelp**: Returns various NSL commands and their helper messages.
-- **sv_nslhandicap**: <0.1 - 1> Lowers your damage to the specified percentage.
+- **sv_nslhandicap**: <0.1 - 1> Modifies your damage based on the provided value (between 10% to 100%).
 - **coinflip**: Simulates a coinflip and returns heads or tails.
 	
 	- Chat Variants:
@@ -124,3 +124,4 @@
 - **sv_nslleaguemapcycle**: Toggles league map cycle being applied to server.  This will not overwrite server mapcycle!
 - **sv_nslconfig**: <league> - Changes the league settings used by the NSL plugin (ENSL, AUSNS2, NOSTALGIA, DEFAULT.
 - **sv_nslcaptainslimit**: <limit> Changes the player limit for each team in Captains mode.
+- **sv_nslenforcegatherbans**: Toggles automatic kicking of players with gather bans from associated league.

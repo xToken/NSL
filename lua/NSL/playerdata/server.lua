@@ -148,6 +148,23 @@ local function UpdateCallbacksWithNSLData(player, nslData)
 	end
 end
 
+local function EnforceLeagueBans(player, nslData)
+	if player and nslData then
+		if nslData.BANS == "gather" and (GetNSLMode() == kNSLPluginConfigs.GATHER or GetNSLMode() == kNSLPluginConfigs.PCW) and GetNSLShouldEnforceGatherBans() then
+			Print(string.format("NSL - Kicking player %s for gather ban currently in effect.", player:GetName()))
+			Server.DisconnectClient(Server.GetOwner(player), "You are currently banned from gathers for this league.")
+		elseif nslData.BANS == "mute" then
+			-- No action here today
+			-- Server.DisconnectClient(Server.GetOwner(player), "You have been banned from this server.") 
+		elseif nslData.BANS == "site" then
+			Print(string.format("NSL - Kicking player %s for site-wide ban currently in effect.", player:GetName()))
+			Server.DisconnectClient(Server.GetOwner(player), "You are currently banned from all games for this league.")
+		else
+			-- All Clear!
+		end
+	end
+end
+
 local function OnClientConnectENSLResponse(response)
 	if response then
 		local responsetable = json.decode(response)
@@ -164,7 +181,8 @@ local function OnClientConnectENSLResponse(response)
 					NSL_Team = string.UTF8SanitizeForNS2(responsetable.team and responsetable.team.name or "No Team"),
 					NSL_ID = responsetable.id or "",
 					NSL_TID = responsetable.team and responsetable.team.id or "",
-					NSL_League = "ENSL"
+					NSL_League = "ENSL",
+					BANS = "none"
 				}
 				if responsetable.admin then
 					clientData.NSL_Level = 4
@@ -190,11 +208,25 @@ local function OnClientConnectENSLResponse(response)
 					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Ref"
 				end
+
+				if responsetable.bans then
+					if responsetable.bans.gather then
+						clientData.BANS = "gather"
+					elseif responsetable.bans.mute then
+						clientData.BANS = "mute"
+					elseif responsetable.bans.site then
+						clientData.BANS = "site"
+					else
+						-- All Clear!
+					end
+				end
 				
 				NSL_ClientData[ns2id] = clientData
 				UpdateCallbacksWithNSLData(player, clientData)
 				RemovePlayerFromRetryTable(player)
 				UpdateClientBadge(ns2id, NSL_ClientData[ns2id])
+				EnforceLeagueBans(player, clientData)
+
 			end
 		end
 	end
@@ -226,6 +258,7 @@ local function OnClientConnectAUSNS2Response(response)
 					UpdateCallbacksWithNSLData(player, NSL_ClientData[ns2id])
 					RemovePlayerFromRetryTable(player)
 					UpdateClientBadge(ns2id, NSL_ClientData[ns2id])
+					EnforceLeagueBans(player, clientData)
 				end				
 			end
 		end
@@ -293,6 +326,7 @@ function UpdateNSLPlayerData(RefTable)
 		local player = GetPlayerMatchingNS2Id(RefTable.id)
 		if player then
 			UpdateCallbacksWithNSLData(player, GetNSLUserData(RefTable.id))
+			EnforceLeagueBans(player, GetNSLUserData(RefTable.id))
 		end
 		RefTable = nil
 	end
@@ -300,7 +334,7 @@ end
 
 local function OnNSLClientConnected(client)
 	local NS2ID = client:GetUserId()
-	if GetNSLModEnabled() and NS2ID > 0 then
+	if GetNSLModEnabled() then --and NS2ID > 0 then
 		table.insert(NSL_PlayerDataRetries, {id = NS2ID, attemps = 0, time = 1})
 	end
 	if not table.contains(G_IDTable, NS2ID) then

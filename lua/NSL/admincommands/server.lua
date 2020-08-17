@@ -195,3 +195,15 @@ local function UpdateNSLErrorReporter(client)
 end
 
 CreateNSLServerAdminCommand("sv_nslerrorreporter", UpdateNSLErrorReporter, "SV_NSLERRORREPORTER")
+
+local function UpdateNSLEnforceGatherBans(client)
+	if not client then return end
+	SetNSLEnforceGatherBans(not GetNSLShouldEnforceGatherBans())
+	if GetNSLShouldEnforceGatherBans() then
+		SendClientServerAdminMessage(client, "NSL_ENFORCEGATHERBANS_ENABLED")
+	else
+		SendClientServerAdminMessage(client, "NSL_ENFORCEGATHERBANS_DISABLED")
+	end
+end
+
+CreateNSLServerAdminCommand("sv_nslenforcegatherbans", UpdateNSLEnforceGatherBans, "SV_NSLENFORCEGATHERBANS")
