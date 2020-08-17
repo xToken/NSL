@@ -1,5 +1,10 @@
 # Changelog
 
+## 8-17-20 (Buld 139)
+- Added logic to parse league bans and enforce them on associated servers.
+	- Currently supports 'gather' level bans, which block users from PCW/GATHERS - and full bans which block users from all modes.
+- Added sv_nslenforcegatherbans server command to toggle if 'gather' level bans are enforced.
+
 ## 6-12-20 (Buld 138)
 - Fixed issue with asset error after 332 relating to scoreboard changes
 - Corrected issue allowing for 1 frame of input even during pauses resulting from 332 input changes.
