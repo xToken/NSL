@@ -197,7 +197,7 @@ end
 CreateNSLServerAdminCommand("sv_nslerrorreporter", UpdateNSLErrorReporter, "SV_NSLERRORREPORTER")
 
 local function UpdateNSLEnforceGatherBans(client)
-	if not client then return end
+	if not GetIsClientNSLRef(client) then return end
 	SetNSLEnforceGatherBans(not GetNSLShouldEnforceGatherBans())
 	if GetNSLShouldEnforceGatherBans() then
 		SendClientServerAdminMessage(client, "NSL_ENFORCEGATHERBANS_ENABLED")
@@ -206,4 +206,4 @@ local function UpdateNSLEnforceGatherBans(client)
 	end
 end
 
-CreateNSLServerAdminCommand("sv_nslenforcegatherbans", UpdateNSLEnforceGatherBans, "SV_NSLENFORCEGATHERBANS")
+RegisterNSLConsoleCommand("sv_nslenforcegatherbans", UpdateNSLEnforceGatherBans, "SV_NSLENFORCEGATHERBANS")
