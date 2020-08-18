@@ -1,5 +1,9 @@
 # Changelog
 
+## 8-18-20 (Buld 140)
+- 'Gather' level bans only enforced in GATHER mode
+- sv_nslenforcegatherbans now accessible by league admins/refs.
+
 ## 8-17-20 (Buld 139)
 - Added logic to parse league bans and enforce them on associated servers.
 	- Currently supports 'gather' level bans, which block users from PCW/GATHERS - and full bans which block users from all modes.
