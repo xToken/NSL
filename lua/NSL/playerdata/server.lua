@@ -150,7 +150,7 @@ end
 
 local function EnforceLeagueBans(player, nslData)
 	if player and nslData then
-		if nslData.BANS == "gather" and (GetNSLMode() == kNSLPluginConfigs.GATHER or GetNSLMode() == kNSLPluginConfigs.PCW) and GetNSLShouldEnforceGatherBans() then
+		if nslData.BANS == "gather" and GetNSLMode() == kNSLPluginConfigs.GATHER and GetNSLShouldEnforceGatherBans() then
 			Print(string.format("NSL - Kicking player %s for gather ban currently in effect.", player:GetName()))
 			Server.DisconnectClient(Server.GetOwner(player), "You are currently banned from gathers for this league.")
 		elseif nslData.BANS == "mute" then
