@@ -11,7 +11,7 @@ local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
 								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.1, leaguesConfigComplete = false,
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.6, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.7, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
 							}
 local NSL_Mode = kNSLPluginConfigs.DISABLED
@@ -425,9 +425,9 @@ function GetCanRunCommandviaNSL(ns2id, commandName)
 		return true
 	end
 	-- Check for access to vanilla/shine style commands
-	if NSL_LeagueAdminsAccess and GetIsNSLRef(ns2id) then
+	if NSL_LeagueAdminsAccess then
 		local pData = GetNSLUserData(ns2id)
-		if pData and pData.NSL_Level then
+		if pData and pData.NSL_Level > 0 then
 			local level = tostring(pData.NSL_Level)
 			local groupData = GetNSLConfigValue("AdminGroups")
 			if groupData and groupData[level] then

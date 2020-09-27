@@ -185,17 +185,20 @@ local function OnClientConnectENSLResponse(response)
 					BANS = "none"
 				}
 				if responsetable.admin then
-					clientData.NSL_Level = 4
+					clientData.NSL_Level = 5
 					clientData.NSL_Rank = "Admin"
 				elseif responsetable.referee then
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 4
 					clientData.NSL_Rank = "Ref"
 				elseif responsetable.caster then
-					clientData.NSL_Level = 1
+					clientData.NSL_Level = 2
 					clientData.NSL_Rank = "Caster"
 				elseif responsetable.moderator then
-					clientData.NSL_Level = 2
+					clientData.NSL_Level = 3
 					clientData.NSL_Rank = "Mod"
+				elseif responsetable.contributor then
+					clientData.NSL_Level = 1
+					clientData.NSL_Rank = "Contributor"
 				else
 					clientData.NSL_Level = 0
 					clientData.NSL_Rank = nil
@@ -205,7 +208,7 @@ local function OnClientConnectENSLResponse(response)
 				local cRefs = GetNSLConfigValue("REFS")
 				if cRefs and table.contains(cRefs, ns2id) then
 					--A manually configured 'Ref' - give them ref level
-					clientData.NSL_Level = 3
+					clientData.NSL_Level = 4
 					clientData.NSL_Rank = "Ref"
 				end
 
