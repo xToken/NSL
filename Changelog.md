@@ -1,5 +1,9 @@
 # Changelog
 
+## 9-27-20 (Buld 141)
+- Corrected issue preventing non-ref level users from having access to their defined admin commands.
+- Added support for contributors from ENSL site.
+
 ## 8-18-20 (Buld 140)
 - 'Gather' level bans only enforced in GATHER mode
 - sv_nslenforcegatherbans now accessible by league admins/refs.
