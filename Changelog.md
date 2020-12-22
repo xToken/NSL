@@ -1,5 +1,8 @@
 # Changelog
 
+## 12-22-20 (Buld 142)
+- Corrected enum reference exception from updated skins/DLC options.
+
 ## 9-27-20 (Buld 141)
 - Corrected issue preventing non-ref level users from having access to their defined admin commands.
 - Added support for contributors from ENSL site.
