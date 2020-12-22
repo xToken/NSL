@@ -5,9 +5,9 @@
 
 -- This seems stupid, but gender models are also considered 'variants'.  Allow for marines BUT force 'default' variant
 function MarineVariantMixin:GetVariantModel()
-	if kMarineVariantBaseType.bigmac then
+	if kDefaultMarineBigmacVariant then
 		if GetNSLConfigValue("UseDefaultSkins") then
-			return MarineVariantMixin.kModelNames[ "male" ][ kMarineVariant.green ]
+			return MarineVariantMixin.kModelNames[ "male" ][ kMarineVariants.green ]
 		end
 		return MarineVariantMixin.kModelNames[ self:GetMarineTypeString() ][ self.variant ]
 	else
