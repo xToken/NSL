@@ -1,35 +1,38 @@
 # Changelog
 
-## 12-22-20 (Buld 142)
+## 1-16-21 (Build 143)
+- Added support for event badges defined by the respective league(s).
+
+## 12-22-20 (Build 142)
 - Corrected enum reference exception from updated skins/DLC options.
 
-## 9-27-20 (Buld 141)
+## 9-27-20 (Build 141)
 - Corrected issue preventing non-ref level users from having access to their defined admin commands.
 - Added support for contributors from ENSL site.
 
-## 8-18-20 (Buld 140)
+## 8-18-20 (Build 140)
 - 'Gather' level bans only enforced in GATHER mode
 - sv_nslenforcegatherbans now accessible by league admins/refs.
 
-## 8-17-20 (Buld 139)
+## 8-17-20 (Build 139)
 - Added logic to parse league bans and enforce them on associated servers.
 	- Currently supports 'gather' level bans, which block users from PCW/GATHERS - and full bans which block users from all modes.
 - Added sv_nslenforcegatherbans server command to toggle if 'gather' level bans are enforced.
 
-## 6-12-20 (Buld 138)
+## 6-12-20 (Build 138)
 - Fixed issue with asset error after 332 relating to scoreboard changes
 - Corrected issue allowing for 1 frame of input even during pauses resulting from 332 input changes.
 
-## 11-28-19 (Buld 137)
+## 11-28-19 (Build 137)
 - Fixed incorrect team being awarded victory from auto-concede
 - Added server admin command to disable automatic error reporting
 - Locked marine models to male in officials
 
-## 11-14-19 (Buld 136)
+## 11-14-19 (Build 136)
 - Fixed assert from calling marine variant function that was removed with B331 BMAC
 - Added fallback default name when using ForceLeagueNicks and an unregistered player joins
 
-## 9-20-19 (Buld 135)
+## 9-20-19 (Build 135)
 - Fixed new main menu not working when game was paused (Build 329)
 - Added sv_nslleaguemapcycle, toggles using the mapcycle configured in the respective league config.  This is a server admin command only!
 - Added note to sv_nslcfg command about seasons & server configs needed mapcycle to clear if mod is disabled.
@@ -37,18 +40,18 @@
 - Cleaned up admin command validations a bit
 - Added ServerAdminsAreRefs config flag to be used in future by default league config
 
-## 9-13-19 (Buld 133)
+## 9-13-19 (Build 133)
 - Fixed random alien spawn not respecting spawn rules for maps with spawn override entities
 
-## 7-13-19 (Buld 132)
+## 7-13-19 (Build 132)
 - Fixed issue with cross spawn vanilla logic not being cached, which caused issues when aliens selected certain spawn locations.
 
-## 7-8-19 (Buld 131)
+## 7-8-19 (Build 131)
 - Consolidated custom spawn toggles into single option.
 - Supports UseFixedSpawnsWhenLoaded (overrides other options), CustomSpawns - allows spawns to be configured by dates and AliensChoose which allows aliens to choose their spawn.
 - Added client side toggleopponentmute console command, toggles the display of opponents chat messages on or off.
 
-## 6-23-19 (Buld 130)
+## 6-23-19 (Build 130)
 - 'Ready' command will no longer work during pauses for game resets.
 - During a pause, 'ready' will toggle your teams readiness for the game to unpause, just like resume/unpause.
 - Fixed GUI workarounds to allow specific GUI scripts to update during pause so that it works with 328 changes.
@@ -59,46 +62,46 @@
 - Added game build to NSL error reporter.
 - Fixed Default perf level not being selectable after changing to other perf levels
 
-## 6-23-19 (Buld 128)
+## 6-23-19 (Build 128)
 - Fixed server commands being server admin commands and not 'League' commands
 - Added function to make command validations easier
 
-## 6-21-19 (Buld 127)
+## 6-21-19 (Build 127)
 - Fixed server commands being registered multiple times in some cases
 - Added support for leagues without player databases
 - Fixed player data cache not being cleared when league is changed
 - Fully removed optimizations module now that entity throttling is live in 328
 - Added additional league
 
-## 6-8-19 (Buld 126)
+## 6-8-19 (Build 126)
 - Fixed assert caused by players joining that didnt have badges
 
-## 6-7-19 (Buld 125)
+## 6-7-19 (Build 125)
 - Fixed badge icon granted being 1 rank off from actual players rank
 - Updated to new badge icons
 - Disabled heartbeat system
 - Disabled optimizations
 
-## 4-28-19 (Buld 123)
+## 4-28-19 (Build 123)
 - Fixed assert caused by IP spawning model
 
-## 4-28-19 (Buld 122)
+## 4-28-19 (Build 122)
 - Fixed assert caused by NutrientMist
 
-## 4-23-19 (Buld 121)
+## 4-23-19 (Build 121)
 - Compatibility with B327
 
-## 4-16-19 (Buld 120)
+## 4-16-19 (Build 120)
 - Removed UpValue utility func, use built-in NS2 debug utility func
 - Re-enabled sound FX optimizations with fixes for local looping sounds not playing correctly.
 - Fixed script error for cyst wakeup calls if cysts had children that dont sleep
 
-## 2-28-19 (Buld 118)
+## 2-28-19 (Build 118)
 - Fixed cysts ticking too fast after they had slept for a considerable amount of time
 - Fixed umbra effect sometimes lingering on entities forever
 - Re-enabled optimizations module
 
-## 2-14-19 (Buld 117)
+## 2-14-19 (Build 117)
 - Removed client side model clear on ghost structure poofing, was causing asserts for spectators.
 
 ## 2-9-19 (Build 116)
