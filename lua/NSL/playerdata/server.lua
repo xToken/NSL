@@ -100,6 +100,16 @@ local function GetRefBadgeforID(ns2id)
 	end
 end
 
+local function GetEventBadgeforID(ns2id)
+	ns2idstr = tostring(ns2id)
+	local NSLEventBadges = GetNSLConfigValue("EventBadges")
+	if NSLEventBadges and type(NSLEventBadges) == "table" then
+		if NSLEventBadges[ns2idstr] then
+			return NSLEventBadges[ns2idstr].badge, NSLEventBadges[ns2idstr].name
+		end
+	end
+end
+
 local function GetBadgeForPlayerData(data)
 	return GetActiveLeague().."#"..ToString(data.NSL_TID)
 end
@@ -108,19 +118,27 @@ local function UpdateClientBadge(ns2id, data)
 	local refBadge, badgeName = GetRefBadgeforID(ns2id)
 	local teamBadge = GetBadgeForPlayerData(data)
 	local teamBadgeName = GetNSLConfigValue("BadgeTitle")
+	local eventBadge, eventBadgeName = GetEventBadgeforID(ns2id)
 	local success
 	local row = 5
 	if refBadge and GiveBadge then
 		success = GiveBadge(ns2id, refBadge, row)
 		if success then
 			SetFormalBadgeName(refBadge, badgeName)
-			row = 4
+			row = row + 1
 		end
 	end
 	if teamBadge and GiveBadge then
 		success = GiveBadge(ns2id, teamBadge, row)
 		if success then
 			SetFormalBadgeName(teamBadge, teamBadgeName .. data.NSL_Team)
+			row = row + 1
+		end
+	end
+	if eventBadge and GiveBadge then
+		success = GiveBadge(ns2id, eventBadge, row)
+		if success then
+			SetFormalBadgeName(eventBadge, eventBadgeName)
 		end
 	end
 end
