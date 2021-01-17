@@ -1,5 +1,5 @@
 {
-"Version": 3.6,
+"Version": 3.8,
 "LeagueName": 							"DEFAULT",
 "PlayerDataURL": 						"www.yournicewebsite.com",
 "PlayerDataFormat":						"N/A",
@@ -56,6 +56,8 @@
 "Badges":				 				[
 											{"badge": "ref", 		"name": "Referee"},
 										],
+"EventBadges":				 			{
+										},
 "REFS":									[
 											123456789101112131415
 										],

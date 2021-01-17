@@ -11,7 +11,7 @@ local perfConfigUpdateURL = "https://raw.githubusercontent.com/xToken/NSL/master
 local defaultConfigFile = "configs/leagueconfigs/DEFAULT.json"
 local configRequestTracking = { 
 								leaguesConfigRequest = false, leaguesConfigRetries = 0, leaguesLocalConfig = "configs/nsl_leagues.json", leaguesExpectedVersion = 1.1, leaguesConfigComplete = false,
-								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.7, leagueConfigComplete = false,
+								leagueConfigRequest = false, leagueConfigRetries = 0, leagueLocalConfig = "configs/leagueconfigs/%s.json", leagueExpectedVersion = 3.8, leagueConfigComplete = false,
 								perfConfigRequest = false, perfConfigRetries = 0, perfLocalConfig = "configs/nsl_perfconfig.json", perfExpectedVersion = 1.1, perfConfigComplete = false
 							}
 local NSL_Mode = kNSLPluginConfigs.DISABLED

@@ -1,5 +1,5 @@
 {
-"Version": 3.6,
+"Version": 3.8,
 "LeagueName": 							"AusNS2",
 "PlayerDataURL": 						"http://ausns2.org/league-api.php?lookup=player&steamid=",
 "PlayerDataFormat":						"AUSNS",
@@ -60,6 +60,8 @@
 										},
 "Badges":				 				[
 										],
+"EventBadges":				 			{
+										},
 "REFS":									[
 											5176141
 										],

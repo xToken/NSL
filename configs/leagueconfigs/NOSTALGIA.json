@@ -1,5 +1,5 @@
 {
-"Version": 3.6,
+"Version": 3.8,
 "LeagueName": 							"NOSTALGIA",
 "PlayerDataURL": 						"",
 "PlayerDataFormat":						"N/A",
@@ -55,6 +55,8 @@
 										},
 "Badges":				 				[
 										],
+"EventBadges":				 			{
+										},
 "REFS":									[
 											344054,
 											5176141,

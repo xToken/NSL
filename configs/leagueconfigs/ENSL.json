@@ -1,5 +1,5 @@
 {
-"Version": 3.7,
+"Version": 3.8,
 "LeagueName": 							"ENSL",
 "PlayerDataURL": 						"http://www.ensl.org/api/v1/users/show/",
 "PlayerDataFormat":						"ENSL",
@@ -66,6 +66,9 @@
 											{"badge": "ensl_ref", 		"name": "ENSL Referee"},
 											{"badge": "ensl_admin1",	"name": "ENSL Admin"},
 										],
+"EventBadges":				 			{
+											"104756893": {"badge": "ensl_fade_2021", 	"name": "ENSL Gungerdome Fade Winner"},
+										},
 "REFS":									[
 											5176141
 										],
