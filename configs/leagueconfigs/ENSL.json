@@ -49,7 +49,7 @@
 											"AutoConcedeDifference":				2,
 										},
 "OFFICIAL":								{
-											"TournamentModeForfeitClock":			0,
+											"TournamentModeForfeitClock":			900,
 											"TournamentModeRestartDuration": 		15,
 											"Limit6PlayerPerTeam": 					true,
 											"MercsRequireApproval": 				true,
@@ -68,6 +68,7 @@
 										],
 "EventBadges":				 			{
 											"104756893": {"badge": "ensl_fade_2021", 	"name": "ENSL Gungerdome Fade Winner"},
+											"68545390": {"badge": "ensl_lerk_2021", 	"name": "ENSL Gungerdome Lerk Winner"},
 										},
 "REFS":									[
 											5176141
@@ -150,6 +151,11 @@
 											{"map": "ns2_summit_334", "mods": ["85d68489"]},
 											{"map": "ns2_docking_nsl", "mods": ["8438b56f"]},
 											{"map": "nsl_arena", "mods": ["8cc380a7"]},
+											{"map": "ns2_stagmod", "mods": ["266C0D1D"]},
+											{"map": "ns2_eclipse_lit", "mods": ["836495D8"]},
+											{"map": "ns2_unearthed_butbetter", "mods": ["454f732c"]},
+											{"map": "ns2_tanith", "mods": ["5912622B"]},
+											{"map": "ns2_tramed", "mods": ["87F86E30"]}
 						                ],
 "LogoLocations":						{
 											"ns2_veil":
