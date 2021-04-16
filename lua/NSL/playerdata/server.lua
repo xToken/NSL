@@ -125,14 +125,14 @@ local function UpdateClientBadge(ns2id, data)
 		success = GiveBadge(ns2id, refBadge, row)
 		if success then
 			SetFormalBadgeName(refBadge, badgeName)
-			row = row + 1
+			row = row - 1
 		end
 	end
 	if teamBadge and GiveBadge then
 		success = GiveBadge(ns2id, teamBadge, row)
 		if success then
 			SetFormalBadgeName(teamBadge, teamBadgeName .. data.NSL_Team)
-			row = row + 1
+			row = row - 1
 		end
 	end
 	if eventBadge and GiveBadge then
