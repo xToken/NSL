@@ -139,7 +139,8 @@ local function CheckGlobalFunctionTable(G, t, R, S)
 	if R > 1 then
 		return
 	end
-	local HookTable = debug.getregistry()["Event.HookTable"]
+	-- local HookTable = debug.getregistry()["Event.HookTable"]
+	local HookTable = Event.HookTable
 	if HookTable then
 		for k, v in pairs(HookTable) do
 			if type(v) == "table" and not table.contains(excludeHooks, k) and string.sub(k, 1, 8) ~= "Console_" then

@@ -170,7 +170,7 @@ end
 
 Client.HookNetworkMessage("NSLAdminChat", AdminChatMessageRecieved)
 
-local oldOnMessageChat
+local oldOnMessageChat = g_NSL_Chat_OnMessageChat
 
 -- Validate against the NSL global opponents chat mute option
 local function OnMessageChat(message)
@@ -182,18 +182,6 @@ local function OnMessageChat(message)
         end
     end
     return oldOnMessageChat(message)
-end
-
-local d = debug.getregistry()
-for k, v in pairs(d) do
-    if type(v) == "function" then
-        local vF = debug.getinfo(v)
-        if vF.short_src == "lua/Chat.lua" then
-            oldOnMessageChat = v
-            --table.remove(d, i) -- This doesnt seem to actually unregister anything?..
-            break
-        end
-    end
 end
 
 if oldOnMessageChat then

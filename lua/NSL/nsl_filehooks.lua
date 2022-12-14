@@ -16,5 +16,8 @@ if not string.find(Script.CallStack(), "Main.lua") then
 		if jit.os ~= "Linux" then
 			ModLoader.SetupFileHook("lua/ClientResources.lua", "lua/NSL/consistencychecks/client.lua", "pre")
 		end
+
+		ModLoader.SetupFileHook("lua/Chat.lua", "lua/NSL/chat/pre.lua", "pre")
+		ModLoader.SetupFileHook("lua/Chat.lua", "lua/NSL/chat/post.lua", "post")
 	end
 end

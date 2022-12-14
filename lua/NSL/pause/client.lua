@@ -138,7 +138,8 @@ originalGUIManagerUpdate = Class_ReplaceMethod("GUIManager", "Update",
 )
 
 local BaseGUIManagerHook
-local HookTable = debug.getregistry()["Event.HookTable"]
+-- local HookTable = debug.getregistry()["Event.HookTable"]
+local HookTable = Event.HookTable
 if HookTable then
 	for i, e in ipairs(HookTable["UpdateClient"]) do
 		if string.find(ToString(e), "lua/GUI/BaseGUIManager.lua") then
