@@ -17,7 +17,7 @@ local function BuildNSLMessageTable()
         io.close(openedFile)
         for k, v in pairs(parsedFile) do
             text = v["text"]
-            idx = v["idx"]
+            idx = v["id"]
             kNSLMessageIDs[k] = idx
             kNSLMessageDefaults[k] = text
         end

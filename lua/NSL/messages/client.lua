@@ -35,7 +35,7 @@ local function BuildNSLLanguageTable()
         io.close(openedFile)
         for k, v in pairs(parsedFile) do
             text = v["text"]
-            idx = v["idx"]
+            idx = v["id"]
             kNSLLanguageIDLookup[idx] = k
             kNSLStringReference["enUS"][k] = text
         end
