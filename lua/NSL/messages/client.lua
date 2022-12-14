@@ -41,26 +41,30 @@ local function BuildNSLLanguageTable()
         end
     end
 
-	-- local langFiles = { }
+	local langFiles = { }
 
-    -- Shared.GetMatchingFileNames("lang/*.json", false, langFiles )
+    Shared.GetMatchingFileNames("lang/*.json", false, langFiles )
 
-    -- table.removevalue(langFiles, "lang/enUS.json")
+    table.removevalue(langFiles, "lang/enUS.json")
 
-    -- if #langFiles > 0 then
-    --     for i = 1, #langFiles do
-    --         local fileName = langFiles[i]
-    --         local localeName = string.gsub(string.gsub(fileName, "lang/", ""), ".json", "")
-    --         --Shared.Message(string.format("NSL - Loading %s Language", localeName))
-    --         local openedFile = GetFileExists(fileName) and io.open(fileName, "r")
-    --         if openedFile then
-    --             local parsedFile, _, errStr = json.decode(openedFile:read("*all"))
-    --             io.close(openedFile)
-    --             kNSLStringReference[localeName] = parsedFile
-    --         end
+    if #langFiles > 0 then
+        for i = 1, #langFiles do
+            local fileName = langFiles[i]
+            local localeName = string.gsub(string.gsub(fileName, "lang/", ""), ".json", "")
+            --Shared.Message(string.format("NSL - Loading %s Language", localeName))
+            local openedFile = GetFileExists(fileName) and io.open(fileName, "r")
+            if openedFile then
+                local parsedFile, _, errStr = json.decode(openedFile:read("*all"))
+                io.close(openedFile)
+                kNSLStringReference[localeName] = { }
+                for k,v in pairs(parsedFile) do
+                    text = v["text"]
+                    kNSLStringReference[localeName][k] = text
+                end
+            end
             
-    --     end
-    -- end
+        end
+    end
     
 end
 
