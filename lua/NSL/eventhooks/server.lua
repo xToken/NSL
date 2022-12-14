@@ -209,7 +209,8 @@ local function FinalizeNSLConsoleCommands(configloaded)
 			nslPlugin = Shine.Plugins["nsl"]
 		end
 		if #gNSLConsoleCommands > 0 then
-			local HookTable = debug.getregistry()["Event.HookTable"]
+			-- local HookTable = debug.getregistry()["Event.HookTable"]
+			local HookTable = Event.HookTable
 			for i = #gNSLConsoleCommands, 1, -1 do
 				local cc = gNSLConsoleCommands[i]
 				local command = "Console_"..cc.command
