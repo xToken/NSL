@@ -11,15 +11,15 @@ local kNSLMessageDefaults = { }
 local function BuildNSLMessageTable()
 
     local fileName = "lang/enUS.json"
-    local counter = 1
     local openedFile = GetFileExists(fileName) and io.open(fileName, "r")
     if openedFile then
         local parsedFile, _, errStr = json.decode(openedFile:read("*all"))
         io.close(openedFile)
         for k, v in pairs(parsedFile) do
-            kNSLMessageIDs[k] = counter
-            kNSLMessageDefaults[k] = v
-            counter = counter + 1
+            text = v["text"]
+            idx = v["idx"]
+            kNSLMessageIDs[k] = idx
+            kNSLMessageDefaults[k] = text
         end
     end
     
