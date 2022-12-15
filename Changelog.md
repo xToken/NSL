@@ -1,5 +1,9 @@
 # Changelog
 
+## 12-14-22 (Build 144)
+- Fixed issues caused by removal of debug.getregistry - Thanks asdfgg!
+- Fixed issues caused by json.decode no longer returning the json array in a predictable order.
+
 ## 1-16-21 (Build 143)
 - Added support for event badges defined by the respective league(s).
 
