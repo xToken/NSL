@@ -10,6 +10,7 @@ local kNSLLanguageIDLookup = { }
 local kNSLStringReference = { }
 local configFileName = "NSLClientConfig.json"
 local kNSLOpponentChatMute = false
+local kNSLDefaultMessageDef = "Default - %s %s %s."
 
 local function SaveNSLClientConfig()
     SaveConfigFile(configFileName, { opponentChatMute = kNSLOpponentChatMute })
@@ -35,7 +36,8 @@ local function BuildNSLLanguageTable()
         local parsedFile, _, errStr = json.decode(openedFile:read("*all"))
         io.close(openedFile)
         for k, v in pairs(parsedFile) do
-            kNSLLanguageIDLookup[counter] = k
+            --kNSLLanguageIDLookup[counter] = k
+			--We will get mapping from server later
             kNSLStringReference["enUS"][k] = v
             counter = counter + 1
         end
@@ -66,6 +68,13 @@ end
 
 BuildNSLLanguageTable()
 
+-- Recieve mapping from server so our ids match :<
+local function OnNSLSystemMessageDefinition(message)
+	kNSLLanguageIDLookup[message.messageid] = message.messagename
+end
+
+Client.HookNetworkMessage("NSLSystemMessageDefinition", OnNSLSystemMessageDefinition)
+
 local function FormatAndReturnNSLMessageByID(msgId, mp1, mp2, mp3)
     return string.format(ReturnNSLMessageByID(msgId), mp1, mp2, mp3)
 end
@@ -73,8 +82,12 @@ end
 function ReturnNSLMessageByID(msgId)
     -- determine users locale
     local msgName = kNSLLanguageIDLookup[msgId]
-    -- do we have translations for this message?
-    return ReturnNSLMessage(msgName)
+	--We might not have mapping if server hasnt sent all message defs yet
+	if msgName then
+		-- do we have translations for this message?
+		return ReturnNSLMessage(msgName)
+	end
+	return kNSLDefaultMessageDef
 end
 
 function ReturnNSLMessage(msgName)

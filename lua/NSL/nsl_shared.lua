@@ -84,3 +84,11 @@ local kNSLPlayerInfoMessage =
 }
 
 Shared.RegisterNetworkMessage("NSLPlayerInfoMessage", kNSLPlayerInfoMessage)
+
+local kNSLSystemMessageDefinition =
+{
+	messageid = string.format("integer (0 to %d)", kNSLMessageIDMax),
+    messagename = string.format("string (%d)", kMaxFunctionMessageLength + 1),
+}
+
+Shared.RegisterNetworkMessage("NSLSystemMessageDefinition", kNSLSystemMessageDefinition)

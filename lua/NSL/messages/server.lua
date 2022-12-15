@@ -7,6 +7,7 @@ Script.Load("lua/dkjson.lua")
 
 local kNSLMessageIDs = { }
 local kNSLMessageDefaults = { }
+local kNSLParsedFile = { }
 
 local function BuildNSLMessageTable()
 
@@ -21,6 +22,7 @@ local function BuildNSLMessageTable()
             kNSLMessageDefaults[k] = v
             counter = counter + 1
         end
+		kNSLParsedFile = parsedFile
     end
     
 end
@@ -34,3 +36,15 @@ end
 function GetNSLMessageDefaultText(messageName)
     return kNSLMessageDefaults[messageName] and string.format(kNSLMessageDefaults[messageName], "") or ""
 end
+
+-- Send msg id mapping to clients on connect :<
+local function OnNSLClientConnected(client)
+	local NS2ID = client:GetUserId()
+	local counter = 1
+	for k, v in pairs(kNSLParsedFile) do
+		Server.SendNetworkMessage(client, "NSLSystemMessageDefinition", {messageid = counter, messagename = k}, true)
+		counter = counter + 1
+	end
+end
+
+table.insert(gConnectFunctions, OnNSLClientConnected)
