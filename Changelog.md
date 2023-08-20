@@ -1,5 +1,8 @@
 # Changelog
 
+## 08-20-23 (Build 145)
+- Fixed missing mapcycle config check which caused the league mapcycle to always be loaded.
+
 ## 12-14-22 (Build 144)
 - Fixed issues caused by removal of debug.getregistry - Thanks asdfgg!
 - Fixed issues caused by json.decode no longer returning the json array in a predictable order.
