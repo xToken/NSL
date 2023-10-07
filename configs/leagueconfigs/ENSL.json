@@ -155,7 +155,9 @@
 											{"map": "ns2_eclipse_lit", "mods": ["836495D8"]},
 											{"map": "ns2_unearthed_butbetter", "mods": ["454f732c"]},
 											{"map": "ns2_tanith", "mods": ["5912622B"]},
-											{"map": "ns2_tramed", "mods": ["87F86E30"]}
+ 											{"map": "ns2_tramed", "mods": ["87F86E30"]},	
+  											{"map": "ns2_nexus_fixes", "mods": ["2905095973"]},
+ 											{"map": "ns2_mineral_nsl", "mods": ["2964037246"]}
 						                ],
 "LogoLocations":						{
 											"ns2_veil":
