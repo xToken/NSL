@@ -220,10 +220,14 @@ table.insert(gConfigLoadedFunctions, SetupServerConfig)
 
 local function SetupServerRanking()
 	if not GetNSLModEnabled() or not GetNSLConfigValue("RankingDisabled") then
-		--gRankingDisabled = false
+		gRankingDisabled = false
 		Shared.Message(string.format("Server Ranking Enabled."))
+		
+		--Call function to request whitelisting check for ranking enablement - called as part of consistency check in vanilla.
+		local ok = Server.EnableServerRanking()
+		Print("Requesting server ranking be enabled, request success: %s", ok)
 	else
-		--gRankingDisabled = true
+		gRankingDisabled = true
 		Shared.Message(string.format("Server Ranking Disabled."))
 	end
 end
