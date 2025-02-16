@@ -1,5 +1,17 @@
 # Changelog
 
+## 02-16-25 (Build 145)
+- No core changes, attempt #3 (actually fixed?!) at fixing ranking not working
+
+## 08-30-24 (Build 145)
+- No core changes, attempt #2 at fixing ranking not working
+
+## 08-29-24 (Build 145)
+- No core changes, attempt #1 at fixing ranking not working
+
+## 08-20-23 (Build 145)
+- Fixed missing mapcycle config check which caused the league mapcycle to always be loaded.
+
 ## 08-20-23 (Build 145)
 - Fixed missing mapcycle config check which caused the league mapcycle to always be loaded.
 
