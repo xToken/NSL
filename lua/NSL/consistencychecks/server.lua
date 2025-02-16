@@ -45,6 +45,15 @@ local function ApplyNSLConsistencyConfig()
 		local endTime = Shared.GetSystemTime()
 		Print("NSL - Enhanced Consistency checking took " .. ToString(endTime - startTime) .. " seconds.")
 		
+		if Server.GetConfigSetting then
+			local shouldBeRanked = true
+
+			if Server.GetConfigSetting("hiveranking") then
+				local ok = Server.EnableServerRanking()
+				Print("Requesting server ranking be enabled, request success: %s", ok)
+			end
+		end
+		
 	end
 	
 end
